@@ -10,8 +10,14 @@ import java.awt.event.WindowEvent;
 public class WindowClosingFrameEvent {
     private JFrame currentFrame;
     private JFrame destFrame;
+    private UseGlobal globals;
 
     public WindowClosingFrameEvent() {
+    }
+
+    public WindowClosingFrameEvent(UseGlobal globals) {
+        this.globals = globals;
+
     }
 
     public WindowClosingFrameEvent(JFrame _currentFrame) {
@@ -73,6 +79,58 @@ public class WindowClosingFrameEvent {
             breakDownFrame.dispose();
             System.exit(0);
 
+        }
+
+    }
+
+    public void navigateTo(JFrame _current, JFrame _dest, boolean onEvent) {
+
+        if (onEvent) {
+            _current.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent event) {
+                    if (_current == null || _dest == null) {
+                        System.out.println("Something Went Wrong!");
+                        return;
+
+                    }
+
+                    _current.dispose();
+                    _dest.setVisible(true);
+
+                }
+
+            });
+
+        } else {
+            if (_current == null || _dest == null) {
+                System.out.println("Something Went Wrong!");
+                return;
+
+            }
+
+            _current.dispose();
+            _dest.setVisible(true);
+            _dest.repaint();
+            _dest.revalidate();
+
+        }
+    }
+
+    public void closePage(JFrame _currentFrame) {
+        JFrame frame = new JFrame();
+
+        int result = JOptionPane.showConfirmDialog(
+                frame,
+                "Are you sure! you want to exit my game?",
+                "Exit Game",
+                JOptionPane.YES_NO_OPTION);
+
+        if (result == JOptionPane.YES_OPTION) {
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            changeFrameEvent(_currentFrame);
+        } else {
+            frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         }
 
     }

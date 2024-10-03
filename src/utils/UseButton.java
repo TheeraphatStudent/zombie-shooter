@@ -4,6 +4,9 @@ package utils;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import page.controls.GameContent;
+import page.home.CreateRoom;
+import page.home.Developer;
 import page.home.GameCenter;
 import page.home.Register;
 
@@ -26,20 +29,12 @@ import javax.imageio.ImageIO;
 
 public class UseButton {
     private int fontSize = 16;
-    private Component componentRef;
 
     public UseButton() {
     }
 
     public UseButton(int getFontSize) {
         this.fontSize = getFontSize;
-
-    }
-
-    // Get Component Reference
-    public UseButton(int getFontSize, Component ref) {
-        this.fontSize = getFontSize;
-        this.componentRef = ref;
 
     }
 
@@ -84,7 +79,6 @@ public class UseButton {
 
     //
     public JButton createButtonAndChangePage(
-            String warringText,
             String imagePath,
             String title,
             Color bg,
@@ -114,20 +108,23 @@ public class UseButton {
                 break;
         }
 
-        try (InputStream is = UseButton.class.getClassLoader().getResourceAsStream(imagePath)) {
-            if (is == null) {
-                System.out.println("Image not found");
+        if (!(imagePath.equals("") || imagePath.equals(""))) {
+            try (InputStream is = UseButton.class.getClassLoader().getResourceAsStream(imagePath)) {
+                if (is == null) {
+                    System.out.println("Image not found");
 
-            } else {
-                BufferedImage iconImage = ImageIO.read(is);
-                int buttonWidth = btn.getPreferredSize().width;
-                int buttonHeight = btn.getPreferredSize().height;
-                Image resizedImage = iconImage.getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
-                btn.setIcon(new ImageIcon(resizedImage));
+                } else {
+                    BufferedImage iconImage = ImageIO.read(is);
+                    int buttonWidth = btn.getPreferredSize().width;
+                    int buttonHeight = btn.getPreferredSize().height;
+                    Image resizedImage = iconImage.getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+                    btn.setIcon(new ImageIcon(resizedImage));
 
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
         }
 
         // dest - ปลายทาง
@@ -138,6 +135,35 @@ public class UseButton {
 
                     thispage.dispose();
                     gameCenter.setVisible(true);
+
+                    break;
+
+                case "dev":
+                    Developer developer = new Developer();
+
+                    thispage.dispose();
+                    developer.setVisible(true);
+
+                    break;
+
+                case "content":
+                    GameContent gameContent = new GameContent();
+
+                    thispage.dispose();
+                    gameContent.setVisible(true);
+
+                    break;
+
+                case "create":
+                    CreateRoom create = new CreateRoom();
+
+                    thispage.dispose();
+                    create.setVisible(true);
+
+                    break;
+
+                case "exit":
+                    new WindowClosingFrameEvent().closePage(thispage);
 
                     break;
 
