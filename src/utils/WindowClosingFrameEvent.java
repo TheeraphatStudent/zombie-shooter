@@ -84,36 +84,22 @@ public class WindowClosingFrameEvent {
     }
 
     public void navigateTo(JFrame _current, JFrame _dest, boolean onEvent) {
+        if (_current == null || _dest == null) {
+            System.out.println("Something Went Wrong!");
+            return;
+        }
 
         if (onEvent) {
             _current.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent event) {
-                    if (_current == null || _dest == null) {
-                        System.out.println("Something Went Wrong!");
-                        return;
-
-                    }
-
                     _current.dispose();
                     _dest.setVisible(true);
-
                 }
-
             });
-
         } else {
-            if (_current == null || _dest == null) {
-                System.out.println("Something Went Wrong!");
-                return;
-
-            }
-
-            _current.dispose();
+            _current.setVisible(false);
             _dest.setVisible(true);
-            _dest.repaint();
-            _dest.revalidate();
-
         }
     }
 

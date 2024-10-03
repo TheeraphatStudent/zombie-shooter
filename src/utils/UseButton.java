@@ -74,6 +74,8 @@ public class UseButton {
             e.printStackTrace();
         }
 
+
+
         return btn;
     }
 
@@ -86,7 +88,7 @@ public class UseButton {
             int height,
             String cursorCase,
             JFrame thispage,
-            String destpage) {
+            JFrame destpage) {
         JButton btn = new JButton();
         btn.setFont(new Font("Arial", Font.PLAIN, this.fontSize));
         btn.setText(title);
@@ -129,48 +131,14 @@ public class UseButton {
 
         // dest - ปลายทาง
         btn.addActionListener((e -> {
-            switch (destpage) {
-                case "game":
-                    GameCenter gameCenter = new GameCenter();
+            if (thispage == null || destpage == null) {
+                return;
 
-                    thispage.dispose();
-                    gameCenter.setVisible(true);
-
-                    break;
-
-                case "dev":
-                    Developer developer = new Developer();
-
-                    thispage.dispose();
-                    developer.setVisible(true);
-
-                    break;
-
-                case "content":
-                    GameContent gameContent = new GameContent();
-
-                    thispage.dispose();
-                    gameContent.setVisible(true);
-
-                    break;
-
-                case "create":
-                    CreateRoom create = new CreateRoom();
-
-                    thispage.dispose();
-                    create.setVisible(true);
-
-                    break;
-
-                case "exit":
-                    new WindowClosingFrameEvent().closePage(thispage);
-
-                    break;
-
-                default:
-                    System.out.println("Page not found!");
-                    break;
             }
+
+            thispage.dispose();
+            destpage.setVisible(true);
+
         }));
 
         return btn;
