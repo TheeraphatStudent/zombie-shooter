@@ -3,6 +3,10 @@ package utils;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.BorderFactory;
 
 import java.awt.Font;
@@ -24,6 +28,7 @@ public class UseText {
     public JTextPane createSimpleText(String text, Color textColor, Color bg, int font_style) {
         JTextPane textPane = new JTextPane();
         textPane.setPreferredSize(new Dimension(this.width, this.height));
+        textPane.setBorder(BorderFactory.createEtchedBorder());
 
         textPane.setFont(new Font("Arial", font_style, this.fontSize));
         textPane.setText(text);
@@ -35,6 +40,7 @@ public class UseText {
         if (bg == null) {
             textPane.setBackground(new Color(0, 0, 0, 0));
             textPane.setOpaque(false);
+
         } else {
             textPane.setBackground(bg);
             textPane.setOpaque(true);
@@ -50,6 +56,8 @@ public class UseText {
         textField.setEditable(isEditable);
         textField.setBorder(
                 BorderFactory.createBevelBorder(BevelBorder.RAISED, color.darker(), color.darker().darker()));
+
+        textField.setFocusable(isEditable);
 
         if (color != null) {
             textField.setBackground(color.brighter());
