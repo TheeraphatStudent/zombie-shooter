@@ -8,14 +8,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
+import components.DrawMouse;
 import utils.LoadImage;
 import utils.UseButton;
 import utils.LoadImage.BackgroundPanel;
@@ -30,6 +31,10 @@ public class Register extends JFrame implements KeyListener {
     private JTextField field;
     private String getDisplayName;
 
+    // Ref
+    private DrawMouse drawMouse;
+    private GameCenter gameCenter;
+
     public Register() {
         setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
         setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
@@ -40,6 +45,8 @@ public class Register extends JFrame implements KeyListener {
 
         GridBagConstraints gridConst = new GridBagConstraints();
         JLayeredPane layers = new JLayeredPane();
+
+        // ==================== Background ====================
 
         // Background Image
         String backgroundPath = "resource/images/background/plain.png";
@@ -53,7 +60,8 @@ public class Register extends JFrame implements KeyListener {
 
         backgroundPanel.setLayout(new GridBagLayout());
 
-        // Display name panel
+        // ==================== Action ====================
+
         JPanel displayName = new JPanel();
         displayName.setLayout(new GridBagLayout());
         displayName.setOpaque(false);
@@ -63,11 +71,8 @@ public class Register extends JFrame implements KeyListener {
         gridConst.weighty = 1;
         gridConst.gridheight = 1;
 
-        // ==================== Display Name ====================
-
         JTextPane title = new UseText(28, 400, 50).createSimpleText("Enter display name: ", null, null, Font.BOLD);
         title.setPreferredSize(new Dimension(400, 30));
-
         displayName.add(title, gridConst);
 
         gridConst.gridy = 1;
@@ -76,7 +81,51 @@ public class Register extends JFrame implements KeyListener {
         field.setPreferredSize(new Dimension(400, 50));
         displayName.add(field, gridConst);
 
-        // Add a KeyListener to field to update isValidName
+        gridConst.gridx = 0;
+        gridConst.gridy = 0;
+        gridConst.anchor = GridBagConstraints.CENTER;
+        gridConst.fill = GridBagConstraints.BOTH;
+        gridConst.weightx = 1.0;
+        gridConst.weighty = 0;
+        gridConst.insets = new Insets(0, 0, 50, 0);
+
+        backgroundPanel.add(displayName, gridConst);
+
+        // Start Button
+        JButton start = new UseButton(32).createSimpleButton("Start", Color.WHITE, 400, 100, "hand");
+        start.addActionListener((e -> {
+            System.out.println("Navigate Work!");
+
+            navigateTo();
+        }));
+
+        gridConst.fill = GridBagConstraints.CENTER;
+        gridConst.gridy = 1;
+        backgroundPanel.add(start, gridConst);
+
+        // ==================== Layer ====================
+
+        backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
+        layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+
+        drawMouse = new DrawMouse();
+        drawMouse.setBounds(0, 0, this.getWidth(), this.getHeight());
+        layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
+
+        setContentPane(layers);
+        layers.revalidate();
+        layers.repaint();
+
+        // ==================== Event ====================
+
+        new WindowClosingFrameEvent(this);
+
+        addKeyListener(this);
+        setFocusable(true);
+        requestFocusInWindow();
+
+        // # Key Input Event
+
         field.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -96,48 +145,6 @@ public class Register extends JFrame implements KeyListener {
             }
         });
 
-        gridConst.gridx = 0;
-        gridConst.gridy = 0;
-        gridConst.anchor = GridBagConstraints.CENTER;
-        gridConst.fill = GridBagConstraints.BOTH;
-        gridConst.weightx = 1.0;
-        gridConst.weighty = 0;
-        gridConst.insets = new Insets(0, 0, 50, 0);
-
-        backgroundPanel.add(displayName, gridConst);
-
-        // ==================== Start Button ====================
-
-        JButton start = new UseButton(32).createSimpleButton(
-                "Start",
-                Color.WHITE,
-                400,
-                100,
-                "hand");
-
-        start.addActionListener((e -> {
-            navigateTo();
-        }));
-
-        gridConst.fill = GridBagConstraints.CENTER;
-        gridConst.gridy = 1;
-        backgroundPanel.add(start, gridConst);
-
-        // Added Content On Layer
-        
-        backgroundPanel.setBounds(0, 0, UseGlobal.getWidth(), UseGlobal.getHeight());
-        layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
-
-        // Parent Content
-        setContentPane(layers);
-        layers.revalidate();
-        layers.repaint();
-
-        new WindowClosingFrameEvent(this);
-
-        addKeyListener(this);
-        setFocusable(true);
-        requestFocusInWindow();
     }
 
     @Override
@@ -156,17 +163,14 @@ public class Register extends JFrame implements KeyListener {
         isValidName = !getDisplayName.isEmpty();
 
         if (isValidName) {
-            GameCenter gameCenter = new GameCenter();
-
-            gameCenter.setDisplayName(getDisplayName);
+            gameCenter = new GameCenter(getDisplayName, "192.168.0.0");
             UseGlobal.setName(getDisplayName);
-            // UseGlobal.printState();
+
+            System.out.println(gameCenter);
 
             new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
-
         } else {
             new useAlert().warringAlert("Please enter display name!");
-
         }
     }
 

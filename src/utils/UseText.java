@@ -3,10 +3,6 @@ package utils;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.BorderFactory;
 
 import java.awt.Font;
@@ -17,6 +13,11 @@ public class UseText {
     private int fontSize = 16;
     private int width = 0;
     private int height = 0;
+    private UseGlobal global;
+
+    public UseText() {
+
+    }
 
     public UseText(int _fontSize, int _width, int _height) {
         this.fontSize = _fontSize;

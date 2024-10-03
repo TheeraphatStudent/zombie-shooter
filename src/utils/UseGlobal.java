@@ -1,13 +1,12 @@
 package utils;
 
 public class UseGlobal {
-    private static int width;
-    private static int height;
-    private static int minWidth;
-    private static String name;
-    private static String ip;
+    public static int width;
+    public static int height;
+    public static int minWidth;
+    public static String name;
+    public static String ip;
 
-    // Add a flag to prevent reinitialization
     private static boolean isInitialized = false;
 
     public UseGlobal() {
@@ -25,9 +24,18 @@ public class UseGlobal {
         }
     }
 
+    public UseGlobal(int width, int height, int min, String name, String ip) {
+        initialize();
+
+        UseGlobal.width = width;
+        UseGlobal.height = height;
+        UseGlobal.minWidth = min;
+        UseGlobal.name = name;
+        UseGlobal.ip = ip;
+    }
+
     private static void initialize() {
         if (!isInitialized) {
-            // Set default values
             width = 0;
             height = 0;
             minWidth = 0;
@@ -70,6 +78,10 @@ public class UseGlobal {
         return name;
     }
 
+    public static String getIp() {
+        return ip;
+    }
+
     public static void printState() {
         System.out.println("Current state:");
         System.out.println("Name: " + name);
@@ -77,5 +89,10 @@ public class UseGlobal {
         System.out.println("Height: " + height);
         System.out.println("MinWidth: " + minWidth);
         System.out.println("IP: " + ip);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
