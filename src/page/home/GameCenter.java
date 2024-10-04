@@ -1,6 +1,7 @@
 package page.home;
 
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import components.DrawMouse;
+import java.awt.Image;
 import page.controls.GameContent;
 import utils.LoadImage;
 import utils.LoadImage.BackgroundPanel;
@@ -58,6 +60,8 @@ public class GameCenter extends JFrame {
                 setTitle("Zombie Shooter - Welcome");
                 setLocationRelativeTo(null);
 
+                setIconImage(new LoadImage().getImage("resource/images/icon/main.png"));
+
                 JLayeredPane layers = new JLayeredPane();
 
                 String backgroundPath = "resource/images/background/plain.png";
@@ -95,21 +99,42 @@ public class GameCenter extends JFrame {
 
                 // ==================== Actions ====================
                 // ##### Game Title #####
-                JButton gameTItle = new UseButton(32).createSimpleButton(
-                                "Zombie Runner",
-                                Color.WHITE,
-                                400,
-                                100,
-                                "default");
+                // JButton gameTItle = new UseButton(32).createSimpleButton(
+                // "Zombie Runner",
+                // Color.WHITE,
+                // 400,
+                // 100,
+                // "default");
 
-                gameTItle.setEnabled(false);
+                // gameTItle.setEnabled(false);
+
+                JPanel gameIcon = new JPanel() {
+                        @Override
+                        public void paintComponent(Graphics g) {
+                                super.paintComponent(g);
+                                Image img = new LoadImage().getImage("resource/images/icon/main.png");
+
+                                if (img != null) {
+                                        g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
+                                }
+                        }
+
+                        @Override
+                        public Dimension getPreferredSize() {
+                                return new Dimension(100, 250);
+                        }
+                };
+
+                gameIcon.setPreferredSize(new Dimension(100, 250));
+                gameIcon.setOpaque(false);
 
                 gridConst.gridx = 0;
                 gridConst.gridy = 1;
                 gridConst.fill = GridBagConstraints.HORIZONTAL;
                 gridConst.weighty = 0;
                 gridConst.insets = new Insets(0, 0, 100, 0);
-                backgroundPanel.add(gameTItle, gridConst);
+
+                backgroundPanel.add(gameIcon, gridConst);
 
                 JButton singlePlay = new UseButton(32).createButtonAndChangePage(
                                 "",

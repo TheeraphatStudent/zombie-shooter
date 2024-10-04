@@ -66,4 +66,11 @@ public class UseText {
         }
         return textField;
     }
+
+    public String truncateText(String ref) {
+        return ref.length() > 15
+                ? ref.substring(0, 13) + "..."
+                : ref;
+
+    }
 }
