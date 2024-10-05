@@ -68,8 +68,11 @@ public class UseText {
     }
 
     public String truncateText(String ref) {
-        return ref.length() > 15
-                ? ref.substring(0, 13) + "..."
+
+        int length = 8;
+
+        return ref.length() >= length
+                ? ref.substring(0, length - 3) + "..."
                 : ref;
 
     }

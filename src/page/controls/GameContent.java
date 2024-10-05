@@ -4,6 +4,9 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
@@ -13,14 +16,21 @@ import javax.swing.JPanel;
 
 import components.CreateCharacter;
 import components.DrawMouse;
+
 import page.home.GameCenter;
+
 import utils.LoadImage;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
 import utils.WindowClosingFrameEvent;
 
 interface GameContentProps {
-    int MOVEMENT_SPEED = 5;
+    int MOVEMENT_SPEED = 10;
+
+    void mouseEvent(DrawMouse mouse);
+
+    // Character control movement
+    // boolean getCharacterMovement();
 
 }
 
@@ -29,11 +39,14 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
     private CreateCharacter character;
+
+    // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
     private Timer movementTimer;
 
     public GameContent(GameCenter gameCenter) {
         this.gameCenter = gameCenter;
+
         createFrame();
         initializeMovement();
         addKeyListener(this);
@@ -107,11 +120,16 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Character ====================
 
-        character = new CreateCharacter(this.gameCenter);
+        character = new CreateCharacter(this.gameCenter, this, false);
 
         // # Set Character To Center
-        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, 200, 200);
+        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, 100, 200);
         content.add(character);
+
+        // # Add Zombie
+        CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
+        zombie.setBounds(100, 100, 100, 200);
+        content.add(zombie);
 
         // ==================== Layer ====================
 
@@ -126,6 +144,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         drawMouse.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
 
+        this.mouseEvent(drawMouse);
+
         setContentPane(layers);
         layers.revalidate();
         layers.repaint();
@@ -134,20 +154,35 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
+    // ----*----*----*---- Dispose Content ----*----*----*----
+
+    @Override
+    public void dispose() {
+        movementTimer.stop();
+        super.dispose();
+    }
+
+    // ----*----*----*---- Player Control - Key Input ----*----*----*----
+
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
                 isUpPressed = true;
+
                 break;
             case KeyEvent.VK_S:
                 isDownPressed = true;
+
                 break;
             case KeyEvent.VK_A:
                 isLeftPressed = true;
+                character.setCharacterMoveLeft(isLeftPressed);
+
                 break;
             case KeyEvent.VK_D:
                 isRightPressed = true;
+
                 break;
         }
     }
@@ -157,15 +192,20 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
                 isUpPressed = false;
+
                 break;
             case KeyEvent.VK_S:
                 isDownPressed = false;
+
                 break;
             case KeyEvent.VK_A:
                 isLeftPressed = false;
+                character.setCharacterMoveLeft(isLeftPressed);
+
                 break;
             case KeyEvent.VK_D:
                 isRightPressed = false;
+
                 break;
         }
     }
@@ -174,9 +214,79 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     public void keyTyped(KeyEvent e) {
     }
 
-    @Override
-    public void dispose() {
-        movementTimer.stop();
-        super.dispose();
+    // ! ----*----*----*---- Zombie Control ----*----*----*----
+
+    // ----*----*----*---- Mouse ----*----*----*----
+    public void mouseEvent(DrawMouse mouse) {
+
+        /*
+         * ==========================================
+         * Mouse Moved
+         * ==========================================
+         */
+
+        mouse.addMouseMotionListener(new MouseMotionListener() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                System.out.println("============================");
+                System.out.println("Is Moved");
+
+                System.out.println(e.getX());
+                System.out.println(e.getY());
+
+                System.out.println("============================");
+
+            }
+
+        });
+
+        /*
+         * ==========================================
+         * Mouse Clicked
+         * ==========================================
+         */
+
+        mouse.addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("+++++++++++++++++++++++++++++");
+                System.out.println("Is Clicked");
+
+                System.out.println(e.getX());
+                System.out.println(e.getY());
+
+                System.out.println("+++++++++++++++++++++++++++++");
+
+            };
+
+            public void mousePressed(MouseEvent e) {
+                System.out.println("+++++++++++++++++++++++++++++");
+                System.out.println("Is Pressed");
+
+                System.out.println(e.getX());
+                System.out.println(e.getY());
+
+                System.out.println("+++++++++++++++++++++++++++++");
+
+            };
+
+            public void mouseReleased(MouseEvent e) {
+
+            };
+
+            public void mouseEntered(MouseEvent e) {
+
+            };
+
+            public void mouseExited(MouseEvent e) {
+
+            };
+
+        });
+
     }
 }
