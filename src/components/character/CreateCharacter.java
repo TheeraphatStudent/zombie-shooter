@@ -85,7 +85,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // Models
 
-    // [[[[[[[[[[ Player ]]]]]]]]]]
+    // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
@@ -165,7 +165,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     }
 
-    // :::::::::: Zombie ::::::::::
+    // :::::::::::::::::::: Zombie ::::::::::::::::::::
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
@@ -205,6 +205,20 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     public void setCharacterHp(int hp) {
         hpBar.setHp(hp);
+
+    }
+
+    // :|:|:|:|:|:|:|:|:|:|:|:|:|: Pain Component :|:|:|:|:|:|:|:|:|:|:|:|:|:
+
+    @Override
+    protected void paintComponent(Graphics g) {
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        g2d.setColor(Color.green);
+        g2d.drawRect(0, 0, getWidth(), getHeight());
+
+        super.paintComponent(g2d);
     }
 
     // ::::::::::::::::: Draw Weapon :::::::::::::::::::
@@ -221,10 +235,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         Image weapon = new LoadImage().getImage(getGun);
 
         // ตำแหน่งในการหมุนปืน
-        int weaponPivotX = character.getX() + 40;
-        int weaponPivotY = character.getY() + 70;
+        int weaponSpinX = character.getX() + 40;
+        int weaponSpinY = character.getY() + 70;
 
-        g2d.translate(weaponPivotX, weaponPivotY);
+        g2d.translate(weaponSpinX, weaponSpinY);
         g2d.rotate(weaponAngle);
 
         g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
@@ -249,11 +263,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         Point componentPos = SwingUtilities.convertPoint(
                 getParent(), mousePos, this);
 
-        int weaponPivotX = character.getX() + 40;
-        int weaponPivotY = character.getY() + 70;
+        int weaponSpinX = character.getX() + 40;
+        int weaponSpinY = character.getY() + 70;
 
-        double deltaX = componentPos.x - weaponPivotX;
-        double deltaY = componentPos.y - weaponPivotY;
+        double deltaX = componentPos.x - weaponSpinX;
+        double deltaY = componentPos.y - weaponSpinY;
 
         weaponAngle = Math.atan2(deltaY, deltaX);
         System.out.println("Weapon Angle: " + weaponAngle);
@@ -267,9 +281,19 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     public void onShootBullet(Point mousePos) {
-        System.out.println("On Shoot");
-        System.out.println(mousePos.getLocation());
+        if (!isSurvive) {
+            return;
 
+        }
+
+        System.out.println("On Shoot Bullet!");
+
+        // ตำแหน่งปืน
+        int weaponSpinX = getX() + 25;
+        int weaponSpinY = getY() + 100;
+
+        // เพิ่มจำนวนกระสุนที่ยิงออกไป
+        gameContent.addBullet(new Bullet(weaponSpinX, weaponSpinY, weaponAngle));
     }
 
     // ::::::::::::::::: Start Drawing Thread :::::::::::::::::::
