@@ -1,4 +1,4 @@
-package components;
+package components.character;
 
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,19 +19,23 @@ import java.awt.Graphics2D;
 
 import page.controls.GameContent;
 import page.home.GameCenter;
+
 import utils.LoadImage;
 import utils.UseText;
 
-interface CreateCharacterProps {
-
+interface ManageCharacterElement {
+    // Character
     final int CHARACTER_WIDTH = 250;
-    final int CHARACTER_HEIGHT = 200;
+    final int CHARACTER_HEIGHT = 250;
 
     // Weapon
     final int WEAPON_WIDTH = 160;
     final int WEAPON_HEIGHT = 155;
     final double WEAPON_SCALE = 0.5;
 
+}
+
+interface CreateCharacterProps {
     // Method
     void setCharacterMoveLeft(boolean isMoveLeft);
 
@@ -38,14 +43,18 @@ interface CreateCharacterProps {
 
     void setCharacterInfected(boolean isInfected);
 
+    void updateWeaponAngle(Point mousePos);
+
+    void onShootBullet(Point mousePos);
+
 }
 
-public class CreateCharacter extends JPanel implements CreateCharacterProps, Runnable {
+public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement, Runnable {
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
 
-    private JPanel character;
+    private CreateCharacterImage character;
     private JPanel weapon;
 
     // ON State
@@ -97,13 +106,18 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
         displayText += " - rank 0";
 
         JTextPane playerName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
-                displayText, Color.WHITE, null, Font.PLAIN);
+                displayText,
+                Color.WHITE,
+                null,
+                Font.PLAIN);
         playerName.setBounds(0, 0, CHARACTER_WIDTH, 40);
         base.add(playerName);
 
         // >>>>>>>>>> Character 🗣️
-        character = createCharacterImage();
-        character.setBounds(0, 25, 80, 140);
+        character = new CreateCharacterImage(useCharacter, !isInfected, this.isMoveLeft);
+
+        // ! Character set content size
+        character.setBounds(0, 25, (int) (CHARACTER_WIDTH / 4), (int) (CHARACTER_HEIGHT / 2));
         character.setOpaque(false);
         base.add(character);
 
@@ -119,20 +133,26 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                drawWeapon(g);
+
+                Graphics2D g2d = (Graphics2D) g;
+                AffineTransform oldTransform = g2d.getTransform();
+
+                // Draw weapon
+                drawWeapon(g2d, oldTransform);
 
             }
         };
+
         weapon.setOpaque(false);
         weapon.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
-        // Add to layered panes
         compressContent.add(base, JLayeredPane.DEFAULT_LAYER);
         compressContent.add(weapon, JLayeredPane.DRAG_LAYER);
 
         add(compressContent);
 
-        // Start drawing thread
+        // :::::::::: Thread ::::::::::
+
         drawingThread = new Thread(this);
         drawingThread.start();
     }
@@ -158,7 +178,9 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
 
         add(zombieName);
 
-        character = createCharacterImage();
+        character = new CreateCharacterImage(useCharacter, false, this.isMoveLeft);
+
+        // ! Character set content size
         character.setBounds(0, 25, 80, 140);
         character.setOpaque(false);
         add(character);
@@ -176,59 +198,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
         hpBar.setHp(hp);
     }
 
-    // ** Create Character **
-
-    private JPanel createCharacterImage() {
-        return new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                g.setColor(Color.RED);
-                g.drawRect(0, 0, getWidth(), getHeight());
-
-                String getImagePath = "resource/images/character/survive/h%d.png";
-
-                if (!isSurvive) {
-                    getImagePath = "resource/images/character/zombie/z%d.png";
-                }
-
-                // ========== Character Props ==========
-
-                Image character = new LoadImage()
-                        .getImage(String.format(getImagePath, useCharacter));
-
-                Graphics2D g2d = (Graphics2D) g;
-
-                if (!isMoveLeft) {
-                    g2d.drawImage(character, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    AffineTransform old = g2d.getTransform();
-
-                    g2d.translate(getWidth(), 0);
-                    g2d.scale(-1, 1);
-
-                    g2d.drawImage(character, 0, 0, getWidth(), getHeight(), this);
-
-                    g2d.setTransform(old);
-                }
-            }
-
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(80, 140);
-            }
-        };
-    }
-
     // ::::::::::::::::: Draw Weapon :::::::::::::::::::
 
-    private void drawWeapon(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    private void drawWeapon(Graphics2D g2d, AffineTransform originTransform) {
 
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setColor(Color.RED);
-        g2d.drawRect(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        // g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        // RenderingHints.VALUE_ANTIALIAS_ON);
 
         if (!isSurvive)
             return;
@@ -236,10 +211,9 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
         String getGun = "resource/images/character/weapon/Gun.png";
         Image weapon = new LoadImage().getImage(getGun);
 
-        AffineTransform oldTransform = g2d.getTransform();
-
-        int weaponPivotX = character.getX() + 40; // center of character
-        int weaponPivotY = character.getY() + 70; // adjusted to be higher up
+        // ตำแหน่งในการหมุนปืน
+        int weaponPivotX = character.getX() + 40;
+        int weaponPivotY = character.getY() + 70;
 
         g2d.translate(weaponPivotX, weaponPivotY);
         g2d.rotate(weaponAngle);
@@ -255,10 +229,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
                 WEAPON_HEIGHT,
                 this);
 
-        g2d.setTransform(oldTransform);
+        g2d.setTransform(originTransform);
     }
 
-    // ::::::::::::::::: Update Weapon Angle :::::::::::::::::::
+    // ::::::::::::::::: Update Weapon :::::::::::::::::::
 
     public void updateWeaponAngle(Point mousePos) {
         this.mousePosition = mousePos;
@@ -273,10 +247,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
         double deltaY = componentPos.y - weaponPivotY;
 
         weaponAngle = Math.atan2(deltaY, deltaX);
+        System.out.println("Weapon Angle: " + weaponAngle);
 
-        if (isMoveLeft) {
-            weaponAngle = Math.PI - weaponAngle;
-        }
+        // if (isMoveLeft) {
+        // weaponAngle = Math.PI - weaponAngle;
+
+        // }
 
         weapon.repaint();
     }
@@ -320,6 +296,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
 
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
+        this.character.setCharacterMoveLeft(isMoveLeft);
+
         revalidateComponent();
     }
 
@@ -332,36 +310,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Run
         this.isInfected = isInfected;
         revalidateComponent();
     }
-}
-
-class CreateHpBar extends JPanel {
-
-    private int hp;
-    private Color colorBar = Color.GREEN;
-
-    public CreateHpBar(int hp, Color colorBar) {
-        this.hp = hp;
-        this.colorBar = colorBar;
-
-        setPreferredSize(new Dimension(100, 20));
-    }
-
-    public void setHp(int hp) {
-        this.hp = hp;
-        repaint();
-    }
 
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, getWidth(), getHeight());
-
-        g.setColor(colorBar);
-        g.fillRect(0, 0, (int) (getWidth() * (hp / 100.0)), getHeight());
-
-        g.setColor(Color.BLACK);
-        g.drawString(hp + " HP", getWidth() / 2 - 15, getHeight() / 2 + 5);
+    public void onShootBullet(Point mousePos) {
     }
 }

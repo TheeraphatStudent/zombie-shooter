@@ -7,16 +7,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
-import components.CreateCharacter;
 import components.DrawMouse;
-
+import components.character.CreateCharacter;
 import page.home.GameCenter;
 
 import utils.LoadImage;
@@ -159,6 +157,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     @Override
     public void dispose() {
         movementTimer.stop();
+
         super.dispose();
     }
 
@@ -215,6 +214,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     }
 
     // ! ----*----*----*---- Zombie Control ----*----*----*----
+
+    
 
     // ----*----*----*---- Mouse ----*----*----*----
     public void mouseEvent(DrawMouse mouse) {

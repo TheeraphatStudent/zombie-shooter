@@ -34,7 +34,7 @@ public class GameCenter extends JFrame {
         private DrawMouse drawMouse;
         private Developer developerPage;
         private CreateRoom createRoomPage;
-        private GameContent gameContentPage;
+        // private GameContent gameContentPage;
 
         public GameCenter() {
                 createFrame();
@@ -47,7 +47,7 @@ public class GameCenter extends JFrame {
 
                 developerPage = new Developer(this);
                 createRoomPage = new CreateRoom(this);
-                gameContentPage = new GameContent(this);
+                // gameContentPage = new GameContent(this);
 
                 createFrame();
         }
@@ -144,7 +144,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                gameContentPage);
+                                new GameContent(this));
 
                 gridConst.gridy = 2;
                 gridConst.insets = new Insets(0, 0, 15, 0);
