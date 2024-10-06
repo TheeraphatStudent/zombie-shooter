@@ -3,6 +3,7 @@ package components;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -21,6 +22,16 @@ import utils.LoadImage;
 import utils.UseText;
 
 interface CreateCharacterProps {
+
+    final int CHARACTER_WIDTH = 250;
+    final int CHARACTER_HEIGHT = 200;
+
+    // Weapon
+    final int WEAPON_WIDTH = 160;
+    final int WEAPON_HEIGHT = 155;
+    final double WEAPON_SCALE = 0.5;
+
+    // Method
     void setCharacterMoveLeft(boolean isMoveLeft);
 
     void setCharacterAlive(boolean isAlive);
@@ -29,7 +40,15 @@ interface CreateCharacterProps {
 
 }
 
-public class CreateCharacter extends JPanel implements CreateCharacterProps {
+public class CreateCharacter extends JPanel implements CreateCharacterProps, Runnable {
+    // ON Character
+    private JLayeredPane base;
+    private JLayeredPane compressContent;
+
+    private JPanel character;
+    private JPanel weapon;
+
+    // ON State
     private boolean isDead = false;
     private boolean isInfected = false;
     private int x, y;
@@ -47,46 +66,75 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
     private GameContent gameContent;
     private CreateHpBar hpBar;
 
+    private Thread drawingThread;
+    private volatile boolean running = true;
+
     // [[[[[[[[[[ Player ]]]]]]]]]]
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
-        this.isSurvive = !isInfected;
-        this.isInfected = isInfected;
 
         setLayout(null);
         setOpaque(false);
-        setPreferredSize(new Dimension(200, 200));
+        setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         this.useCharacter = (int) (Math.random() * 10) + 1;
 
+        // [document/images/enemy.png]
+
+        // >>>>>>>>>> Create 📃
+        base = new JLayeredPane();
+        compressContent = new JLayeredPane();
+
+        base.setOpaque(false);
+        base.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        compressContent.setOpaque(false);
+        compressContent.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+        // >>>>>>>>>> Player name 👋
         String displayName = gameCenter.getDisplayName();
         String displayText = new UseText().truncateText(displayName);
         displayText += " - rank 0";
 
-        JTextPane playerName = new UseText(14, 200, 40).createSimpleText(
+        JTextPane playerName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
                 displayText, Color.WHITE, null, Font.PLAIN);
-        playerName.setBounds(0, 0, 200, 40);
+        playerName.setBounds(0, 0, CHARACTER_WIDTH, 40);
+        base.add(playerName);
 
-        add(playerName);
-
-        // Character panel
-        JPanel character = createCharacterImage();
+        // >>>>>>>>>> Character 🗣️
+        character = createCharacterImage();
         character.setBounds(0, 25, 80, 140);
         character.setOpaque(false);
-        add(character);
+        base.add(character);
 
-        Color hpColor = Color.GREEN;
+        // >>>>>>>>>> Health bar ❤️‍🩹
+        Color onSurvive = !isInfected ? Color.GREEN : Color.ORANGE;
 
-        if (isInfected) {
-            hpColor = Color.ORANGE;
-
-        }
-
-        // Health bar
-        hpBar = new CreateHpBar(hp, hpColor);
+        hpBar = new CreateHpBar(hp, onSurvive);
         hpBar.setBounds(0, 175, 100, 20);
-        add(hpBar);
+        base.add(hpBar);
+
+        // >>>>>>>>>> Weapon 🗡️
+        weapon = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                drawWeapon(g);
+
+            }
+        };
+        weapon.setOpaque(false);
+        weapon.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+        // Add to layered panes
+        compressContent.add(base, JLayeredPane.DEFAULT_LAYER);
+        compressContent.add(weapon, JLayeredPane.DRAG_LAYER);
+
+        add(compressContent);
+
+        // Start drawing thread
+        drawingThread = new Thread(this);
+        drawingThread.start();
     }
 
     // :::::::::: Zombie ::::::::::
@@ -100,17 +148,17 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
 
         setLayout(null);
         setOpaque(false);
-        setPreferredSize(new Dimension(200, 200));
+        setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         this.useCharacter = (int) (Math.random() * 10) + 1;
 
-        JTextPane zombieName = new UseText(14, 200, 40).createSimpleText(
+        JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
                 "", Color.WHITE, null, Font.PLAIN);
-        zombieName.setBounds(0, 0, 200, 40);
+        zombieName.setBounds(0, 0, CHARACTER_WIDTH, 40);
 
         add(zombieName);
 
-        JPanel character = createCharacterImage();
+        character = createCharacterImage();
         character.setBounds(0, 25, 80, 140);
         character.setOpaque(false);
         add(character);
@@ -118,14 +166,19 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
         hpBar = new CreateHpBar(hp, Color.RED);
         hpBar.setBounds(0, 175, 100, 20);
         add(hpBar);
+
+        // Start drawing thread
+        drawingThread = new Thread(this);
+        drawingThread.start();
     }
 
     public void setCharacterHp(int hp) {
         hpBar.setHp(hp);
     }
 
-    private JPanel createCharacterImage() {
+    // ** Create Character **
 
+    private JPanel createCharacterImage() {
         return new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -138,7 +191,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
 
                 if (!isSurvive) {
                     getImagePath = "resource/images/character/zombie/z%d.png";
-
                 }
 
                 // ========== Character Props ==========
@@ -150,7 +202,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
 
                 if (!isMoveLeft) {
                     g2d.drawImage(character, 0, 0, getWidth(), getHeight(), this);
-
                 } else {
                     AffineTransform old = g2d.getTransform();
 
@@ -160,7 +211,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
                     g2d.drawImage(character, 0, 0, getWidth(), getHeight(), this);
 
                     g2d.setTransform(old);
-
                 }
             }
 
@@ -171,45 +221,56 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
         };
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    // ::::::::::::::::: Draw Weapon :::::::::::::::::::
 
+    private void drawWeapon(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2d.drawRect(0, 0, getWidth(), getHeight());
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.RED);
+        g2d.drawRect(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+        if (!isSurvive)
+            return;
 
         String getGun = "resource/images/character/weapon/Gun.png";
-        if (!isSurvive) {
-            getGun = "";
-        }
         Image weapon = new LoadImage().getImage(getGun);
 
         AffineTransform oldTransform = g2d.getTransform();
 
-        int characterCenterX = 40; // width is 80
-        int characterCenterY = 95; // height (140/2 + 25)
+        int weaponPivotX = character.getX() + 40; // center of character
+        int weaponPivotY = character.getY() + 70; // adjusted to be higher up
 
-        g2d.translate(characterCenterX, characterCenterY);
+        g2d.translate(weaponPivotX, weaponPivotY);
         g2d.rotate(weaponAngle);
 
-        // Weapon
-        int weaponWidth = 50;
-        int weaponHeight = 20;
-        g2d.drawImage(weapon, 0, 0, weaponWidth, weaponHeight, this);
+        g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
+
+        int scaledHeight = (int) (WEAPON_HEIGHT * WEAPON_SCALE);
+
+        g2d.drawImage(weapon,
+                -20,
+                -scaledHeight / 2,
+                WEAPON_WIDTH,
+                WEAPON_HEIGHT,
+                this);
 
         g2d.setTransform(oldTransform);
     }
 
+    // ::::::::::::::::: Update Weapon Angle :::::::::::::::::::
+
     public void updateWeaponAngle(Point mousePos) {
         this.mousePosition = mousePos;
 
-        int characterCenterX = getX() + 40;
-        int characterCenterY = getY() + 95;
+        Point componentPos = SwingUtilities.convertPoint(
+                getParent(), mousePos, this);
 
-        double deltaX = mousePos.x - characterCenterX;
-        double deltaY = mousePos.y - characterCenterY;
+        int weaponPivotX = character.getX() + 40;
+        int weaponPivotY = character.getY() + 70;
+
+        double deltaX = componentPos.x - weaponPivotX;
+        double deltaY = componentPos.y - weaponPivotY;
 
         weaponAngle = Math.atan2(deltaY, deltaX);
 
@@ -217,37 +278,59 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
             weaponAngle = Math.PI - weaponAngle;
         }
 
-        repaint();
+        weapon.repaint();
     }
 
-    // :*:*:*:*:*:*:*:*:*: Character Getter :*:*:*:*:*:*:*:*:*:
+    // ::::::::::::::::: Start Drawing Thread :::::::::::::::::::
 
-    // :v:v:v:v:v:v:v:v:v: Character Setter :v:v:v:v:v:v:v:v:v:
-    public void setCharacterMoveLeft(boolean isMoveLeft) {
-        this.isMoveLeft = !isMoveLeft;
+    @Override
+    public void run() {
+        while (running) {
+            try {
+                revalidateComponent();
+                Thread.sleep(64);
 
-        // อย่าลืม Repain
-        revalidateComponent();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+
+                break;
+            }
+        }
     }
 
-    public void setCharacterAlive(boolean isAlive) {
-        this.isSurvive = isAlive;
-
-        revalidateComponent();
-
+    public void stop() {
+        running = false;
+        drawingThread.interrupt();
     }
 
-    public void setCharacterInfected(boolean isInfected) {
-        this.isInfected = isInfected;
-
-        revalidateComponent();
-
-    }
+    // ::::::::::::::::: Revalidate Component :::::::::::::::::::
 
     public void revalidateComponent() {
         repaint();
         revalidate();
 
+        weapon.repaint();
+        weapon.revalidate();
+
+        character.repaint();
+        character.revalidate();
+    }
+
+    // ::::::::::::::::: Control :::::::::::::::::::
+
+    public void setCharacterMoveLeft(boolean isMoveLeft) {
+        this.isMoveLeft = isMoveLeft;
+        revalidateComponent();
+    }
+
+    public void setCharacterAlive(boolean isAlive) {
+        this.isSurvive = isAlive;
+        revalidateComponent();
+    }
+
+    public void setCharacterInfected(boolean isInfected) {
+        this.isInfected = isInfected;
+        revalidateComponent();
     }
 }
 

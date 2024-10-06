@@ -120,7 +120,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Character ====================
 
-        character = new CreateCharacter(this.gameCenter, this, true);
+        character = new CreateCharacter(this.gameCenter, this, false);
 
         // # Set Character To Center
         character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, 100, 200);
@@ -229,6 +229,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
             @Override
             public void mouseDragged(MouseEvent e) {
+                character.updateWeaponAngle(e.getPoint());
+
             }
 
             @Override
@@ -275,6 +277,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 // System.out.println("+++++++++++++++++++++++++++++");
 
                 System.out.println("On Shoot");
+                character.updateWeaponAngle(e.getPoint());
 
             };
 
