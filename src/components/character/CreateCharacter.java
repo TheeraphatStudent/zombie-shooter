@@ -91,7 +91,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         // [document/images/enemy.png]
 
-        // >>>>>>>>>> Create 📃
+        // >>>>>>>>>> 📃 Create
         base = new JLayeredPane();
         compressContent = new JLayeredPane();
 
@@ -117,7 +117,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         character = new CreateCharacterImage(useCharacter, !isInfected, this.isMoveLeft);
 
         // ! Character set content size
-        character.setBounds(0, 25, (int) (CHARACTER_WIDTH / 4), (int) (CHARACTER_HEIGHT / 2));
+        character.setBounds(0, 25, 80, 140);
         character.setOpaque(false);
         base.add(character);
 
@@ -237,8 +237,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     public void updateWeaponAngle(Point mousePos) {
         this.mousePosition = mousePos;
 
-        Point componentPos = SwingUtilities.convertPoint(
-                getParent(), mousePos, this);
+        Point componentPos = SwingUtilities.convertPoint(getParent(), mousePos, this);
 
         int weaponPivotX = character.getX() + 40;
         int weaponPivotY = character.getY() + 70;

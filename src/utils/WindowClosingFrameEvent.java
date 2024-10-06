@@ -40,6 +40,8 @@ public class WindowClosingFrameEvent {
                 }
             }
         });
+
+        _currentFrame.revalidate();
     }
 
     public WindowClosingFrameEvent(JFrame _currentFrame, JFrame _destFrame) {
