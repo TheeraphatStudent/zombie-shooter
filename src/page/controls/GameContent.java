@@ -54,6 +54,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     }
 
     private void initializeMovement() {
+        System.out.println("Initialize Movement Work!");
+
         movementTimer = new Timer(16, (e -> {
             updateCharacterPosition();
 
