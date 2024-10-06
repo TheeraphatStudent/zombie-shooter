@@ -51,6 +51,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
+        this.isSurvive = !isInfected;
+        this.isInfected = isInfected;
 
         setLayout(null);
         setOpaque(false);
@@ -74,15 +76,15 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
         character.setOpaque(false);
         add(character);
 
-        Color onSurvive = Color.GREEN;
+        Color hpColor = Color.GREEN;
 
-        if (!isInfected) {
-            onSurvive = Color.ORANGE;
+        if (isInfected) {
+            hpColor = Color.ORANGE;
 
         }
 
         // Health bar
-        hpBar = new CreateHpBar(hp, onSurvive);
+        hpBar = new CreateHpBar(hp, hpColor);
         hpBar.setBounds(0, 175, 100, 20);
         add(hpBar);
     }
@@ -91,6 +93,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
+
+        // Zombie State -> false, false
+        this.isSurvive = false;
+        this.isInfected = false;
 
         setLayout(null);
         setOpaque(false);
@@ -130,7 +136,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
 
                 String getImagePath = "resource/images/character/survive/h%d.png";
 
-                if (!isSurvive || isInfected) {
+                if (!isSurvive) {
                     getImagePath = "resource/images/character/zombie/z%d.png";
 
                 }
@@ -189,8 +195,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
         g2d.rotate(weaponAngle);
 
         // Weapon
-        int weaponWidth = 50; 
-        int weaponHeight = 20; 
+        int weaponWidth = 50;
+        int weaponHeight = 20;
         g2d.drawImage(weapon, 0, 0, weaponWidth, weaponHeight, this);
 
         g2d.setTransform(oldTransform);
@@ -198,7 +204,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
 
     public void updateWeaponAngle(Point mousePos) {
         this.mousePosition = mousePos;
-
 
         int characterCenterX = getX() + 40;
         int characterCenterY = getY() + 95;
@@ -219,7 +224,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps {
 
     // :v:v:v:v:v:v:v:v:v: Character Setter :v:v:v:v:v:v:v:v:v:
     public void setCharacterMoveLeft(boolean isMoveLeft) {
-        this.isMoveLeft = isMoveLeft;
+        this.isMoveLeft = !isMoveLeft;
 
         // อย่าลืม Repain
         revalidateComponent();
