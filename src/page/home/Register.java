@@ -43,6 +43,8 @@ public class Register extends JFrame implements KeyListener {
         setTitle("Zombie Shooter - Register");
         setLocationRelativeTo(null);
 
+        setIconImage(new LoadImage().getImage("resource/images/icon/main.png"));
+
         GridBagConstraints gridConst = new GridBagConstraints();
         JLayeredPane layers = new JLayeredPane();
 
@@ -158,8 +160,16 @@ public class Register extends JFrame implements KeyListener {
         }
     }
 
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
     private void navigateTo() {
-        getDisplayName = field.getText().trim();
+        getDisplayName = new UseText().truncateText(field.getText().trim());
         isValidName = !getDisplayName.isEmpty();
 
         if (isValidName) {
@@ -172,13 +182,5 @@ public class Register extends JFrame implements KeyListener {
         } else {
             new useAlert().warringAlert("Please enter display name!");
         }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
     }
 }

@@ -31,7 +31,7 @@ public class LoadImage {
             setPreferredSize(new Dimension(panelWidth, panelHeight));
             this.backgroundImage = new LoadImage().getImage(imagePath);
 
-            this.darkenFilter = getDarken;
+            this.darkenFilter = 1 - getDarken;
 
             Timer timer = new Timer(moveSpeed, e -> {
                 xOffset = (xOffset + 1) % backgroundImage.getWidth(this); // Move left
