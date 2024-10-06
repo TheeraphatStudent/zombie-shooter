@@ -215,8 +215,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! ----*----*----*---- Zombie Control ----*----*----*----
 
-    
-
     // ----*----*----*---- Mouse ----*----*----*----
     public void mouseEvent(DrawMouse mouse) {
 
@@ -277,8 +275,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                 // System.out.println("+++++++++++++++++++++++++++++");
 
-                System.out.println("On Shoot");
+                // System.out.println("On Shoot");
                 character.updateWeaponAngle(e.getPoint());
+                character.onShootBullet(e.getPoint());
 
             };
 

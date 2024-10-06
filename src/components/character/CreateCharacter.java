@@ -2,11 +2,16 @@ package components.character;
 
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
+import components.objectElement.Bullet;
 
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -78,6 +83,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private Thread drawingThread;
     private volatile boolean running = true;
 
+    // Models
+
     // [[[[[[[[[[ Player ]]]]]]]]]]
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
         this.gameCenter = gameCenter;
@@ -117,7 +124,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         character = new CreateCharacterImage(useCharacter, !isInfected, this.isMoveLeft);
 
         // ! Character set content size
-        character.setBounds(0, 25, (int) (CHARACTER_WIDTH / 4), (int) (CHARACTER_HEIGHT / 2));
+        character.setBounds(0, 25, 80, 140);
         character.setOpaque(false);
         base.add(character);
 
@@ -155,6 +162,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         drawingThread = new Thread(this);
         drawingThread.start();
+
     }
 
     // :::::::::: Zombie ::::::::::
@@ -192,6 +200,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         // Start drawing thread
         drawingThread = new Thread(this);
         drawingThread.start();
+
     }
 
     public void setCharacterHp(int hp) {
@@ -232,7 +241,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         g2d.setTransform(originTransform);
     }
 
-    // ::::::::::::::::: Update Weapon :::::::::::::::::::
+    // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
     public void updateWeaponAngle(Point mousePos) {
         this.mousePosition = mousePos;
@@ -255,6 +264,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         // }
 
         weapon.repaint();
+    }
+
+    public void onShootBullet(Point mousePos) {
+        System.out.println("On Shoot");
+        System.out.println(mousePos.getLocation());
+
     }
 
     // ::::::::::::::::: Start Drawing Thread :::::::::::::::::::
@@ -292,7 +307,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         character.revalidate();
     }
 
-    // ::::::::::::::::: Control :::::::::::::::::::
+    // ::::::::::::::::: Control :::::::::::::::::
+    // >>>>>>>>>> Setter >>>>>>>>>>
 
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
@@ -311,7 +327,5 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         revalidateComponent();
     }
 
-    @Override
-    public void onShootBullet(Point mousePos) {
-    }
+    // <<<<<<<<<< Getter <<<<<<<<<<
 }
