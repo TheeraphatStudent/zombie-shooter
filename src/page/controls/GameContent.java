@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 
 import components.DrawMouse;
 import components.character.CreateCharacter;
+import components.character.ManageCharacterElement;
 import components.objectElement.Bullet;
 import page.home.GameCenter;
 
@@ -43,7 +44,7 @@ interface GameContentProps {
 
 }
 
-public class GameContent extends JFrame implements KeyListener, GameContentProps {
+public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement {
 
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
@@ -152,12 +153,12 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         character = new CreateCharacter(this.gameCenter, this, false);
 
         // # Set Character To Center
-        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, 100, 200);
+        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(character);
 
         // # Add Zombie
         CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
-        zombie.setBounds(100, 100, 100, 200);
+        zombie.setBounds(100, 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(zombie);
 
         // ==================== Layer ====================
@@ -181,6 +182,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
     }
 
     // ----*----*----*---- Bullet Management ----*----*----*----
@@ -207,8 +209,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     }
 
     private void drawBullets(Graphics2D g2d) {
-        System.out.println("Draw Bullets Work!");
-
         for (Bullet bullet : bullets) {
             bullet.drawContent(g2d);
 
@@ -217,6 +217,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private void drawBulletLine(Graphics2D g2d) {
         final int BULLET_LINE_LENGTH = 200;
+
+        if (mousePosition == null) {
+            return;
+
+        }
 
         // Start Position
         int weaponSpinX = character.getX() + 25;
@@ -229,7 +234,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         int endX = weaponSpinX + (int) (Math.cos(angle) * BULLET_LINE_LENGTH);
         int endY = weaponSpinY + (int) (Math.sin(angle) * BULLET_LINE_LENGTH);
 
-        // Draw line
+        // วาดเส้นประ
         float[] dashPattern = { 10f, 10f };
         Stroke dashedStroke = new BasicStroke(4f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_MITER, 10f, dashPattern, 0f);

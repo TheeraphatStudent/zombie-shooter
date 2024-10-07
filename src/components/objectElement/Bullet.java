@@ -27,6 +27,7 @@ public class Bullet implements ManageBulletElement {
     public Bullet(double startX, double startY, double angle) {
         this.x = startX;
         this.y = startY;
+
         this.dx = Math.cos(angle) * BULLET_SPEED;
         this.dy = Math.sin(angle) * BULLET_SPEED;
     }
@@ -38,7 +39,7 @@ public class Bullet implements ManageBulletElement {
         y += dy;
     }
 
-    // Draw bullet
+    // วาดลูกกระสุนขึ้นมา
     public void drawContent(Graphics2D g2d) {
         if (!isActive)
             return;
@@ -54,6 +55,7 @@ public class Bullet implements ManageBulletElement {
         return x < 0 || x > width || y < 0 || y > height;
     }
 
+    // เมื่อผู้เล่นติดเชื้อ หรือ ตาย จะไม่ยิง
     public void setIsAlive(Boolean isActive) {
         this.isActive = isActive;
 

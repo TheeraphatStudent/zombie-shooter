@@ -34,7 +34,6 @@ public class GameCenter extends JFrame {
         private DrawMouse drawMouse;
         private Developer developerPage;
         private CreateRoom createRoomPage;
-        // private GameContent gameContentPage;
 
         public GameCenter() {
                 createFrame();
@@ -47,7 +46,6 @@ public class GameCenter extends JFrame {
 
                 developerPage = new Developer(this);
                 createRoomPage = new CreateRoom(this);
-                // gameContentPage = new GameContent(this);
 
                 createFrame();
         }

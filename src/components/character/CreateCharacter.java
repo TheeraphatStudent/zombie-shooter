@@ -99,13 +99,39 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         // [document/images/enemy.png]
 
         // >>>>>>>>>> Create 📃
-        base = new JLayeredPane();
-        compressContent = new JLayeredPane();
+        base = new JLayeredPane() {
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2d = (Graphics2D) g;
+
+                g2d.setColor(Color.ORANGE);
+                g2d.drawRect(0, 0, getWidth(), CHARACTER_HEIGHT);
+
+                super.paintComponent(g);
+            }
+
+        };
+        compressContent = new JLayeredPane() {
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2d = (Graphics2D) g;
+
+                g2d.setColor(Color.PINK);
+                g2d.drawRect(0, 0, getWidth(), getHeight());
+
+                super.paintComponent(g);
+            }
+
+        };
+        compressContent.setOpaque(false);
+        compressContent.setBounds((int) (CHARACTER_WIDTH / 2.5), 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        compressContent.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         base.setOpaque(false);
         base.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
-        compressContent.setOpaque(false);
-        compressContent.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        base.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         // >>>>>>>>>> Player name 👋
         String displayName = gameCenter.getDisplayName();
@@ -118,6 +144,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
                 null,
                 Font.PLAIN);
         playerName.setBounds(0, 0, CHARACTER_WIDTH, 40);
+
         base.add(playerName);
 
         // >>>>>>>>>> Character 🗣️
@@ -216,7 +243,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.green);
-        g2d.drawRect(0, 0, getWidth(), getHeight());
+        g2d.drawRect(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
         super.paintComponent(g2d);
     }
@@ -270,7 +297,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         double deltaY = componentPos.y - weaponSpinY;
 
         weaponAngle = Math.atan2(deltaY, deltaX);
-        System.out.println("Weapon Angle: " + weaponAngle);
 
         // if (isMoveLeft) {
         // weaponAngle = Math.PI - weaponAngle;
@@ -285,8 +311,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
             return;
 
         }
-
-        System.out.println("On Shoot Bullet!");
 
         // ตำแหน่งปืน
         int weaponSpinX = getX() + 25;
