@@ -62,4 +62,5 @@ public class CreateRoom extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }
+    
 }
