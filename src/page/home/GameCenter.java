@@ -8,7 +8,6 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -36,6 +35,9 @@ public class GameCenter extends JFrame {
         private CreateRoom createRoomPage;
 
         public GameCenter() {
+                this.name = UseGlobal.name;
+                this.ip = UseGlobal.ip;
+
                 createFrame();
 
         }
@@ -43,6 +45,9 @@ public class GameCenter extends JFrame {
         public GameCenter(String name, String ip) {
                 this.name = name;
                 this.ip = ip;
+
+                UseGlobal.setName(name);
+                UseGlobal.setIp(ip);
 
                 developerPage = new Developer(this);
                 createRoomPage = new CreateRoom(this);
@@ -184,7 +189,9 @@ public class GameCenter extends JFrame {
                                 "hand");
 
                 exit.addActionListener((e -> {
-                        new WindowClosingFrameEvent(this);
+                        System.out.println("On Exit Work!");
+
+                        new WindowClosingFrameEvent().closePage(GameCenter.this);
 
                 }));
 

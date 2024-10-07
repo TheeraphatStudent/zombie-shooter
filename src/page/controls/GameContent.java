@@ -60,6 +60,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private Timer bulletTimer;
 
     public GameContent(GameCenter gameCenter) {
+        System.out.println("On Create Game Center");
+
         this.gameCenter = gameCenter;
 
         createFrame();
@@ -182,7 +184,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         layers.revalidate();
         layers.repaint();
 
-        new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }
@@ -255,9 +256,13 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     @Override
     public void dispose() {
+        this.removeAll();
+
         bulletTimer.stop();
         movementTimer.stop();
         bullets.clear();
+
+        new WindowClosingFrameEvent().navigateTo(this, new GameCenter(), false);
 
         super.dispose();
     }

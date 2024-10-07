@@ -35,6 +35,7 @@ public class WindowClosingFrameEvent {
                 if (result == JOptionPane.YES_OPTION) {
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     changeFrameEvent(_currentFrame);
+
                 } else {
                     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 }
