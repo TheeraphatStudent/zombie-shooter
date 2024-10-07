@@ -2,11 +2,16 @@ package components.character;
 
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
+import components.objectElement.Bullet;
 
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -78,7 +83,9 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private Thread drawingThread;
     private volatile boolean running = true;
 
-    // [[[[[[[[[[ Player ]]]]]]]]]]
+    // Models
+
+    // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
@@ -91,14 +98,40 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         // [document/images/enemy.png]
 
-        // >>>>>>>>>> 📃 Create
-        base = new JLayeredPane();
-        compressContent = new JLayeredPane();
+        // >>>>>>>>>> Create 📃
+        base = new JLayeredPane() {
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2d = (Graphics2D) g;
+
+                g2d.setColor(Color.ORANGE);
+                g2d.drawRect(0, 0, getWidth(), CHARACTER_HEIGHT);
+
+                super.paintComponent(g);
+            }
+
+        };
+        compressContent = new JLayeredPane() {
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2d = (Graphics2D) g;
+
+                g2d.setColor(Color.PINK);
+                g2d.drawRect(0, 0, getWidth(), getHeight());
+
+                super.paintComponent(g);
+            }
+
+        };
+        compressContent.setOpaque(false);
+        compressContent.setBounds((int) (CHARACTER_WIDTH / 2.5), 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        compressContent.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         base.setOpaque(false);
         base.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
-        compressContent.setOpaque(false);
-        compressContent.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        base.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         // >>>>>>>>>> Player name 👋
         String displayName = gameCenter.getDisplayName();
@@ -111,6 +144,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
                 null,
                 Font.PLAIN);
         playerName.setBounds(0, 0, CHARACTER_WIDTH, 40);
+
         base.add(playerName);
 
         // >>>>>>>>>> Character 🗣️
@@ -155,9 +189,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         drawingThread = new Thread(this);
         drawingThread.start();
+
     }
 
-    // :::::::::: Zombie ::::::::::
+    // :::::::::::::::::::: Zombie ::::::::::::::::::::
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
@@ -192,10 +227,25 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         // Start drawing thread
         drawingThread = new Thread(this);
         drawingThread.start();
+
     }
 
     public void setCharacterHp(int hp) {
         hpBar.setHp(hp);
+
+    }
+
+    // :|:|:|:|:|:|:|:|:|:|:|:|:|: Pain Component :|:|:|:|:|:|:|:|:|:|:|:|:|:
+
+    @Override
+    protected void paintComponent(Graphics g) {
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        g2d.setColor(Color.green);
+        g2d.drawRect(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+        super.paintComponent(g2d);
     }
 
     // ::::::::::::::::: Draw Weapon :::::::::::::::::::
@@ -212,10 +262,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         Image weapon = new LoadImage().getImage(getGun);
 
         // ตำแหน่งในการหมุนปืน
-        int weaponPivotX = character.getX() + 40;
-        int weaponPivotY = character.getY() + 70;
+        int weaponSpinX = character.getX() + 40;
+        int weaponSpinY = character.getY() + 70;
 
-        g2d.translate(weaponPivotX, weaponPivotY);
+        g2d.translate(weaponSpinX, weaponSpinY);
         g2d.rotate(weaponAngle);
 
         g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
@@ -232,21 +282,20 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         g2d.setTransform(originTransform);
     }
 
-    // ::::::::::::::::: Update Weapon :::::::::::::::::::
+    // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
     public void updateWeaponAngle(Point mousePos) {
         this.mousePosition = mousePos;
 
         Point componentPos = SwingUtilities.convertPoint(getParent(), mousePos, this);
 
-        int weaponPivotX = character.getX() + 40;
-        int weaponPivotY = character.getY() + 70;
+        int weaponSpinX = character.getX() + 40;
+        int weaponSpinY = character.getY() + 70;
 
-        double deltaX = componentPos.x - weaponPivotX;
-        double deltaY = componentPos.y - weaponPivotY;
+        double deltaX = componentPos.x - weaponSpinX;
+        double deltaY = componentPos.y - weaponSpinY;
 
         weaponAngle = Math.atan2(deltaY, deltaX);
-        System.out.println("Weapon Angle: " + weaponAngle);
 
         // if (isMoveLeft) {
         // weaponAngle = Math.PI - weaponAngle;
@@ -254,6 +303,20 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         // }
 
         weapon.repaint();
+    }
+
+    public void onShootBullet(Point mousePos) {
+        if (!isSurvive) {
+            return;
+
+        }
+
+        // ตำแหน่งปืน
+        int weaponSpinX = getX() + 25;
+        int weaponSpinY = getY() + 100;
+
+        // เพิ่มจำนวนกระสุนที่ยิงออกไป
+        gameContent.addBullet(new Bullet(weaponSpinX, weaponSpinY, weaponAngle));
     }
 
     // ::::::::::::::::: Start Drawing Thread :::::::::::::::::::
@@ -291,7 +354,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         character.revalidate();
     }
 
-    // ::::::::::::::::: Control :::::::::::::::::::
+    // ::::::::::::::::: Control :::::::::::::::::
+    // >>>>>>>>>> Setter >>>>>>>>>>
 
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
@@ -310,7 +374,5 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         revalidateComponent();
     }
 
-    @Override
-    public void onShootBullet(Point mousePos) {
-    }
+    // <<<<<<<<<< Getter <<<<<<<<<<
 }

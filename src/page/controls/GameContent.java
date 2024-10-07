@@ -1,12 +1,22 @@
 package page.controls;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Stroke;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import javax.swing.Timer;
 
 import javax.swing.JFrame;
@@ -15,6 +25,8 @@ import javax.swing.JPanel;
 
 import components.DrawMouse;
 import components.character.CreateCharacter;
+import components.character.ManageCharacterElement;
+import components.objectElement.Bullet;
 import page.home.GameCenter;
 
 import utils.LoadImage;
@@ -32,7 +44,7 @@ interface GameContentProps {
 
 }
 
-public class GameContent extends JFrame implements KeyListener, GameContentProps {
+public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement {
 
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
@@ -41,12 +53,18 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
     private Timer movementTimer;
+    private Point mousePosition;
+
+    // Bullet
+    private ArrayList<Bullet> bullets = new ArrayList<>();
+    private Timer bulletTimer;
 
     public GameContent(GameCenter gameCenter) {
         this.gameCenter = gameCenter;
 
         createFrame();
         initializeMovement();
+        initializeBulletTimer();
         addKeyListener(this);
         setFocusable(true);
         requestFocus();
@@ -115,20 +133,34 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         backgroundPanel.setLayout(new GridBagLayout());
 
-        JPanel content = new JPanel();
+        JPanel content = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+
+                // g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                // RenderingHints.VALUE_ANTIALIAS_ON);
+
+                drawBulletLine(g2d);
+                drawBullets(g2d);
+            }
+        };
+
         content.setLayout(null);
+        content.setOpaque(false);
 
         // ==================== Create Character ====================
 
         character = new CreateCharacter(this.gameCenter, this, false);
 
         // # Set Character To Center
-        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, 100, 200);
+        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(character);
 
         // # Add Zombie
         CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
-        zombie.setBounds(100, 100, 100, 200);
+        zombie.setBounds(100, 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(zombie);
 
         // ==================== Layer ====================
@@ -152,13 +184,80 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    }
+
+    // ----*----*----*---- Bullet Management ----*----*----*----
+
+    private void initializeBulletTimer() {
+        bulletTimer = new Timer(16, e -> {
+            updateBullets();
+            repaint();
+
+        });
+        bulletTimer.start();
+    }
+
+    private void updateBullets() {
+        Iterator<Bullet> iterator = bullets.iterator();
+        while (iterator.hasNext()) {
+            Bullet bullet = iterator.next();
+            bullet.move();
+
+            if (bullet.isOutOfBounds(getWidth(), getHeight())) {
+                iterator.remove();
+            }
+        }
+    }
+
+    private void drawBullets(Graphics2D g2d) {
+        for (Bullet bullet : bullets) {
+            bullet.drawContent(g2d);
+
+        }
+    }
+
+    private void drawBulletLine(Graphics2D g2d) {
+        final int BULLET_LINE_LENGTH = 200;
+
+        if (mousePosition == null) {
+            return;
+
+        }
+
+        // Start Position
+        int weaponSpinX = character.getX() + 25;
+        int weaponSpinY = character.getY() + 100;
+
+        double deltaX = mousePosition.x - weaponSpinX;
+        double deltaY = mousePosition.y - weaponSpinY;
+        double angle = Math.atan2(deltaY, deltaX);
+
+        int endX = weaponSpinX + (int) (Math.cos(angle) * BULLET_LINE_LENGTH);
+        int endY = weaponSpinY + (int) (Math.sin(angle) * BULLET_LINE_LENGTH);
+
+        // วาดเส้นประ
+        float[] dashPattern = { 10f, 10f };
+        Stroke dashedStroke = new BasicStroke(4f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER, 10f, dashPattern, 0f);
+
+        g2d.setStroke(dashedStroke);
+        g2d.setColor(Color.RED);
+        g2d.drawLine(weaponSpinX, weaponSpinY, endX, endY);
+    }
+
+    public void addBullet(Bullet bullet) {
+        bullets.add(bullet);
+
     }
 
     // ----*----*----*---- Dispose Content ----*----*----*----
 
     @Override
     public void dispose() {
+        bulletTimer.stop();
         movementTimer.stop();
+        bullets.clear();
 
         super.dispose();
     }
@@ -217,9 +316,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! ----*----*----*---- Zombie Control ----*----*----*----
 
-    
-
     // ----*----*----*---- Mouse ----*----*----*----
+
     public void mouseEvent(DrawMouse mouse) {
 
         /*
@@ -247,6 +345,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 // System.out.println("============================");
 
                 character.updateWeaponAngle(e.getPoint());
+                updateMousePosition(e.getPoint());
 
             }
 
@@ -279,8 +378,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                 // System.out.println("+++++++++++++++++++++++++++++");
 
-                System.out.println("On Shoot");
+                // System.out.println("On Shoot");
                 character.updateWeaponAngle(e.getPoint());
+                character.onShootBullet(e.getPoint());
 
             };
 
@@ -298,5 +398,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         });
 
+    }
+
+    private void updateMousePosition(Point point) {
+        mousePosition = point;
+        character.updateWeaponAngle(point);
+        repaint();
     }
 }

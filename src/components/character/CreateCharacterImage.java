@@ -35,7 +35,7 @@ public class CreateCharacterImage extends JPanel implements ManageCharacterEleme
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.setColor(Color.RED);
+        g.setColor(Color.BLUE);
         g.drawRect(0, 0, getWidth(), getHeight());
 
         String getImagePath = "resource/images/character/survive/h%d.png";
