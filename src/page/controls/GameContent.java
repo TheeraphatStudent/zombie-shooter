@@ -49,6 +49,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
     private CreateCharacter character;
+    private CreateCharacter zombie;
 
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
@@ -67,6 +68,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         createFrame();
         initializeMovement();
         initializeBulletTimer();
+        movementzom();
         addKeyListener(this);
         setFocusable(true);
         requestFocus();
@@ -83,9 +85,20 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         movementTimer.start();
     }
 
+    private void movementzom() {
+        System.out.println("Initialize Movement Work!");
+
+        movementTimer = new Timer(16, (e -> {
+            updatezombie();
+
+        }));
+        movementTimer.start();
+    }
+
     private void updateCharacterPosition() {
         int currentX = character.getX();
         int currentY = character.getY();
+
         boolean moved = false;
 
         if (isUpPressed && currentY - MOVEMENT_SPEED >= 0) {
@@ -109,6 +122,15 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             character.setLocation(currentX, currentY);
             repaint();
         }
+    }
+
+    // !ซอมบี้เดิน
+    private void updatezombie() {
+        int currentXzom = zombie.getX();
+        int currentYzom = zombie.getY();
+
+        zombie.setLocation(currentXzom + 5, currentYzom + 5);
+        repaint();
     }
 
     private void createFrame() {
@@ -160,9 +182,10 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(character);
 
-        // # Add Zombie
-        CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
+        // ! Add Zombie
+        zombie = new CreateCharacter(this.gameCenter, this);
         zombie.setBounds(100, 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        repaint();
         content.add(zombie);
 
         // ==================== Layer ====================
