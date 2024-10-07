@@ -184,7 +184,7 @@ public class GameCenter extends JFrame {
                                 "hand");
 
                 exit.addActionListener((e -> {
-                        new WindowClosingFrameEvent(this);
+                        new WindowClosingFrameEvent().closePage(GameCenter.this);;
 
                 }));
 
