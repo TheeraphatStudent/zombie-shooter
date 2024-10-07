@@ -50,6 +50,11 @@ public class UseGlobal {
         System.out.println("Name set to: " + name);
     }
 
+    public static void setIp(String _ip) {
+        ip = _ip;
+        System.out.println("IP set to: " + name);
+    }
+
     public static void setWidth(int width) {
         UseGlobal.width = width;
     }
