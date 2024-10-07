@@ -335,8 +335,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         repaint();
         revalidate();
 
-        weapon.repaint();
-        weapon.revalidate();
+        if (!(weapon == null)) {
+            weapon.repaint();
+            weapon.revalidate();
+
+        }
 
         character.repaint();
         character.revalidate();
