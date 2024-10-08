@@ -58,6 +58,7 @@ public class CreateCharacterImage extends JPanel implements ManageCharacterEleme
             AffineTransform old = g2d.getTransform();
 
             g2d.translate(getWidth(), 0);
+
             g2d.scale(-1, 1);
 
             g2d.drawImage(character, 0, 0, getWidth(), getHeight(), this);
@@ -69,6 +70,6 @@ public class CreateCharacterImage extends JPanel implements ManageCharacterEleme
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        return new Dimension(CHARACTER_HIT_X, CHARACTER_HIT_Y);
     }
 }

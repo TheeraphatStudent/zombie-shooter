@@ -3,10 +3,9 @@ package components.objectElement;
 import java.awt.Graphics2D;
 
 import java.awt.Color;
-
 interface ManageBulletElement {
     final int BULLET_SIZE = 10;
-    final int BULLET_SPEED = 15;
+    final int BULLET_SPEED = 8;
 
 }
 
@@ -39,7 +38,7 @@ public class Bullet implements ManageBulletElement {
         y += dy;
     }
 
-    // วาดลูกกระสุนขึ้นมา
+    // วาดลูกกระสุน
     public void drawContent(Graphics2D g2d) {
         if (!isActive)
             return;
@@ -51,6 +50,7 @@ public class Bullet implements ManageBulletElement {
                 BULLET_SIZE, BULLET_SIZE);
     }
 
+    // Check out of frame
     public boolean isOutOfBounds(int width, int height) {
         return x < 0 || x > width || y < 0 || y > height;
     }

@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
+import components.DrawBulletLine;
 import components.DrawMouse;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
@@ -92,7 +93,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             updatezombie();
 
         }));
-        movementTimer.start();
+        // movementTimer.start();
     }
 
     private void updateCharacterPosition() {
@@ -166,7 +167,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 // g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 // RenderingHints.VALUE_ANTIALIAS_ON);
 
-                drawBulletLine(g2d);
+                new DrawBulletLine(g2d, mousePosition, character);
                 drawBullets(g2d);
             }
         };
@@ -176,7 +177,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Character ====================
 
-        character = new CreateCharacter(this.gameCenter, this, false);
+        character = new CreateCharacter(this.gameCenter, this, !false);
 
         // # Set Character To Center
         character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
@@ -184,6 +185,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ! Add Zombie
         zombie = new CreateCharacter(this.gameCenter, this);
+
         zombie.setBounds(100, 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         repaint();
         content.add(zombie);
@@ -239,35 +241,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             bullet.drawContent(g2d);
 
         }
-    }
-
-    private void drawBulletLine(Graphics2D g2d) {
-        final int BULLET_LINE_LENGTH = 200;
-
-        if (mousePosition == null) {
-            return;
-
-        }
-
-        // Start Position
-        int weaponSpinX = character.getX() + 25;
-        int weaponSpinY = character.getY() + 100;
-
-        double deltaX = mousePosition.x - weaponSpinX;
-        double deltaY = mousePosition.y - weaponSpinY;
-        double angle = Math.atan2(deltaY, deltaX);
-
-        int endX = weaponSpinX + (int) (Math.cos(angle) * BULLET_LINE_LENGTH);
-        int endY = weaponSpinY + (int) (Math.sin(angle) * BULLET_LINE_LENGTH);
-
-        // วาดเส้นประ
-        float[] dashPattern = { 10f, 10f };
-        Stroke dashedStroke = new BasicStroke(4f, BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_MITER, 10f, dashPattern, 0f);
-
-        g2d.setStroke(dashedStroke);
-        g2d.setColor(Color.RED);
-        g2d.drawLine(weaponSpinX, weaponSpinY, endX, endY);
     }
 
     public void addBullet(Bullet bullet) {
