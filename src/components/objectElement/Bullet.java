@@ -1,8 +1,11 @@
 package components.objectElement;
 
 import java.awt.Graphics2D;
-
 import java.awt.Color;
+import java.awt.Rectangle;
+
+import javax.swing.JPanel;
+
 interface ManageBulletElement {
     final int BULLET_SIZE = 10;
     final int BULLET_SPEED = 8;
@@ -18,7 +21,7 @@ interface BulletProps {
 
 }
 
-public class Bullet implements ManageBulletElement {
+public class Bullet extends JPanel implements ManageBulletElement {
     private double x, y;
     private double dx, dy;
     private boolean isActive = true;
@@ -43,6 +46,9 @@ public class Bullet implements ManageBulletElement {
         if (!isActive)
             return;
 
+        g2d.setColor(Color.RED);
+        g2d.drawRect((int) x, (int) y, BULLET_SIZE, BULLET_SIZE);
+
         g2d.setColor(Color.YELLOW);
         g2d.fillOval(
                 (int) x,
@@ -55,9 +61,14 @@ public class Bullet implements ManageBulletElement {
         return x < 0 || x > width || y < 0 || y > height;
     }
 
-    // เมื่อผู้เล่นติดเชื้อ หรือ ตาย จะไม่ยิง
+    // เมื่อผู้เล่นติดเชื้อ หรือ ตาย จะยิงไม่ได้
     public void setIsAlive(Boolean isActive) {
         this.isActive = isActive;
 
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return new Rectangle((int) x, (int) y, BULLET_SIZE, BULLET_SIZE);
     }
 }

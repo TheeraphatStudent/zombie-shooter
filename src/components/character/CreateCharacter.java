@@ -47,6 +47,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
+    private String zombieType;
 
     private CreateCharacterImage character;
     private JPanel weapon;
@@ -204,7 +205,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         this.useCharacter = (int) (Math.random() * 10) + 1;
 
         // JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
-        //         "", Color.WHITE, null, Font.PLAIN);
+        // "", Color.WHITE, null, Font.PLAIN);
         // zombieName.setBounds(0, 0, CHARACTER_WIDTH, 40);
 
         // add(zombieName);
@@ -356,10 +357,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Control :::::::::::::::::
     // >>>>>>>>>> Setter >>>>>>>>>>
 
+    public void setZombieType(String zombieType) {
+        this.zombieType = zombieType;
+    }
+
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
-
-        System.out.println("Is Move Left! -> " + isMoveLeft);
         this.character.setCharacterMoveLeft(isMoveLeft);
 
         revalidateComponent();
@@ -380,6 +383,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     public boolean getCharacterIsAlive() {
         return this.isSurvive;
 
+    }
+
+    public String getZombieType() {
+        return this.zombieType;
     }
 
 }
