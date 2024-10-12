@@ -281,19 +281,21 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
             boolean bulletRemoved = false;
 
-            Iterator<CreateCharacter> zombieIterator = zombies.iterator();
-            while (zombieIterator.hasNext() && !bulletRemoved) {
-                CreateCharacter zombie = zombieIterator.next();
+            Iterator<CreateCharacter> zombieContain = zombies.iterator();
+            while (zombieContain.hasNext() && !bulletRemoved) {
+                CreateCharacter getZombie = zombieContain.next();
                 
                 // Get the hitbox (blue border area) of the zombie
-                Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
+                Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(getZombie);
                 
-                // Check if the bullet intersects with the zombie's hitbox
                 if (bullet.getBounds().intersects(zombieHitbox)) {
                     // Remove both bullet and zombie
                     bulletIterator.remove();
-                    zombieIterator.remove();
-                    content.remove(zombie);
+                    zombieContain.remove();
+
+                    getZombie.setCharacterHp(50);
+
+                    content.remove(getZombie);
             
                     bulletRemoved = true;
                     repaint();
@@ -325,7 +327,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         this.removeAll();
 
         bulletTimer.stop();
-        movementTimer.stop();
         bullets.clear();
 
         new WindowClosingFrameEvent().navigateTo(this, new GameCenter(), false);
@@ -407,7 +408,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private class ZombieMovementThread extends Thread {
         private CreateCharacter zombie;
-        private volatile boolean running = true; // Control the thread's execution
+        private volatile boolean running = true;
 
         public ZombieMovementThread(CreateCharacter zombie) {
             this.zombie = zombie;
