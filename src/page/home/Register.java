@@ -73,13 +73,13 @@ public class Register extends JFrame implements KeyListener {
         gridConst.weighty = 1;
         gridConst.gridheight = 1;
 
-        JTextPane title = new UseText(28, 400, 50).createSimpleText("Enter display name: ", null, null, Font.BOLD);
+        JTextPane title = new UseText(28, 400, 50, false).createSimpleText("Enter display name: ", null, null, Font.BOLD);
         title.setPreferredSize(new Dimension(400, 30));
         displayName.add(title, gridConst);
 
         gridConst.gridy = 1;
 
-        field = new UseText(30, 400, 50).createTextField("", Color.white, true);
+        field = new UseText(30, 400, 50, false).createTextField("", Color.white, true);
         field.setPreferredSize(new Dimension(400, 50));
         displayName.add(field, gridConst);
 

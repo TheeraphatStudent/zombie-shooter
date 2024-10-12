@@ -31,8 +31,8 @@ public class Card extends JPanel {
         JPanel head = new RoundedPanel(20, imgName);
         head.setPreferredSize(new Dimension(350, 600));
 
-        JTextPane displayName = new UseText(20, 400, 50).createSimpleText("Name: " + name, null, null, Font.PLAIN);
-        JTextPane displayId = new UseText(20, 400, 50).createSimpleText("Id: " + id, null, null, Font.PLAIN);
+        JTextPane displayName = new UseText(20, 400, 50, false).createSimpleText("Name: " + name, null, null, Font.PLAIN);
+        JTextPane displayId = new UseText(20, 400, 50, false).createSimpleText("Id: " + id, null, null, Font.PLAIN);
 
         JPanel compressPanel = new JPanel(new GridLayout(2, 1, 10, 10));
         compressPanel.setBackground(Color.WHITE);

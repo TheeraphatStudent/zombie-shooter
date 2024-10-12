@@ -80,12 +80,12 @@ public class GameCenter extends JFrame {
                 titleContent.setLayout(null);
 
                 // ---------- Name ----------
-                JTextPane title_name = new UseText(24, 400, 50)
+                JTextPane title_name = new UseText(24, 400, 50, false)
                                 .createSimpleText("Name: " + name, null, null, Font.BOLD);
                 title_name.setOpaque(false);
 
                 // ---------- IP ----------
-                JTextPane title_ip = new UseText(24, 400, 50)
+                JTextPane title_ip = new UseText(24, 400, 50, false)
                                 .createSimpleText("IP: " + ip, null, null, Font.BOLD);
                 title_ip.setOpaque(false);
 

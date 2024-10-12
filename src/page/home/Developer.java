@@ -88,12 +88,12 @@ public class Developer extends JFrame {
         titleContent.setLayout(null);
 
         // ---------- Name ----------
-        JTextPane title_name = new UseText(24, 400, 50)
+        JTextPane title_name = new UseText(24, 400, 50, false)
                 .createSimpleText("Name: " + gameCenter.getDisplayName(), null, null, Font.BOLD);
         title_name.setOpaque(false);
 
         // ---------- IP ----------
-        JTextPane title_ip = new UseText(24, 400, 50)
+        JTextPane title_ip = new UseText(24, 400, 50, false)
                 .createSimpleText("IP: " + gameCenter.getIp(), null, null, Font.BOLD);
         title_ip.setOpaque(false);
 

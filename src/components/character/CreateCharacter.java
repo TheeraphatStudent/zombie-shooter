@@ -14,6 +14,7 @@ import javax.swing.Timer;
 import components.objectElement.Bullet;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -46,6 +47,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
+    private String zombieType;
 
     private CreateCharacterImage character;
     private JPanel weapon;
@@ -77,6 +79,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
         this.gameCenter = gameCenter;
         this.gameContent = gameContent;
+        this.isSurvive = !isInfected;
 
         setLayout(null);
         setOpaque(false);
@@ -113,8 +116,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
             }
 
         };
+
+        // Compress Content Here!
         compressContent.setOpaque(false);
-        compressContent.setBounds((int) (CHARACTER_WIDTH / 2.5), 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        compressContent.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         compressContent.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         base.setOpaque(false);
@@ -126,12 +131,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         String displayText = new UseText().truncateText(displayName);
         displayText += " - rank 0";
 
-        JTextPane playerName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
+        JTextPane playerName = new UseText(14, CHARACTER_WIDTH, 40, true).createSimpleText(
                 displayText,
                 Color.WHITE,
                 null,
                 Font.PLAIN);
-        playerName.setBounds(0, 0, CHARACTER_WIDTH, 40);
+        playerName.setBounds(0, 25, CHARACTER_WIDTH, 40);
 
         base.add(playerName);
 
@@ -139,7 +144,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         character = new CreateCharacterImage(useCharacter, !isInfected, this.isMoveLeft);
 
         // ! Character set content size
-        character.setBounds(0, 25, 80, 140);
+        character.setBounds(CHARACTER_CENTER_XY);
         character.setOpaque(false);
         base.add(character);
 
@@ -147,7 +152,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         Color onSurvive = !isInfected ? Color.GREEN : Color.ORANGE;
 
         hpBar = new CreateHpBar(hp, onSurvive);
-        hpBar.setBounds(0, 175, 100, 20);
+        hpBar.setBounds((CHARACTER_CENTER_X - 8), (CHARACTER_CENTER_Y + CHARACTER_HIT_Y) + 8, 100, 20);
         base.add(hpBar);
 
         // >>>>>>>>>> Weapon 🗡️
@@ -159,6 +164,9 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
                 Graphics2D g2d = (Graphics2D) g;
                 AffineTransform oldTransform = g2d.getTransform();
 
+                g2d.setColor(Color.MAGENTA);
+                g2d.drawRect(0, 0, getWidth(), getHeight());
+
                 // Draw weapon
                 drawWeapon(g2d, oldTransform);
 
@@ -167,6 +175,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         weapon.setOpaque(false);
         weapon.setBounds(0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        weapon.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         compressContent.add(base, JLayeredPane.DEFAULT_LAYER);
         compressContent.add(weapon, JLayeredPane.DRAG_LAYER);
@@ -195,21 +204,21 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         this.useCharacter = (int) (Math.random() * 10) + 1;
 
-        JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
-                "", Color.WHITE, null, Font.PLAIN);
-        zombieName.setBounds(0, 0, CHARACTER_WIDTH, 40);
+        // JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
+        // "", Color.WHITE, null, Font.PLAIN);
+        // zombieName.setBounds(0, 0, CHARACTER_WIDTH, 40);
 
-        add(zombieName);
+        // add(zombieName);
 
         character = new CreateCharacterImage(useCharacter, false, this.isMoveLeft);
 
         // ! Character set content size
-        character.setBounds(0, 25, 80, 140);
+        character.setBounds(CHARACTER_CENTER_XY);
         character.setOpaque(false);
         add(character);
 
         hpBar = new CreateHpBar(hp, Color.RED);
-        hpBar.setBounds(0, 175, 100, 20);
+        hpBar.setBounds((CHARACTER_CENTER_X - 8), (CHARACTER_CENTER_Y + CHARACTER_HIT_Y) + 8, 100, 20);
         add(hpBar);
 
         // Start drawing thread
@@ -300,8 +309,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         }
 
         // ตำแหน่งปืน
-        int weaponSpinX = getX() + 25;
-        int weaponSpinY = getY() + 100;
+        int weaponSpinX = (getX() + CHARACTER_CENTER_X) + 40;
+        int weaponSpinY = (getY() + CHARACTER_CENTER_Y) + 70;
 
         // เพิ่มจำนวนกระสุนที่ยิงออกไป
         gameContent.addBullet(new Bullet(weaponSpinX, weaponSpinY, weaponAngle));
@@ -346,7 +355,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // ::::::::::::::::: Control :::::::::::::::::
+
     // >>>>>>>>>> Setter >>>>>>>>>>
+
+    public void setZombieType(String zombieType) {
+        this.zombieType = zombieType;
+    }
 
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
@@ -366,4 +380,14 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // <<<<<<<<<< Getter <<<<<<<<<<
+
+    public boolean getCharacterIsAlive() {
+        return this.isSurvive;
+
+    }
+
+    public String getZombieType() {
+        return this.zombieType;
+    }
+
 }
