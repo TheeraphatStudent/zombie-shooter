@@ -355,6 +355,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // ::::::::::::::::: Control :::::::::::::::::
+
     // >>>>>>>>>> Setter >>>>>>>>>>
 
     public void setZombieType(String zombieType) {

@@ -14,6 +14,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Rectangle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +36,7 @@ import components.objectElement.Bullet;
 import page.home.GameCenter;
 
 import utils.LoadImage;
+import utils.UseCharacter;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
 import utils.WindowClosingFrameEvent;
@@ -104,7 +107,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private void initializeZombieSpawner() {
         Timer spawner = new Timer(1500, e -> {
-            if (zombies.size() < CREATE_ZOMBIES && zombies.size() < 10) {
+            if (zombies.size() < CREATE_ZOMBIES && zombies.size() < 3) {
                 String[] types = { "normal", "fast", "slow" };
                 String randomType = types[(int) (Math.random() * types.length)];
 
@@ -281,11 +284,17 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             Iterator<CreateCharacter> zombieIterator = zombies.iterator();
             while (zombieIterator.hasNext() && !bulletRemoved) {
                 CreateCharacter zombie = zombieIterator.next();
-                if ((bullet.getBounds().intersects(zombie.getBounds()))) {
+                
+                // Get the hitbox (blue border area) of the zombie
+                Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
+                
+                // Check if the bullet intersects with the zombie's hitbox
+                if (bullet.getBounds().intersects(zombieHitbox)) {
                     // Remove both bullet and zombie
                     bulletIterator.remove();
                     zombieIterator.remove();
                     content.remove(zombie);
+            
                     bulletRemoved = true;
                     repaint();
                 }
