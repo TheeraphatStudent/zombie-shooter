@@ -33,8 +33,9 @@ import components.DrawMouse;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import components.objectElement.Bullet;
+import models.Zombie;
 import page.home.GameCenter;
-
+import types.ZombieType;
 import utils.LoadImage;
 import utils.UseCharacter;
 import utils.LoadImage.BackgroundPanel;
@@ -146,43 +147,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
     }
 
-    // !ซอมบี้เดิน
-    private void updateZombies() {
-        for (CreateCharacter zombie : zombies) {
-            // Get positions
-            int playerX = character.getX() + (CHARACTER_WIDTH / 2);
-            int playerY = character.getY() + (CHARACTER_HEIGHT / 2);
-            int zombieX = zombie.getX() + (CHARACTER_WIDTH / 2);
-            int zombieY = zombie.getY() + (CHARACTER_HEIGHT / 2);
-
-            // Calculate direction to player
-            double dx = playerX - zombieX;
-            double dy = playerY - zombieY;
-
-            // Calculate angle to player for zombie rotation
-            double angle = Math.atan2(dy, dx);
-
-            // Determine if zombie should face left or right
-            boolean shouldFaceLeft = dx < 0;
-            zombie.setCharacterMoveLeft(shouldFaceLeft);
-
-            // Get zombie type and speed
-            ZombieType zombieType = zombieTypes.get(zombie.getZombieType());
-            double zombieSpeed = zombieType.speed; // Get speed based on type
-
-            // Move zombie
-            int newX = zombie.getX() + (int) (Math.cos(angle) * zombieSpeed);
-            int newY = zombie.getY() + (int) (Math.sin(angle) * zombieSpeed);
-
-            // Optional: Add boundary checking
-            newX = Math.max(0, Math.min(newX, getWidth() - CHARACTER_WIDTH));
-            newY = Math.max(0, Math.min(newY, getHeight() - CHARACTER_HEIGHT));
-
-            zombie.setLocation(newX, newY);
-        }
-        repaint();
-    }
-
     private void createFrame() {
         setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
         setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
@@ -283,19 +247,22 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
             Iterator<CreateCharacter> zombieContain = zombies.iterator();
             while (zombieContain.hasNext() && !bulletRemoved) {
-                CreateCharacter getZombie = zombieContain.next();
-                
-                // Get the hitbox (blue border area) of the zombie
-                Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(getZombie);
+                CreateCharacter zombie = zombieContain.next();
+                Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
                 
                 if (bullet.getBounds().intersects(zombieHitbox)) {
                     // Remove both bullet and zombie
                     bulletIterator.remove();
-                    zombieContain.remove();
+                    
+                    zombie.setCharacterHp(zombie.getCharacterHp() - 20);
+                    
+                    if (zombie.getCharacterHp() <= 0) {
+                        zombieContain.remove();
+                        content.remove(zombie);
 
-                    getZombie.setCharacterHp(50);
+                        // Count kill zombie here!
 
-                    content.remove(getZombie);
+                    }
             
                     bulletRemoved = true;
                     repaint();
@@ -388,24 +355,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! ----*----*----*---- Zombie Control ----*----*----*----
 
-    public class ZombieType {
-        double speed;
-        double detectionRange;
-
-        public ZombieType(double speed, double detectionRange) {
-            this.speed = speed;
-            this.detectionRange = detectionRange;
-        }
-    }
-
-    private Map<String, ZombieType> zombieTypes = new HashMap<String, ZombieType>() {
-        {
-            put("normal", new ZombieType(5, 300));
-            put("fast", new ZombieType(8, 250));
-            put("slow", new ZombieType(3, 400));
-        }
-    };
-
     private class ZombieMovementThread extends Thread {
         private CreateCharacter zombie;
         private volatile boolean running = true;
@@ -418,13 +367,10 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         public void run() {
             while (running) {
                 try {
-                    // Sleep to control zombie movement speed
-                    Thread.sleep(16); // Adjust this value to control the refresh rate (60 FPS = 1000ms / 60 ≈ 16ms)
+                    Thread.sleep(16);
 
-                    // Update the zombie's position towards the player
-                    updateZombiePosition(zombie);
+                    new Zombie(character, zombie, GameContent.this).updateZombiePosition();
 
-                    // Ensure the UI updates (invoke on the Swing Event Dispatch Thread)
                     SwingUtilities.invokeLater(() -> repaint());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -432,40 +378,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             }
         }
 
-    }
-
-    private void updateZombiePosition(CreateCharacter zombie) {
-        // Get positions
-        int playerX = character.getX() + (CHARACTER_WIDTH / 2); // Center of player
-        int playerY = character.getY() + (CHARACTER_HEIGHT / 2);
-        int zombieX = zombie.getX() + (CHARACTER_WIDTH / 2); // Center of zombie
-        int zombieY = zombie.getY() + (CHARACTER_HEIGHT / 2);
-
-        // Calculate direction to player
-        double dx = playerX - zombieX;
-        double dy = playerY - zombieY;
-
-        // Calculate angle to player for zombie rotation
-        double angle = Math.atan2(dy, dx);
-
-        // Determine if zombie should face left or right
-        boolean shouldFaceLeft = dx < 0;
-        zombie.setCharacterMoveLeft(shouldFaceLeft);
-
-        // Get zombie type and speed
-        ZombieType zombieType = zombieTypes.get(zombie.getZombieType());
-        double zombieSpeed = zombieType.speed; // Get speed based on type
-
-        // Move zombie
-        int newX = zombie.getX() + (int) (Math.cos(angle) * zombieSpeed);
-        int newY = zombie.getY() + (int) (Math.sin(angle) * zombieSpeed);
-
-        // Optional: Add boundary checking
-        newX = Math.max(0, Math.min(newX, getWidth() - CHARACTER_WIDTH));
-        newY = Math.max(0, Math.min(newY, getHeight() - CHARACTER_HEIGHT));
-
-        // Update the zombie's location
-        zombie.setLocation(newX, newY);
     }
 
     // Method to add a zombie and start its movement
@@ -482,19 +394,26 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 x = -CHARACTER_WIDTH; // Place it just outside the left edge
                 y = (int) (Math.random() * getHeight()); // Random vertical position
                 break;
+
             case 1: // Right
                 x = getWidth(); // Place it just outside the right edge
                 y = (int) (Math.random() * getHeight()); // Random vertical position
                 break;
+
             case 2: // Top
                 x = (int) (Math.random() * getWidth()); // Random horizontal position
                 y = -CHARACTER_HEIGHT; // Place it just outside the top edge
                 break;
+
             case 3: // Bottom
                 x = (int) (Math.random() * getWidth()); // Random horizontal position
                 y = getHeight(); // Place it just outside the bottom edge
                 break;
+
         }
+
+        System.out.println(x);
+        System.out.println(y);
 
         // Set bounds for the zombie
         zombie.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
@@ -605,7 +524,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     public void run() {
         while (true) {
             updateCharacterPosition();
-            updateZombies();
             updateBullets();
 
             try {

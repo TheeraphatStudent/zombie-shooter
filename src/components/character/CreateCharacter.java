@@ -227,11 +227,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     }
 
-    public void setCharacterHp(int hp) {
-        hpBar.setHp(hp);
-
-    }
-
     // :|:|:|:|:|:|:|:|:|:|:|:|:|: Pain Component :|:|:|:|:|:|:|:|:|:|:|:|:|:
 
     @Override
@@ -379,10 +374,21 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         revalidateComponent();
     }
 
+    public void setCharacterHp(int hp) {
+        this.hp = hp;
+        hpBar.setHp(this.hp);
+
+    }
+
     // <<<<<<<<<< Getter <<<<<<<<<<
 
     public boolean getCharacterIsAlive() {
         return this.isSurvive;
+
+    }
+
+    public int getCharacterHp() {
+        return this.hp;
 
     }
 
