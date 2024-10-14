@@ -33,9 +33,13 @@ import components.DrawMouse;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import components.objectElement.Bullet;
+import components.Cover;
+
 import models.Player;
 import models.Zombie;
+
 import page.home.GameCenter;
+
 import types.ZombieType;
 import utils.LoadImage;
 import utils.UseCharacter;
@@ -58,6 +62,8 @@ interface GameContentProps {
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
 
     private JPanel content;
+    private JLayeredPane layers;
+    private Cover backgroundCover;
 
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
@@ -82,41 +88,18 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         this.gameCenter = gameCenter;
 
         createFrame();
+
+        // ปิดการปรับขนาดจอ
+        // setUndecorated(true);
         addKeyListener(this);
         setFocusable(true);
         requestFocus();
 
+        layers.revalidate();
+        layers.repaint();
+
         new Thread(this).start();
 
-    }
-
-    private void updateCharacterPosition() {
-        int currentX = character.getX();
-        int currentY = character.getY();
-
-        boolean moved = false;
-
-        if (isUpPressed && currentY - MOVEMENT_SPEED >= 0) {
-            currentY -= MOVEMENT_SPEED;
-            moved = true;
-        }
-        if (isDownPressed && currentY + MOVEMENT_SPEED + character.getHeight() <= getHeight()) {
-            currentY += MOVEMENT_SPEED;
-            moved = true;
-        }
-        if (isLeftPressed && currentX - MOVEMENT_SPEED >= 0) {
-            currentX -= MOVEMENT_SPEED;
-            moved = true;
-        }
-        if (isRightPressed && currentX + MOVEMENT_SPEED + character.getWidth() <= getWidth()) {
-            currentX += MOVEMENT_SPEED;
-            moved = true;
-        }
-
-        if (moved) {
-            character.setLocation(currentX, currentY);
-
-        }
     }
 
     private void createFrame() {
@@ -127,7 +110,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         setTitle("Zombie Shooter - Let's Survive");
         setLocationRelativeTo(null);
 
-        JLayeredPane layers = new JLayeredPane();
+        layers = new JLayeredPane();
 
         // ==================== Background ====================
 
@@ -182,8 +165,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
         content.setBounds(0, 0, this.getWidth(), this.getHeight());
-        content.setOpaque(false);
         layers.add(content, JLayeredPane.PALETTE_LAYER);
+
+        backgroundCover = new Cover();
+        backgroundCover.setBounds(0, 0, this.getWidth(), this.getHeight());
+        layers.add(backgroundCover, JLayeredPane.POPUP_LAYER);
 
         drawMouse = new DrawMouse();
         drawMouse.setBounds(0, 0, this.getWidth(), this.getHeight());
@@ -192,8 +178,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         this.mouseEvent(drawMouse);
 
         setContentPane(layers);
-        layers.revalidate();
-        layers.repaint();
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -260,9 +244,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ----*----*----*---- Dispose Content ----*----*----*----
 
-    @Override
-    public void dispose() {
-        this.removeAll();
+    public void disposeContent() {
         bullets.clear();
         zombies.clear();
         character.removeAll();
@@ -271,12 +253,48 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         spawner.stop();
         player.onGameFinish();
 
-        new WindowClosingFrameEvent().navigateTo(this, new Scoreboard(gameCenter, player), false);
+    }
+
+    @Override
+    public void dispose() {
+        disposeContent();
+
+        this.removeAll();
+        new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
 
         super.dispose();
     }
 
     // ----*----*----*---- Player Control - Key Input ----*----*----*----
+
+    private void updateCharacterPosition() {
+        int currentX = character.getX();
+        int currentY = character.getY();
+
+        boolean moved = false;
+
+        if (isUpPressed && currentY - MOVEMENT_SPEED >= 0) {
+            currentY -= MOVEMENT_SPEED;
+            moved = true;
+        }
+        if (isDownPressed && currentY + MOVEMENT_SPEED + character.getHeight() <= getHeight()) {
+            currentY += MOVEMENT_SPEED;
+            moved = true;
+        }
+        if (isLeftPressed && currentX - MOVEMENT_SPEED >= 0) {
+            currentX -= MOVEMENT_SPEED;
+            moved = true;
+        }
+        if (isRightPressed && currentX + MOVEMENT_SPEED + character.getWidth() <= getWidth()) {
+            currentX += MOVEMENT_SPEED;
+            moved = true;
+        }
+
+        if (moved) {
+            character.setLocation(currentX, currentY);
+
+        }
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -342,7 +360,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         spawner.start();
     }
 
-    //! ซอมบี้เดิน
+    // ! ซอมบี้เดิน
     private class ZombieMovementThread extends Thread {
         private Zombie behavior;
         private CreateCharacter zombie;
@@ -406,7 +424,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 if (player.getCharacterHp() <= 0) {
                     System.out.println("Player is dead!");
 
-                    dispose();
+                    backgroundCover.setCoverBackground(0.5f);
+                    disposeContent();
+                    // dispose();
 
                 }
             }
@@ -417,7 +437,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
     }
 
-    //! เพิ่ม ซอมบี้เข้า Frame
+    // ! เพิ่ม ซอมบี้เข้า Frame
     private void addZombie(String type) {
         CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
         zombie.setZombieType(type);
@@ -571,7 +591,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     @Override
     public void run() {
-        while (true) {
+        while (character.getCharacterHp() > 0) {
 
             // ใช้ Thread A เพื่อควบคุมกระสุน
             new Thread(new Runnable() {
