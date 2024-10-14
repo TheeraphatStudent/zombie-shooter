@@ -142,7 +142,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                new GameContent(this));
+                                () -> new GameContent(this));
 
                 gridConst.gridy = 2;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -156,7 +156,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                createRoomPage);
+                                () -> createRoomPage);
 
                 gridConst.gridy = 3;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -170,7 +170,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                developerPage);
+                                () -> developerPage);
 
                 gridConst.gridy = 4;
                 gridConst.insets = new Insets(0, 0, 15, 0);

@@ -43,7 +43,7 @@ interface CreateCharacterProps {
 
 }
 
-public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement, Runnable {
+public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
@@ -63,15 +63,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // Weapon Angle
     private double weaponAngle = 0;
-    private Point mousePosition = new Point(0, 0);
 
     // Ref
     private GameCenter gameCenter;
     private GameContent gameContent;
     private CreateHpBar hpBar;
-
-    private Thread drawingThread;
-    private volatile boolean running = true;
 
     // Models
 
@@ -182,10 +178,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         add(compressContent);
 
-        // :::::::::: Thread ::::::::::
-
-        drawingThread = new Thread(this);
-        drawingThread.start();
 
     }
 
@@ -220,15 +212,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         hpBar = new CreateHpBar(hp, Color.RED);
         hpBar.setBounds((CHARACTER_CENTER_X - 8), (CHARACTER_CENTER_Y + CHARACTER_HIT_Y) + 8, 100, 20);
         add(hpBar);
-
-        // Start drawing thread
-        drawingThread = new Thread(this);
-        drawingThread.start();
-
-    }
-
-    public void setCharacterHp(int hp) {
-        hpBar.setHp(hp);
 
     }
 
@@ -282,8 +265,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
     public void updateWeaponAngle(Point mousePos) {
-        this.mousePosition = mousePos;
-
         Point componentPos = SwingUtilities.convertPoint(getParent(), mousePos, this);
 
         int weaponSpinX = character.getX() + 40;
@@ -316,44 +297,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         gameContent.addBullet(new Bullet(weaponSpinX, weaponSpinY, weaponAngle));
     }
 
-    // ::::::::::::::::: Start Drawing Thread :::::::::::::::::::
-
-    @Override
-    public void run() {
-        while (running) {
-            try {
-                revalidateComponent();
-                Thread.sleep(64);
-
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-
-                break;
-            }
-        }
-    }
-
-    public void stop() {
-        running = false;
-        drawingThread.interrupt();
-    }
-
-    // ::::::::::::::::: Revalidate Component :::::::::::::::::::
-
-    public void revalidateComponent() {
-        repaint();
-        revalidate();
-
-        if (!(weapon == null)) {
-            weapon.repaint();
-            weapon.revalidate();
-
-        }
-
-        character.repaint();
-        character.revalidate();
-    }
-
     // ::::::::::::::::: Control :::::::::::::::::
 
     // >>>>>>>>>> Setter >>>>>>>>>>
@@ -366,23 +309,31 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         this.isMoveLeft = isMoveLeft;
         this.character.setCharacterMoveLeft(isMoveLeft);
 
-        revalidateComponent();
     }
 
     public void setCharacterAlive(boolean isAlive) {
         this.isSurvive = isAlive;
-        revalidateComponent();
     }
 
     public void setCharacterInfected(boolean isInfected) {
         this.isInfected = isInfected;
-        revalidateComponent();
+    }
+
+    public void setCharacterHp(int hp) {
+        this.hp = hp;
+        hpBar.setHp(this.hp);
+
     }
 
     // <<<<<<<<<< Getter <<<<<<<<<<
 
     public boolean getCharacterIsAlive() {
         return this.isSurvive;
+
+    }
+
+    public int getCharacterHp() {
+        return this.hp;
 
     }
 

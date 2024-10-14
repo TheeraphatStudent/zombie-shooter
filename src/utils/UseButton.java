@@ -24,6 +24,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
@@ -74,8 +75,6 @@ public class UseButton {
             e.printStackTrace();
         }
 
-
-
         return btn;
     }
 
@@ -88,7 +87,8 @@ public class UseButton {
             int height,
             String cursorCase,
             JFrame thispage,
-            JFrame destpage) {
+            // รอให้เกิด Event แล้วค่อยเรียกใช้งาน JFrame
+            Supplier<JFrame> destpage) {
         JButton btn = new JButton();
         btn.setFont(new Font("Arial", Font.PLAIN, this.fontSize));
         btn.setText(title);
@@ -137,7 +137,8 @@ public class UseButton {
             }
 
             thispage.dispose();
-            destpage.setVisible(true);
+            JFrame getDestPage = destpage.get();
+            getDestPage.setVisible(true);
 
         }));
 
