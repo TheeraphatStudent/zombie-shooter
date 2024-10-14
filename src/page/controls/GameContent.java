@@ -33,6 +33,7 @@ import components.DrawMouse;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import components.objectElement.Bullet;
+import models.Player;
 import models.Zombie;
 import page.home.GameCenter;
 import types.ZombieType;
@@ -62,6 +63,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private DrawMouse drawMouse;
 
     private CreateCharacter character;
+    private Player player;
+
     private ArrayList<CreateCharacter> zombies = new ArrayList<>();
     private ArrayList<ZombieMovementThread> zombieThreads = new ArrayList<>();
     private Timer spawner;
@@ -164,6 +167,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // ==================== Create Character ====================
 
         character = new CreateCharacter(this.gameCenter, this, false);
+        player = new Player(character);
 
         // # Set Character To Center
         character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
@@ -223,7 +227,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                                 break;
                             }
                         }
-                        
+
+                        player.addZombieWasKilled(1);
+
                         zombieContain.remove();
                         content.remove(zombie);
                         revalidateContent();
@@ -263,8 +269,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         stopAllZombies();
 
         spawner.stop();
+        player.onGameFinish();
 
-        new WindowClosingFrameEvent().navigateTo(this, new GameCenter(), false);
+        new WindowClosingFrameEvent().navigateTo(this, new Scoreboard(gameCenter, player), false);
 
         super.dispose();
     }
@@ -325,7 +332,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private void initializeZombieSpawner() {
         spawner = new Timer(1500, e -> {
-            if (zombies.size() < CREATE_ZOMBIES && zombies.size() <= 1) {
+            if (zombies.size() < CREATE_ZOMBIES && zombies.size() <= 5) {
                 String[] types = { "normal", "fast", "slow" };
                 String randomType = types[(int) (Math.random() * types.length)];
 
@@ -335,6 +342,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         spawner.start();
     }
 
+    //! ซอมบี้เดิน
     private class ZombieMovementThread extends Thread {
         private Zombie behavior;
         private CreateCharacter zombie;
@@ -342,16 +350,15 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         private CreateCharacter player;
 
         private volatile boolean running = true;
-        private Timer biteTimer; // Timer for the biting action
-        private boolean isBiting = false; // To track if the player is currently being bitten
+        private volatile Timer biteTimer;
+        private volatile boolean isBiting = false;
 
         public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, CreateCharacter player) {
             this.zombie = zombie;
             this.behavior = behavior;
             this.player = player;
 
-            // Initialize the bite timer
-            biteTimer = new Timer(1000, e -> performBiteIfInRange());
+            biteTimer = new Timer(1000, e -> biteInArea());
         }
 
         @Override
@@ -365,13 +372,15 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                     if (!isBiting && isPlayerInRange()) {
                         isBiting = true;
-                        performBiteIfInRange();
+                        biteInArea();
 
                         biteTimer.start();
-                    } else if (isBiting && !isPlayerInRange()) {
-                        isBiting = false;
-                        biteTimer.stop();
 
+                        if (isBiting && !isPlayerInRange()) {
+                            isBiting = false;
+                            biteTimer.stop();
+
+                        }
                     }
 
                 } catch (InterruptedException e) {
@@ -389,11 +398,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             return zombieHitbox.intersects(playerHitbox);
         }
 
-        private void performBiteIfInRange() {
+        private void biteInArea() {
             if (isPlayerInRange()) {
                 System.out.println("Bite!");
 
-                player.setCharacterHp(player.getCharacterHp() - (int) behavior.getZombieSpeed());
+                player.setCharacterHp(player.getCharacterHp() - (int) behavior.getZombieDamage());
                 if (player.getCharacterHp() <= 0) {
                     System.out.println("Player is dead!");
 
@@ -408,47 +417,43 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
     }
 
-    // Method to add a zombie and start its movement in a new thread
+    //! เพิ่ม ซอมบี้เข้า Frame
     private void addZombie(String type) {
         CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
         zombie.setZombieType(type);
 
         Zombie zombieBehavior = new Zombie(character, zombie, this);
-
         zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
 
-        // Determine spawn position based on a random side
         int spawnSide = (int) (Math.random() * 4);
         int x = 0, y = 0;
 
         switch (spawnSide) {
             case 0: // Left
-                x = -CHARACTER_WIDTH; // Place it just outside the left edge
-                y = (int) (Math.random() * getHeight()); // Random vertical position
+                x = -CHARACTER_WIDTH;
+                y = (int) (Math.random() * getHeight());
                 break;
 
             case 1: // Right
-                x = getWidth(); // Place it just outside the right edge
-                y = (int) (Math.random() * getHeight()); // Random vertical position
+                x = getWidth();
+                y = (int) (Math.random() * getHeight());
                 break;
 
             case 2: // Top
-                x = (int) (Math.random() * getWidth()); // Random horizontal position
-                y = -CHARACTER_HEIGHT; // Place it just outside the top edge
+                x = (int) (Math.random() * getWidth());
+                y = -CHARACTER_HEIGHT;
                 break;
 
             case 3: // Bottom
-                x = (int) (Math.random() * getWidth()); // Random horizontal position
-                y = getHeight(); // Place it just outside the bottom edge
+                x = (int) (Math.random() * getWidth());
+                y = getHeight();
                 break;
         }
 
-        // Set bounds for the zombie
         zombie.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(zombie);
         zombies.add(zombie);
 
-        // Start the zombie's movement in a separate thread
         ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, character);
         zombieThread.start();
 

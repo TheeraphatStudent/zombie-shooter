@@ -75,9 +75,9 @@ public class Zombie implements ManageCharacterElement {
 
     private Map<String, ZombieType> zombieTypes = new HashMap<String, ZombieType>() {
         {
-            put("normal", new ZombieType(7, 10, 100));
-            put("fast", new ZombieType(10, 5, 60));
-            put("slow", new ZombieType(5, 15, 150));
+            put("normal", new ZombieType(7, 15, 100));
+            put("fast", new ZombieType(15, 10, 60));
+            put("slow", new ZombieType(3, 20, 150));
         }
     };
 }

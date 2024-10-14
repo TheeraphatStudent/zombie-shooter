@@ -49,8 +49,8 @@ public class Bullet extends JPanel implements ManageBulletElement {
         if (!isActive)
             return;
 
-        g2d.setColor(Color.RED);
-        g2d.drawRect((int) x, (int) y, BULLET_SIZE, BULLET_SIZE);
+        // g2d.setColor(Color.RED);
+        // g2d.drawRect((int) x, (int) y, BULLET_SIZE, BULLET_SIZE);
 
         g2d.setColor(Color.YELLOW);
         g2d.fillOval(

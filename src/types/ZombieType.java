@@ -1,27 +1,27 @@
 package types;
 
 public class ZombieType {
-    double speed;
-    double damage;
-    double health;
+    int speed;
+    int damage;
+    int health;
 
-    public ZombieType(double speed, double damage, double health) {
+    public ZombieType(int speed, int damage, int health) {
         this.speed = speed;
         this.damage = damage;
         this.health = health;
     }
 
-    public double getSpeed() {
+    public int getSpeed() {
         return this.speed;
 
     }
 
-    public double getDamage() {
+    public int getDamage() {
         return this.damage;
 
     }
 
-    public double getHealth() {
+    public int getHealth() {
             return this.health;
 
     }
