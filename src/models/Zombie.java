@@ -68,11 +68,16 @@ public class Zombie implements ManageCharacterElement {
 
     }
 
+    public double getZombieHealth() {
+        return zombieTypes.get(zombie.getZombieType()).getHealth();
+
+    }
+
     private Map<String, ZombieType> zombieTypes = new HashMap<String, ZombieType>() {
         {
             put("normal", new ZombieType(7, 10, 100));
-            put("fast", new ZombieType(10, 5, 100));
-            put("slow", new ZombieType(5, 15, 100));
+            put("fast", new ZombieType(10, 5, 60));
+            put("slow", new ZombieType(5, 15, 150));
         }
     };
 }

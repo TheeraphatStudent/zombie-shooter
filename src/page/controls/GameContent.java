@@ -325,7 +325,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private void initializeZombieSpawner() {
         spawner = new Timer(1500, e -> {
-            if (zombies.size() < CREATE_ZOMBIES && zombies.size() < 5) {
+            if (zombies.size() < CREATE_ZOMBIES && zombies.size() <= 1) {
                 String[] types = { "normal", "fast", "slow" };
                 String randomType = types[(int) (Math.random() * types.length)];
 
@@ -336,7 +336,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     }
 
     private class ZombieMovementThread extends Thread {
-        private Zombie zombieBehavior;
+        private Zombie behavior;
         private CreateCharacter zombie;
 
         private CreateCharacter player;
@@ -345,8 +345,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         private Timer biteTimer; // Timer for the biting action
         private boolean isBiting = false; // To track if the player is currently being bitten
 
-        public ZombieMovementThread(CreateCharacter zombie, CreateCharacter player) {
+        public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, CreateCharacter player) {
             this.zombie = zombie;
+            this.behavior = behavior;
             this.player = player;
 
             // Initialize the bite timer
@@ -359,8 +360,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 try {
                     Thread.sleep(16);
 
-                    zombieBehavior = new Zombie(character, zombie, GameContent.this);
-                    zombieBehavior.updateZombiePosition();
+                    behavior = new Zombie(character, zombie, GameContent.this);
+                    behavior.updateZombiePosition();
 
                     if (!isBiting && isPlayerInRange()) {
                         isBiting = true;
@@ -392,9 +393,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             if (isPlayerInRange()) {
                 System.out.println("Bite!");
 
-                player.setCharacterHp(player.getCharacterHp() - (int) zombieBehavior.getZombieSpeed());
+                player.setCharacterHp(player.getCharacterHp() - (int) behavior.getZombieSpeed());
                 if (player.getCharacterHp() <= 0) {
                     System.out.println("Player is dead!");
+
+                    dispose();
 
                 }
             }
@@ -409,6 +412,10 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private void addZombie(String type) {
         CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
         zombie.setZombieType(type);
+
+        Zombie zombieBehavior = new Zombie(character, zombie, this);
+
+        zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
 
         // Determine spawn position based on a random side
         int spawnSide = (int) (Math.random() * 4);
@@ -442,7 +449,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         zombies.add(zombie);
 
         // Start the zombie's movement in a separate thread
-        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, character);
+        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, character);
         zombieThread.start();
 
         zombieThreads.add(zombieThread);

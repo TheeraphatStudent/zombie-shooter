@@ -20,4 +20,9 @@ public class ZombieType {
         return this.damage;
 
     }
+
+    public double getHealth() {
+            return this.health;
+
+    }
 }
