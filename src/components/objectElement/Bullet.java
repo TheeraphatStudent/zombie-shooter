@@ -35,8 +35,11 @@ public class Bullet extends JPanel implements ManageBulletElement {
     }
 
     public void move() {
-        if (!isActive)
+        if (!isActive) {
             return;
+
+        }
+
         x += dx;
         y += dy;
     }

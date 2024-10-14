@@ -63,15 +63,15 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private CreateCharacter character;
     private ArrayList<CreateCharacter> zombies = new ArrayList<>();
+    private ArrayList<ZombieMovementThread> zombieThreads = new ArrayList<>();
+    private Timer spawner;
 
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
-    private Timer movementTimer;
     private Point mousePosition;
 
     // Bullet
     private ArrayList<Bullet> bullets = new ArrayList<>();
-    private Timer bulletTimer;
 
     public GameContent(GameCenter gameCenter) {
         System.out.println("On Create Game Center");
@@ -83,39 +83,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         setFocusable(true);
         requestFocus();
 
-        initializeBulletTimer();
-
         new Thread(this).start();
 
-    }
-
-    // private void initializeMovement() {
-    // System.out.println("Initialize Movement Work!");
-
-    // movementTimer = new Timer(16, (e -> {
-    // updateCharacterPosition();
-
-    // }));
-    // movementTimer.start();
-    // }
-
-    // private void movementzom() {
-    // Timer zombieTimer = new Timer(16, (e -> {
-    // updateZombies();
-    // }));
-    // zombieTimer.start();
-    // }
-
-    private void initializeZombieSpawner() {
-        Timer spawner = new Timer(1500, e -> {
-            if (zombies.size() < CREATE_ZOMBIES && zombies.size() < 3) {
-                String[] types = { "normal", "fast", "slow" };
-                String randomType = types[(int) (Math.random() * types.length)];
-
-                addZombie(randomType);
-            }
-        });
-        spawner.start();
     }
 
     private void updateCharacterPosition() {
@@ -143,7 +112,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         if (moved) {
             character.setLocation(currentX, currentY);
-            repaint();
+
         }
     }
 
@@ -228,15 +197,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ----*----*----*---- Bullet Management ----*----*----*----
 
-    private void initializeBulletTimer() {
-        bulletTimer = new Timer(16, e -> {
-            updateBullets();
-            repaint();
-
-        });
-        bulletTimer.start();
-    }
-
     private void updateBullets() {
         Iterator<Bullet> bulletIterator = bullets.iterator();
         while (bulletIterator.hasNext()) {
@@ -249,13 +209,13 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             while (zombieContain.hasNext() && !bulletRemoved) {
                 CreateCharacter zombie = zombieContain.next();
                 Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
-                
+
                 if (bullet.getBounds().intersects(zombieHitbox)) {
                     // Remove both bullet and zombie
                     bulletIterator.remove();
-                    
+
                     zombie.setCharacterHp(zombie.getCharacterHp() - 20);
-                    
+
                     if (zombie.getCharacterHp() <= 0) {
                         zombieContain.remove();
                         content.remove(zombie);
@@ -263,9 +223,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                         // Count kill zombie here!
 
                     }
-            
+
                     bulletRemoved = true;
-                    repaint();
                 }
             }
 
@@ -292,9 +251,12 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     @Override
     public void dispose() {
         this.removeAll();
-
-        bulletTimer.stop();
         bullets.clear();
+        zombies.clear();
+        character.removeAll();
+        stopAllZombies();
+
+        spawner.stop();
 
         new WindowClosingFrameEvent().navigateTo(this, new GameCenter(), false);
 
@@ -355,6 +317,18 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! ----*----*----*---- Zombie Control ----*----*----*----
 
+    private void initializeZombieSpawner() {
+        spawner = new Timer(1500, e -> {
+            if (zombies.size() < CREATE_ZOMBIES && zombies.size() < 5) {
+                String[] types = { "normal", "fast", "slow" };
+                String randomType = types[(int) (Math.random() * types.length)];
+
+                addZombie(randomType);
+            }
+        });
+        spawner.start();
+    }
+
     private class ZombieMovementThread extends Thread {
         private CreateCharacter zombie;
         private volatile boolean running = true;
@@ -371,18 +345,21 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                     new Zombie(character, zombie, GameContent.this).updateZombiePosition();
 
-                    SwingUtilities.invokeLater(() -> repaint());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    running = false;
                 }
             }
         }
 
+        public void stopMovement() {
+            running = false;
+        }
     }
 
-    // Method to add a zombie and start its movement
+    // Method to add a zombie and start its movement in a new thread
     private void addZombie(String type) {
-        CreateCharacter zombie = new CreateCharacter(this.gameCenter, this, true);
+        CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
         zombie.setZombieType(type);
 
         // Determine spawn position based on a random side
@@ -409,25 +386,24 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 x = (int) (Math.random() * getWidth()); // Random horizontal position
                 y = getHeight(); // Place it just outside the bottom edge
                 break;
-
         }
-
-        System.out.println(x);
-        System.out.println(y);
 
         // Set bounds for the zombie
         zombie.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(zombie);
         zombies.add(zombie);
 
-        // Update the UI
-        SwingUtilities.invokeLater(() -> {
-            content.revalidate();
-            content.repaint();
-        });
+        // Start the zombie's movement in a separate thread
+        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie);
+        zombieThread.start();
 
-        // Start the movement thread for this zombie
-        new Thread(new ZombieMovementThread(zombie)).start(); // If you have zombie movement logic
+        zombieThreads.add(zombieThread);
+    }
+
+    private void stopAllZombies() {
+        for (ZombieMovementThread thread : zombieThreads) {
+            thread.stopMovement();
+        }
     }
 
     // ----*----*----*---- Mouse ----*----*----*----
@@ -517,20 +493,55 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private void updateMousePosition(Point point) {
         mousePosition = point;
         character.updateWeaponAngle(point);
-        repaint();
+
+    }
+
+    private void revalidateContent() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                content.revalidate();
+                content.repaint();
+
+            }
+        });
+
     }
 
     @Override
     public void run() {
         while (true) {
-            updateCharacterPosition();
-            updateBullets();
+
+            // ใช้ Thread A เพื่อควบคุมกระสุน
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    updateBullets();
+
+                }
+
+            }).start();
+
+            // ใช้ Thread B เพื่อควบคุมการเดินของผู้เล่น
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    updateCharacterPosition();
+
+                }
+
+            }).start();
+
+            revalidateContent();
 
             try {
-                Thread.sleep(16);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.sleep(12);
+
+            } catch (Exception e) {
+                // TODO: handle exception
             }
+
         }
 
     }

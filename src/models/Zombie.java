@@ -53,7 +53,7 @@ public class Zombie implements ManageCharacterElement {
         zombie.setLocation(newX, newY);
     }
 
-    
+
 
     ZombieType getZombieType(String zombieBehavior) {
         return zombieTypes.get(zombieBehavior);
@@ -62,9 +62,9 @@ public class Zombie implements ManageCharacterElement {
 
     private Map<String, ZombieType> zombieTypes = new HashMap<String, ZombieType>() {
         {
-            put("normal", new ZombieType(5, 10, 100));
-            put("fast", new ZombieType(8, 5, 100));
-            put("slow", new ZombieType(3, 15, 100));
+            put("normal", new ZombieType(7, 10, 100));
+            put("fast", new ZombieType(10, 5, 100));
+            put("slow", new ZombieType(5, 15, 100));
         }
     };
 }
