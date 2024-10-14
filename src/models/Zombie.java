@@ -53,10 +53,18 @@ public class Zombie implements ManageCharacterElement {
         zombie.setLocation(newX, newY);
     }
 
-
-
-    ZombieType getZombieType(String zombieBehavior) {
+    public ZombieType getZombieType(String zombieBehavior) {
         return zombieTypes.get(zombieBehavior);
+
+    }
+
+    public double getZombieSpeed() {
+        return zombieTypes.get(zombie.getZombieType()).getSpeed();
+
+    }
+
+    public double getZombieDamage() {
+        return zombieTypes.get(zombie.getZombieType()).getDamage();
 
     }
 

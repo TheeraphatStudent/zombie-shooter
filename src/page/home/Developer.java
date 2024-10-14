@@ -106,7 +106,7 @@ public class Developer extends JFrame {
                 100,
                 "hand",
                 this,
-                gameCenter);
+                () -> gameCenter);
 
         title_name.setBounds(10, 10, 400, 50);
         titleContent.add(title_name);

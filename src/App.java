@@ -5,8 +5,10 @@ import utils.UseGlobal;
 
 public class App {
 
-    private static int screenWidth = 1920;
-    private static int screenHeight = 1080;
+    // private static int screenWidth = 1920;
+    // private static int screenHeight = 1080;
+    private static int screenWidth = 1660;
+    private static int screenHeight = 933;
 
     private static int MIN_SCREEN = 600;
 
