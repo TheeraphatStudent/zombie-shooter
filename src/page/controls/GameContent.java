@@ -201,6 +201,16 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         character = new CreateCharacter(this.gameCenter, this, false);
         player = new Player(character, state);
 
+        // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก
+
+        int bulletDamage = 10;
+        int playerHealth = 100;
+
+        player.setPlayerBulletDamage(bulletDamage);
+        player.setPlayerHealth(playerHealth);
+
+        character.setCharacterHp(100);
+
         // # Set Character To Center
         character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(character);
@@ -280,7 +290,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                     // Remove both bullet and zombie
                     bulletIterator.remove();
 
-                    zombie.setCharacterHp(zombie.getCharacterHp() - 20);
+                    zombie.setCharacterHp(zombie.getCharacterHp() - player.getPlayerBulletDamage());
 
                     if (zombie.getCharacterHp() <= 0) {
                         for (ZombieMovementThread thread : zombieThreads) {

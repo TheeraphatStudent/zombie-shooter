@@ -9,6 +9,9 @@ public class Player {
     private CreateCharacter character;
     private volatile int zombieHunt = 0;
 
+    private volatile int damage = 10;
+    private volatile int health = 100;
+
     // ใช้สำหรับอัพแรงค์
     private volatile int storeZombieHunt = 0;
 
@@ -45,6 +48,11 @@ public class Player {
 
     }
 
+    public void onGameFinish() {
+        this.onSurvive.stop();
+
+    }
+
     // >>>>>>>>>> Setter >>>>>>>>>>
 
     public void addZombieWasKilled(int number) {
@@ -55,6 +63,10 @@ public class Player {
             System.out.println("Is Rank Up!");
             rank++;
             character.setCharacterRank(rank);
+            character.setCharacterHp(character.getCharacterHp() + ((10 * (rank + 1)) * state.getLevelState()));
+
+            this.damage += (5 * rank+1) + state.getLevelState();
+            System.out.println("Current Damage: " + this.damage);
 
             storeZombieHunt = 0;
 
@@ -64,10 +76,25 @@ public class Player {
 
     }
 
+    public void setPlayerBulletDamage(int newDamage) {
+        this.damage = newDamage;
+
+    }
+
+    public void setPlayerHealth(int newHealth) {
+        this.health = newHealth;
+
+    }
+
     // <<<<<<<<<< Getter <<<<<<<<<<
 
-    public void onGameFinish() {
-        this.onSurvive.stop();
+    public int getPlayerBulletDamage() {
+        return this.damage;
+
+    }
+
+    public int getPlayerHealth() {
+        return this.health;
 
     }
 
