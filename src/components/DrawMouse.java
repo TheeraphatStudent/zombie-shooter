@@ -2,6 +2,7 @@ package components;
 
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -17,6 +18,7 @@ public class DrawMouse extends JPanel {
     public DrawMouse() {
         setOpaque(false);
         setFocusable(false);
+        setLayout(new GridBagLayout());
 
         // Load the cursor image
         Image tempCursor = new LoadImage().getImage("resource/images/cursor.png");
