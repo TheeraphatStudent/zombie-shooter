@@ -18,7 +18,10 @@ public class Scoreboard extends JPanel {
     private int maxZombie = 0;
     private int neededZombie = 0;
 
+    private int rank = 0;
+
     private JTextPane killedText;
+    private JTextPane currentRank;
     private JTextPane rankUp;
 
     public Scoreboard() {
@@ -45,14 +48,19 @@ public class Scoreboard extends JPanel {
                 Color.WHITE, Font.PLAIN);
         add(killedText, gridConst);
 
-        gridConst.insets = new Insets(10, 0, -10, 0);
         gridConst.gridy = 2;
-        add(new UseText(20, 200, 40, false).createSimpleText("Rank up", Color.BLACK, null, Font.PLAIN),
+        currentRank = new UseText(20, 200, 35, true).createSimpleText(String.format("Rank: %d", rank), Color.BLACK,
+                Color.WHITE, Font.PLAIN);
+        add(currentRank, gridConst);
+
+        gridConst.insets = new Insets(10, 0, -10, 0);
+        gridConst.gridy = 3;
+        add(new UseText(20, 200, 35, false).createSimpleText("Rank up", Color.BLACK, null, Font.PLAIN),
                 gridConst);
 
         gridConst.insets = new Insets(0, 0, 0, 0);
-        gridConst.gridy = 3;
-        rankUp = new UseText(20, 200, 40, true).createSimpleText(String.format("Require: %d / %d", neededZombie, maxZombie),
+        gridConst.gridy = 4;
+        rankUp = new UseText(20, 200, 35, true).createSimpleText(String.format("Require: %d / %d", neededZombie, maxZombie),
                 Color.BLACK, Color.WHITE, Font.PLAIN);
         add(rankUp, gridConst);
     }
@@ -67,6 +75,14 @@ public class Scoreboard extends JPanel {
     public void setMaxZombie(int max) {
         this.maxZombie = max;
         rankUp.setText(String.format("Require: %d / %d", neededZombie, maxZombie));
+
+        revalidateContent();
+
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+        currentRank.setText(String.format("Rank: %d", rank));
 
         revalidateContent();
 

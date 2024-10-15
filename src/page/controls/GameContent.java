@@ -146,6 +146,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         scoreboard.setKilled(player.getZombieHunt());
         scoreboard.setNeededKilled(player.getStoreZombieHunt());
         scoreboard.setMaxZombie(player.getRankUpKillZombieNeeded());
+        
+        scoreboard.setRank(player.getRank());
 
     }
 

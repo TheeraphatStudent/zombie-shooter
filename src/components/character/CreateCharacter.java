@@ -131,7 +131,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         displayName = gameCenter.getDisplayName();
         displayText = new UseText().truncateText(displayName) + " - rank " + currentRank;
 
-        playerName = new UseText(14, CHARACTER_WIDTH, 40, true).createSimpleText(
+        playerName = new UseText(16, CHARACTER_WIDTH, 40, true).createSimpleText(
                 displayText,
                 Color.WHITE,
                 null,
