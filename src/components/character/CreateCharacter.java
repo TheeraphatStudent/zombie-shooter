@@ -61,6 +61,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private boolean isMoveLeft = false;
     private boolean isSurvive = true;
 
+    private JTextPane playerName;
+    private String displayName = "";
+    private String displayText = "";
+    private int currentRank = 0;
+
     // Weapon Angle
     private double weaponAngle = 0;
 
@@ -123,11 +128,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         base.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         // >>>>>>>>>> Player name 👋
-        String displayName = gameCenter.getDisplayName();
-        String displayText = new UseText().truncateText(displayName);
-        displayText += " - rank 0";
+        displayName = gameCenter.getDisplayName();
+        displayText = new UseText().truncateText(displayName) + " - rank " + currentRank;
 
-        JTextPane playerName = new UseText(14, CHARACTER_WIDTH, 40, true).createSimpleText(
+        playerName = new UseText(16, CHARACTER_WIDTH, 40, true).createSimpleText(
                 displayText,
                 Color.WHITE,
                 null,
@@ -325,6 +329,19 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     }
 
+    public void setCharacterRank(int rank) {
+        System.out.println("Set Character Rank Work!");
+        System.out.println(rank);
+    
+        this.currentRank = rank;
+        this.displayText = displayName + " - rank " + this.currentRank;  // Update display text
+    
+        playerName.setText(displayText); 
+    
+        revalidateContent();
+    }
+    
+
     // <<<<<<<<<< Getter <<<<<<<<<<
 
     public boolean getCharacterIsAlive() {
@@ -339,6 +356,19 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     public String getZombieType() {
         return this.zombieType;
+    }
+
+    private void revalidateContent() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+
+                revalidate();
+                repaint();
+
+            }
+        });
+
     }
 
 }
