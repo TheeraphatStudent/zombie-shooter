@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.Timer;
-
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -43,6 +42,7 @@ import components.Cover;
 
 import models.Player;
 import models.Zombie;
+import models.State;
 
 import page.home.GameCenter;
 
@@ -67,10 +67,14 @@ interface GameContentProps {
 }
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
+    // Game State
+    private State state;
 
     private JPanel content;
     private JLayeredPane layers;
     private Cover backgroundCover;
+
+    // Stat
     private LevelState levelState;
     private Scoreboard scoreboard;
 
@@ -95,6 +99,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         System.out.println("On Create Game Center");
 
         this.gameCenter = gameCenter;
+        state = new State();
 
         createFrame();
 
@@ -108,6 +113,18 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         layers.repaint();
 
         new Thread(this).start();
+
+    }
+
+    // ==================== Game State ====================
+
+    private void updateGameState() {
+        state.setStateLevel(1);
+
+        scoreboard.setNeededKilled(5);
+        scoreboard.setMaxZombie(state.getMaxZombie());
+
+        levelState.setLevelState(state.getLevelState());
 
     }
 
@@ -217,6 +234,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         setContentPane(layers);
 
+        updateGameState();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }

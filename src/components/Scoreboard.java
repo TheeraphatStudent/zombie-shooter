@@ -15,8 +15,11 @@ public class Scoreboard extends JPanel {
 
     private int killed = 0;
 
+    private int maxZombie = 0;
+    private int neededZombie = 0;
+
     private JTextPane killedText;
-    private JTextPane requireText;
+    private JTextPane rankUp;
 
     public Scoreboard() {
         createScoreboard();
@@ -49,14 +52,28 @@ public class Scoreboard extends JPanel {
 
         gridConst.insets = new Insets(0, 0, 0, 0);
         gridConst.gridy = 3;
-        requireText = new UseText(20, 200, 40, true).createSimpleText(String.format("Require: %d / %d", 0, 0),
+        rankUp = new UseText(20, 200, 40, true).createSimpleText(String.format("Require: %d / %d", neededZombie, maxZombie),
                 Color.BLACK, Color.WHITE, Font.PLAIN);
-        add(requireText, gridConst);
+        add(rankUp, gridConst);
     }
 
     public void setKilled(int killed) {
         this.killed = killed;
         killedText.setText(String.format("Kill: %d", killed));
+        
+        revalidateContent();
+    }
+    
+    public void setMaxZombie(int max) {
+        this.maxZombie = max;
+        rankUp.setText(String.format("Require: %d / %d", neededZombie, maxZombie));
+
+        revalidateContent();
+
+    }
+
+    public void setNeededKilled(int needed) {
+        this.neededZombie = needed;
 
         revalidateContent();
     }
@@ -65,6 +82,12 @@ public class Scoreboard extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                killedText.revalidate();
+                killedText.repaint(); 
+
+                rankUp.revalidate();
+                rankUp.repaint(); 
+
                 revalidate();
                 repaint();
             }
