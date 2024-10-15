@@ -55,11 +55,11 @@ import utils.UseText;
 import utils.WindowClosingFrameEvent;
 
 interface GameContentProps {
-    int CREATE_ZOMBIES = 50;
-
     void mouseEvent(DrawMouse mouse);
 
     void addBullet(Bullet bullet);
+
+    void updateGameState();
 
     // Character control movement
     // boolean getCharacterMovement();
@@ -81,12 +81,15 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
 
+    // Character Content
     private CreateCharacter character;
     private Player player;
 
     private ArrayList<CreateCharacter> zombies = new ArrayList<>();
     private ArrayList<ZombieMovementThread> zombieThreads = new ArrayList<>();
     private Timer spawner;
+    private volatile int CREATE_ZOMBIES;
+    private volatile int ZOMBIE_REMAIN;
 
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
@@ -103,6 +106,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         createFrame();
 
+        updateGameState();
+        updatePlayerStat();
+
         // ปิดการปรับขนาดจอ
         // setUndecorated(true);
         addKeyListener(this);
@@ -118,13 +124,30 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ==================== Game State ====================
 
-    private void updateGameState() {
+    public void updateGameState() {
         state.setStateLevel(1);
 
-        scoreboard.setNeededKilled(5);
-        scoreboard.setMaxZombie(state.getMaxZombie());
+        CREATE_ZOMBIES = state.getMaxZombie();
+        ZOMBIE_REMAIN = state.getMaxZombie();
 
+        updateLevelScoreboard();
+
+    }
+
+    private void updateLevelScoreboard() {
         levelState.setLevelState(state.getLevelState());
+        levelState.setZombieOnState(state.getMaxZombie());
+        levelState.setZombieRemain(ZOMBIE_REMAIN);
+
+    }
+
+    private void updatePlayerStat() {
+        // Killed Stat
+        scoreboard.setKilled(player.getZombieHunt());
+        scoreboard.setNeededKilled(player.getStoreZombieHunt());
+
+        // Rank
+        scoreboard.setMaxZombie(state.getMaxZombie());
 
     }
 
@@ -176,7 +199,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // ==================== Create Character ====================
 
         character = new CreateCharacter(this.gameCenter, this, false);
-        player = new Player(character);
+        player = new Player(character, state);
 
         // # Set Character To Center
         character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
@@ -234,7 +257,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         setContentPane(layers);
 
-        updateGameState();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }
@@ -273,6 +295,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                         zombieContain.remove();
                         content.remove(zombie);
+
+                        this.ZOMBIE_REMAIN = ZOMBIE_REMAIN - 1;
+                        updateLevelScoreboard();
+
+                        updatePlayerStat();
                         revalidateContent();
 
                     }

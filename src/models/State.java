@@ -34,8 +34,7 @@ public class State {
 
     public int getMaxZombie() {
         // return this.maxZombie;
-        int maxZombie = (int) ((int) (5 + (1 * 5)) * (levelState * 0.5));
-        System.out.println(maxZombie);
+        maxZombie = (int) ((int) (5 + (1 * 5)) * (levelState * 0.5));
 
         return maxZombie;
 

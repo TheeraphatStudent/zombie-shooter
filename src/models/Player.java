@@ -5,8 +5,14 @@ import javax.swing.Timer;
 import components.character.CreateCharacter;
 
 public class Player {
+    private State state;
     private CreateCharacter character;
     private volatile int zombieHunt = 0;
+
+    // ใช้สำหรับอัพแรงค์
+    private volatile int storeZombieHunt = 0;
+
+    private volatile int rank = 0;
 
     // On Survive
     private Timer onSurvive;
@@ -14,8 +20,9 @@ public class Player {
     private volatile int min = 0;
     private volatile int hour = 0;
 
-    public Player(CreateCharacter character) {
+    public Player(CreateCharacter character, State state) {
         this.character = character;
+        this.state = state;
 
         this.onSurvive = new Timer(1000, e -> {
             sec++;
@@ -42,6 +49,16 @@ public class Player {
 
     public void addZombieWasKilled(int number) {
         this.zombieHunt += number;
+        this.storeZombieHunt += number;
+
+        if (storeZombieHunt >= state.getMaxZombie()) {
+            rank++;
+            character.setCharacterRank(rank);
+
+            storeZombieHunt = 0;
+
+        }
+
         System.out.println(this.zombieHunt);
 
     }
@@ -55,6 +72,18 @@ public class Player {
 
     public int getZombieHunt() {
         return this.zombieHunt;
+
+    }
+
+    public int getStoreZombieHunt() {
+        System.out.println("Store Zombie Hunt: " + this.storeZombieHunt);
+
+        return this.storeZombieHunt;
+
+    }
+
+    public int getRank() {
+        return this.rank;
 
     }
 

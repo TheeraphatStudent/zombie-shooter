@@ -73,7 +73,10 @@ public class Scoreboard extends JPanel {
     }
 
     public void setNeededKilled(int needed) {
+        System.out.println("Set Needed Killed: " + needed);
         this.neededZombie = needed;
+
+        rankUp.setText(String.format("Require: %d / %d", neededZombie, maxZombie));
 
         revalidateContent();
     }
