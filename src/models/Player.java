@@ -51,7 +51,8 @@ public class Player {
         this.zombieHunt += number;
         this.storeZombieHunt += number;
 
-        if (storeZombieHunt >= state.getMaxZombie()) {
+        if (storeZombieHunt >= (5 * (rank + 1))) {
+            System.out.println("Is Rank Up!");
             rank++;
             character.setCharacterRank(rank);
 
@@ -76,14 +77,17 @@ public class Player {
     }
 
     public int getStoreZombieHunt() {
-        System.out.println("Store Zombie Hunt: " + this.storeZombieHunt);
-
         return this.storeZombieHunt;
 
     }
 
     public int getRank() {
         return this.rank;
+
+    }
+
+    public int getRankUpKillZombieNeeded() {
+        return (5 * (this.rank + 1));
 
     }
 

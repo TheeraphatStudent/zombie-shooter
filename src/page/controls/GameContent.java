@@ -145,9 +145,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // Killed Stat
         scoreboard.setKilled(player.getZombieHunt());
         scoreboard.setNeededKilled(player.getStoreZombieHunt());
-
-        // Rank
-        scoreboard.setMaxZombie(state.getMaxZombie());
+        scoreboard.setMaxZombie(player.getRankUpKillZombieNeeded());
 
     }
 
@@ -297,6 +295,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                         content.remove(zombie);
 
                         this.ZOMBIE_REMAIN = ZOMBIE_REMAIN - 1;
+                        if (ZOMBIE_REMAIN <= 0) {
+                            updateGameState();
+
+                        }
+
                         updateLevelScoreboard();
 
                         updatePlayerStat();

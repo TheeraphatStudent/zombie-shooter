@@ -33,8 +33,9 @@ public class State {
     // <<<<<<<<<< Getter <<<<<<<<<<
 
     public int getMaxZombie() {
-        // return this.maxZombie;
         maxZombie = (int) ((int) (5 + (1 * 5)) * (levelState * 0.5));
+        System.out.println("Level State: " + levelState);
+        System.out.println("Max Zombie: " + maxZombie);
 
         return maxZombie;
 
@@ -49,7 +50,5 @@ public class State {
         return this.levelState;
         
     }
-
-
 
 }
