@@ -4,6 +4,8 @@ import java.awt.Rectangle;
 
 public interface ManageCharacterElement {
     // Character
+    final int MOVEMENT_SPEED = 10;
+
     final int CHARACTER_WIDTH = 250;
     final int CHARACTER_HEIGHT = 250;
 

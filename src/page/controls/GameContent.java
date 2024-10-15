@@ -3,18 +3,22 @@ package page.controls;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Point;
+import java.awt.Font;
 import java.awt.RenderingHints;
 import java.awt.Rectangle;
+import java.awt.Insets;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +34,8 @@ import javax.swing.SwingUtilities;
 
 import components.DrawBulletLine;
 import components.DrawMouse;
+import components.LevelState;
+import components.Scoreboard;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import components.objectElement.Bullet;
@@ -45,14 +51,15 @@ import utils.LoadImage;
 import utils.UseCharacter;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
+import utils.UseText;
 import utils.WindowClosingFrameEvent;
 
 interface GameContentProps {
-    int MOVEMENT_SPEED = 10;
-
     int CREATE_ZOMBIES = 50;
 
     void mouseEvent(DrawMouse mouse);
+
+    void addBullet(Bullet bullet);
 
     // Character control movement
     // boolean getCharacterMovement();
@@ -64,6 +71,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private JPanel content;
     private JLayeredPane layers;
     private Cover backgroundCover;
+    private LevelState levelState;
+    private Scoreboard scoreboard;
 
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
@@ -167,6 +176,35 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         content.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(content, JLayeredPane.PALETTE_LAYER);
 
+        // Scoreboard
+        JPanel score = new JPanel();
+        score.setLayout(new GridBagLayout());
+        score.setOpaque(false);
+
+        GridBagConstraints gridConst = new GridBagConstraints();
+
+        gridConst.gridx = 0;
+        gridConst.gridy = 0;
+        gridConst.weightx = 1;
+        gridConst.weighty = 1;
+        gridConst.insets = new Insets(15, 15, 0, 0);
+
+        gridConst.anchor = GridBagConstraints.NORTHWEST;
+
+        scoreboard = new Scoreboard();
+        score.add(scoreboard, gridConst);
+
+        gridConst.insets = new Insets(15, 0, 0, 0);
+        gridConst.anchor = GridBagConstraints.NORTH;
+
+        levelState = new LevelState();
+        levelState.setBackground(Color.GREEN);
+
+        score.add(levelState, gridConst);
+
+        score.setBounds(0, 0, this.getWidth(), this.getHeight());
+        layers.add(score, JLayeredPane.MODAL_LAYER);
+
         backgroundCover = new Cover();
         backgroundCover.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(backgroundCover, JLayeredPane.POPUP_LAYER);
@@ -213,6 +251,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                         }
 
                         player.addZombieWasKilled(1);
+                        scoreboard.setKilled(player.getZombieHunt());
 
                         zombieContain.remove();
                         content.remove(zombie);
