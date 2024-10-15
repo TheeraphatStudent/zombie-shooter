@@ -35,6 +35,7 @@ import components.DrawBulletLine;
 import components.DrawMouse;
 import components.LevelState;
 import components.Scoreboard;
+import components.Sumstat;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import components.objectElement.Bullet;
@@ -43,6 +44,7 @@ import components.Cover;
 import models.Player;
 import models.Zombie;
 import models.State;
+import components.Sumstat;
 
 import page.home.GameCenter;
 
@@ -712,6 +714,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             }
 
         }
+
+        drawMouse.add(new Sumstat(this, gameCenter));
 
     }
 }
