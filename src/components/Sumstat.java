@@ -9,22 +9,36 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
+import models.Player;
 import page.controls.GameContent;
 import page.home.GameCenter;
 import utils.UseButton;
+import utils.UseGlobal;
 import utils.UseText;
 
 public class Sumstat extends JPanel {
 
   private GameContent gamecontent;
   private GameCenter gamecenter;
+  private Player player ;
 
   private boolean isShowBackButton = true;
 
-  public Sumstat(GameContent gameContent, GameCenter gameCenter, boolean isShowBackButton) {
+  // ใส่ Parameter เข้ามาใน Object
+  // เก็บ Parameter ใน Attribute แล้วนำไปเรียกใช้งาน
+  // นำ Attribute มาใช้งานในการแสดงผล
+  // ;
+
+  public Sumstat(
+      GameContent gameContent,
+      GameCenter gameCenter,
+      boolean isShowBackButton,
+      Player player) {
+
     this.gamecontent = gameContent;
     this.gamecenter = gameCenter;
     this.isShowBackButton = isShowBackButton;
+    this.player = player;
 
     System.out.println("Create Sum Stat Work!");
 
@@ -52,17 +66,25 @@ public class Sumstat extends JPanel {
     statGridConst.weightx = 1;
     statGridConst.weighty = 1;
     statGridConst.gridx = 0;
-    
-    statContain.add(new UseText(20, 200, 30, false).createSimpleText("Name: Player", Color.BLACK, Color.WHITE, Font.PLAIN), statGridConst);
+
+    statContain.add(
+        new UseText(20, 200, 30, false).createSimpleText("Name: "+player.getName(), Color.BLACK, Color.WHITE, Font.PLAIN),
+        statGridConst);
     statGridConst.gridy = 1;
-    statContain.add(new UseText(20, 200, 30, false).createSimpleText("IP: 192.168.0.0", Color.BLACK, Color.WHITE, Font.PLAIN), statGridConst);
+    statContain.add(
+        new UseText(20, 200, 30, false).createSimpleText("IP: "+player.getip(), Color.BLACK, Color.WHITE, Font.PLAIN),
+        statGridConst);
     statGridConst.gridy = 2;
-    statContain.add(new UseText(20, 200, 30, false).createSimpleText("Kill: 11", Color.BLACK, Color.WHITE, Font.PLAIN), statGridConst);
+    statContain.add(new UseText(20, 200, 30, false).createSimpleText("Kill: "+player.getZombieHunt(), Color.BLACK, Color.WHITE, Font.PLAIN),
+        statGridConst);
     statGridConst.gridy = 3;
-    statContain.add(new UseText(20, 200, 30, false).createSimpleText("Rank: 1", Color.BLACK, Color.WHITE, Font.PLAIN), statGridConst);
+    statContain.add(new UseText(20, 200, 30, false).createSimpleText("Rank: "+player.getRank(), Color.BLACK, Color.WHITE, Font.PLAIN),
+        statGridConst);
     statGridConst.gridy = 4;
-    statContain.add(new UseText(20, 200, 30, false).createSimpleText("Alive Time: 00:05:00", Color.BLACK, Color.WHITE, Font.PLAIN), statGridConst);
-    
+    statContain.add(
+        new UseText(20, 200, 30, false).createSimpleText("Alive Time: "+player.getAliveTime(), Color.BLACK, Color.WHITE, Font.PLAIN),
+        statGridConst);
+
     gridConst.gridy = 1;
     // gridConst.insets = new Insets(0, 20, 0, 20);
     add(statContain, gridConst);
@@ -70,8 +92,9 @@ public class Sumstat extends JPanel {
     gridConst.gridy = 2;
     gridConst.insets = new Insets(10, 10, 10, 10);
 
-    if (isShowBackButton) {
-      add(new UseButton(24).createButtonAndChangePage("", "Back", Color.WHITE, 200, 40, "hand", this.gamecontent, () -> this.gamecenter), gridConst);
+    if (this.isShowBackButton) {
+      add(new UseButton(24).createButtonAndChangePage("", "Back", Color.WHITE, 200, 40, "hand", this.gamecontent,
+          () -> this.gamecenter), gridConst);
 
     }
   }
