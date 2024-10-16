@@ -725,7 +725,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         }
 
-        drawMouse.add(new Sumstat(this, this.gameCenter, true));
+        drawMouse.add(new Sumstat(this, this.gameCenter, true,player));
         drawMouse.revalidate();
         drawMouse.repaint();
 
