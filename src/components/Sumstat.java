@@ -13,6 +13,7 @@ import models.Player;
 import page.controls.GameContent;
 import page.home.GameCenter;
 import utils.UseButton;
+import utils.UseGlobal;
 import utils.UseText;
 
 public class Sumstat extends JPanel {
@@ -67,11 +68,11 @@ public class Sumstat extends JPanel {
     statGridConst.gridx = 0;
 
     statContain.add(
-        new UseText(20, 200, 30, false).createSimpleText("Name: Player", Color.BLACK, Color.WHITE, Font.PLAIN),
+        new UseText(20, 200, 30, false).createSimpleText("Name: "+player.getName(), Color.BLACK, Color.WHITE, Font.PLAIN),
         statGridConst);
     statGridConst.gridy = 1;
     statContain.add(
-        new UseText(20, 200, 30, false).createSimpleText("IP: 192.168.0.0", Color.BLACK, Color.WHITE, Font.PLAIN),
+        new UseText(20, 200, 30, false).createSimpleText("IP: "+player.getip(), Color.BLACK, Color.WHITE, Font.PLAIN),
         statGridConst);
     statGridConst.gridy = 2;
     statContain.add(new UseText(20, 200, 30, false).createSimpleText("Kill: "+player.getZombieHunt(), Color.BLACK, Color.WHITE, Font.PLAIN),

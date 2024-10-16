@@ -6,6 +6,8 @@ import components.character.CreateCharacter;
 
 public class Player {
     private State state;
+    private String name;
+    private String ip;
     private CreateCharacter character;
     private volatile int zombieHunt = 0;
 
@@ -23,9 +25,11 @@ public class Player {
     private volatile int min = 0;
     private volatile int hour = 0;
 
-    public Player(CreateCharacter character, State state) {
+    public Player(CreateCharacter character, State state,String name,String ip) {
         this.character = character;
         this.state = state;
+        this.name = name;
+        this.ip = ip;
 
         this.onSurvive = new Timer(1000, e -> {
             sec++;
@@ -121,6 +125,14 @@ public class Player {
     public String getAliveTime() {
         return String.format("%d : %d : %d", this.hour, this.min, this.sec);
 
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public String getip(){
+        return this.ip;
     }
 
 }
