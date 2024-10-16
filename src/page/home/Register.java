@@ -8,13 +8,18 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+
+import client.Server;
+
 import components.DrawMouse;
+
 import utils.LoadImage;
 import utils.UseButton;
 import utils.LoadImage.BackgroundPanel;
@@ -170,8 +175,12 @@ public class Register extends JFrame implements KeyListener {
         getDisplayName = new UseText().truncateText(field.getText().trim());
         isValidName = !getDisplayName.isEmpty();
 
+        Server server = new Server();
+        System.out.println("Server IP: " + server.getServerIp());
+        System.out.println("Server Port: " + server.getServerPort());
+
         if (isValidName) {
-            gameCenter = new GameCenter(getDisplayName, "192.168.0.0");
+            gameCenter = new GameCenter(getDisplayName, server.getServerIp());
             UseGlobal.setName(getDisplayName);
 
             System.out.println(gameCenter);
