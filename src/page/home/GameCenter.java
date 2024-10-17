@@ -19,6 +19,7 @@ import javax.swing.JTextPane;
 import client.Client;
 import client.Server;
 import components.DrawMouse;
+import models.ClientObj;
 
 import java.awt.Image;
 import page.controls.GameContent;
@@ -33,6 +34,7 @@ import utils.WindowResize;
 public class GameCenter extends JFrame {
 
         Server server;
+        ClientObj client;
 
         private String name = "???";
         private String ip = "???";
@@ -41,13 +43,14 @@ public class GameCenter extends JFrame {
         private DrawMouse drawMouse;
         private Developer developerPage;
 
-        public GameCenter(Server server) {
+        public GameCenter(Server server, ClientObj client) {
                 this.server = server;
+                this.client = client;
 
-                this.name = "";
-                this.ip = "";
+                this.name = this.client.getClientName();
+                this.ip = this.client.getClientIp();
 
-                developerPage = new Developer(this);
+                developerPage = new Developer(this, client);
                 // createRoomPage = new CreateRoom(this, server);
 
                 createFrame();
@@ -145,7 +148,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> new GameContent(this, server));
+                                () -> new GameContent(this, server, client));
 
                 gridConst.gridy = 2;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -216,16 +219,6 @@ public class GameCenter extends JFrame {
 
                 new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, drawMouse}, new Component[]{layers});
                 new WindowClosingFrameEvent(this);
-
-        }
-
-        public String getDisplayName() {
-                return this.name;
-
-        }
-
-        public String getIp() {
-                return this.ip;
 
         }
 

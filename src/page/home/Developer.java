@@ -15,6 +15,7 @@ import javax.swing.JTextPane;
 import components.Card;
 import components.CoverTitle;
 import components.DrawMouse;
+import models.ClientObj;
 
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -33,8 +34,11 @@ public class Developer extends JFrame {
         private DrawMouse drawMouse;
         private GameCenter gameCenter;
 
-        public Developer(GameCenter gameCenter) {
+        private ClientObj client;
+
+        public Developer(GameCenter gameCenter, ClientObj client) {
                 this.gameCenter = gameCenter;
+                this.client = client;
 
                 createFrame();
         }
@@ -83,7 +87,7 @@ public class Developer extends JFrame {
 
                 // ==================== Absolute Content ===================
 
-                JPanel titleContent = new CoverTitle("", "");
+                JPanel titleContent = new CoverTitle(client.getClientName(), client.getClientIp());
                 titleContent.setLayout(null);
 
                 // ---------- Back ----------

@@ -23,6 +23,7 @@ import client.Client;
 import client.Server;
 
 import components.DrawMouse;
+import models.ClientObj;
 import utils.LoadImage;
 import utils.UseButton;
 import utils.LoadImage.BackgroundPanel;
@@ -35,6 +36,7 @@ import utils.useAlert;
 public class Register extends JFrame implements KeyListener {
 
     Server server;
+    ClientObj client;
 
     private boolean isValidName = false;
     private JTextField field;
@@ -190,8 +192,10 @@ public class Register extends JFrame implements KeyListener {
         System.out.println("Server IP: " + server.getServerIp());
         System.out.println("Server Port: " + server.getServerPort());
 
+        client = new ClientObj(getDisplayName, server.getServerIp());
+
         if (isValidName) {
-            gameCenter = new GameCenter(server);
+            gameCenter = new GameCenter(server, client);
 
             new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
         } else {
