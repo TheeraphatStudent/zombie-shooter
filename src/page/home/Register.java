@@ -1,11 +1,14 @@
 package page.home;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -16,19 +19,22 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
+import client.Client;
 import client.Server;
 
 import components.DrawMouse;
-
 import utils.LoadImage;
 import utils.UseButton;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
 import utils.UseText;
 import utils.WindowClosingFrameEvent;
+import utils.WindowResize;
 import utils.useAlert;
 
 public class Register extends JFrame implements KeyListener {
+
+    Server server;
 
     private boolean isValidName = false;
     private JTextField field;
@@ -38,7 +44,9 @@ public class Register extends JFrame implements KeyListener {
     private DrawMouse drawMouse;
     private GameCenter gameCenter;
 
-    public Register() {
+    public Register(Server server) {
+        this.server = server;
+
         setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
         setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
 
@@ -50,6 +58,9 @@ public class Register extends JFrame implements KeyListener {
 
         GridBagConstraints gridConst = new GridBagConstraints();
         JLayeredPane layers = new JLayeredPane();
+
+        layers.setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
+        layers.setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
 
         // ==================== Background ====================
 
@@ -123,6 +134,7 @@ public class Register extends JFrame implements KeyListener {
 
         // ==================== Event ====================
 
+        new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, drawMouse}, new Component[]{layers});
         new WindowClosingFrameEvent(this);
 
         addKeyListener(this);
@@ -175,15 +187,11 @@ public class Register extends JFrame implements KeyListener {
         getDisplayName = new UseText().truncateText(field.getText().trim());
         isValidName = !getDisplayName.isEmpty();
 
-        Server server = new Server();
         System.out.println("Server IP: " + server.getServerIp());
         System.out.println("Server Port: " + server.getServerPort());
 
         if (isValidName) {
-            gameCenter = new GameCenter(getDisplayName, server.getServerIp());
-            UseGlobal.setName(getDisplayName);
-
-            System.out.println(gameCenter);
+            gameCenter = new GameCenter(server);
 
             new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
         } else {

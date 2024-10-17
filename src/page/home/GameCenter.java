@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,7 +16,10 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
+import client.Client;
+import client.Server;
 import components.DrawMouse;
+
 import java.awt.Image;
 import page.controls.GameContent;
 import utils.LoadImage;
@@ -24,8 +28,11 @@ import utils.UseButton;
 import utils.UseGlobal;
 import utils.UseText;
 import utils.WindowClosingFrameEvent;
+import utils.WindowResize;
 
 public class GameCenter extends JFrame {
+
+        Server server;
 
         private String name = "???";
         private String ip = "???";
@@ -33,19 +40,15 @@ public class GameCenter extends JFrame {
         // Ref
         private DrawMouse drawMouse;
         private Developer developerPage;
-        private CreateRoom createRoomPage;
 
-        public GameCenter() {
-                createFrame();
+        public GameCenter(Server server) {
+                this.server = server;
 
-        }
-
-        public GameCenter(String name, String ip) {
-                this.name = name;
-                this.ip = ip;
+                this.name = "";
+                this.ip = "";
 
                 developerPage = new Developer(this);
-                createRoomPage = new CreateRoom(this);
+                // createRoomPage = new CreateRoom(this, server);
 
                 createFrame();
         }
@@ -142,7 +145,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> new GameContent(this));
+                                () -> new GameContent(this, server));
 
                 gridConst.gridy = 2;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -156,7 +159,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> createRoomPage);
+                                () -> new CreateRoom(this, server));
 
                 gridConst.gridy = 3;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -184,7 +187,7 @@ public class GameCenter extends JFrame {
                                 "hand");
 
                 exit.addActionListener((e -> {
-                        new WindowClosingFrameEvent().closePage(GameCenter.this);;
+                        new WindowClosingFrameEvent().closePage(GameCenter.this);
 
                 }));
 
@@ -211,6 +214,7 @@ public class GameCenter extends JFrame {
                 layers.revalidate();
                 layers.repaint();
 
+                new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, drawMouse}, new Component[]{layers});
                 new WindowClosingFrameEvent(this);
 
         }

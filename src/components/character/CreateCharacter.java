@@ -24,9 +24,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import page.controls.GameContent;
-import page.home.GameCenter;
 
 import utils.LoadImage;
+import utils.UseGlobal;
 import utils.UseText;
 
 interface CreateCharacterProps {
@@ -70,15 +70,13 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private double weaponAngle = 0;
 
     // Ref
-    private GameCenter gameCenter;
     private GameContent gameContent;
     private CreateHpBar hpBar;
 
     // Models
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
-    public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
-        this.gameCenter = gameCenter;
+    public CreateCharacter(GameContent gameContent, boolean isInfected) {
         this.gameContent = gameContent;
         this.isSurvive = !isInfected;
 
@@ -128,7 +126,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         base.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         // >>>>>>>>>> Player name 👋
-        displayName = gameCenter.getDisplayName();
+        displayName = gameContent.getName();
         displayText = new UseText().truncateText(displayName) + " - rank " + currentRank;
 
         playerName = new UseText(16, CHARACTER_WIDTH, 40, true).createSimpleText(
@@ -186,8 +184,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // :::::::::::::::::::: Zombie ::::::::::::::::::::
-    public CreateCharacter(GameCenter gameCenter, GameContent gameContent) {
-        this.gameCenter = gameCenter;
+    public CreateCharacter(GameContent gameContent) {
         this.gameContent = gameContent;
 
         // Zombie State -> false, false

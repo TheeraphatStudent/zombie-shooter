@@ -1,28 +1,34 @@
 package page.home;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 
+import client.Client;
+import client.Server;
+import components.DrawMouse;
 import utils.LoadImage;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
 import utils.WindowClosingFrameEvent;
+import utils.WindowResize;
 
 public class CreateRoom extends JFrame {
 
+    Server server;
+
     private GameCenter gameCenter;
+    private DrawMouse drawMouse;
 
-    public CreateRoom(GameCenter gameCenter) {
+    public CreateRoom(GameCenter gameCenter, Server server) {
         this.gameCenter = gameCenter;
+        this.server = server;
 
-        createFrame();
+        // new Client(server.getServerIp(), server.getServerPort());
 
-    }
-
-    public CreateRoom() {
         createFrame();
 
     }
@@ -51,6 +57,10 @@ public class CreateRoom extends JFrame {
 
         backgroundPanel.setLayout(new GridBagLayout());
 
+        drawMouse = new DrawMouse();
+        drawMouse.setBounds(0, 0, this.getWidth(), this.getHeight());
+        layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
+
         backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
@@ -58,6 +68,7 @@ public class CreateRoom extends JFrame {
         layers.revalidate();
         layers.repaint();
 
+        new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, drawMouse}, new Component[]{layers});
         new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

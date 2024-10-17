@@ -1,6 +1,7 @@
 package page.home;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,7 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import components.Card;
+import components.CoverTitle;
 import components.DrawMouse;
+
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 
@@ -22,124 +25,106 @@ import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
 import utils.UseText;
 import utils.WindowClosingFrameEvent;
+import utils.WindowResize;
 
 public class Developer extends JFrame {
 
-    // Ref
-    private DrawMouse drawMouse;
-    private GameCenter gameCenter;
+        // Ref
+        private DrawMouse drawMouse;
+        private GameCenter gameCenter;
 
-    public Developer() {
-        createFrame();
+        public Developer(GameCenter gameCenter) {
+                this.gameCenter = gameCenter;
 
-    }
+                createFrame();
+        }
 
-    public Developer(GameCenter gameCenter) {
-        this.gameCenter = gameCenter;
+        private void createFrame() {
+                setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
+                setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
 
-        createFrame();
-    }
+                setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                setTitle("Zombie Shooter - Developer");
+                setLocationRelativeTo(null);
 
-    private void createFrame() {
-        setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
-        setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
+                JLayeredPane layers = new JLayeredPane();
+                GridBagConstraints gridConst = new GridBagConstraints();
 
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setTitle("Zombie Shooter - Developer");
-        setLocationRelativeTo(null);
+                // ==================== Background ====================
 
-        JLayeredPane layers = new JLayeredPane();
-        GridBagConstraints gridConst = new GridBagConstraints();
+                // Background Image
+                String backgroundPath = "resource/images/background/plain.png";
+                BackgroundPanel backgroundPanel = new LoadImage.BackgroundPanel(
+                                backgroundPath,
+                                this.getWidth(),
+                                this.getHeight(),
+                                1,
+                                .5,
+                                true);
 
-        // ==================== Background ====================
+                backgroundPanel.setLayout(new GridBagLayout());
 
-        // Background Image
-        String backgroundPath = "resource/images/background/plain.png";
-        BackgroundPanel backgroundPanel = new LoadImage.BackgroundPanel(
-                backgroundPath,
-                this.getWidth(),
-                this.getHeight(),
-                1,
-                .5,
-                true);
+                // ==================== Content ====================
 
-        backgroundPanel.setLayout(new GridBagLayout());
+                gridConst.insets = new Insets(0, 50, 0, 0);
 
-        // ==================== Content ====================
+                JPanel content = new JPanel();
+                content.setLayout(new GridBagLayout());
 
-        gridConst.insets = new Insets(0, 50, 0, 0);
+                content.add(new Card(
+                                "Theeraphat Chueanokkhum",
+                                "66011212103",
+                                "resource/images/author/theeraphat.png"), gridConst);
 
-        JPanel content = new JPanel();
-        content.setLayout(new GridBagLayout());
+                content.add(new Card(
+                                "Boonisa Pitchawrong",
+                                "66011212184",
+                                "resource/images/author/boonisa.png"), gridConst);
 
-        content.add(new Card(
-                "Theeraphat Chueanokkhum",
-                "66011212103",
-                "resource/images/author/theeraphat.png"), gridConst);
+                // ==================== Absolute Content ===================
 
-        content.add(new Card(
-                "Boonisa Pitchawrong",
-                "66011212184",
-                "resource/images/author/boonisa.png"), gridConst);
+                JPanel titleContent = new CoverTitle("", "");
+                titleContent.setLayout(null);
 
-        // ==================== Absolute Content ===================
+                // ---------- Back ----------
+                JButton back = new UseButton(32).createButtonAndChangePage(
+                                "-",
+                                "Back",
+                                Color.WHITE,
+                                200,
+                                100,
+                                "hand",
+                                this,
+                                () -> gameCenter);
 
-        JPanel titleContent = new JPanel();
-        titleContent.setLayout(null);
+                back.setBounds(10, (this.getHeight() - 100), 200, 50);
+                titleContent.add(back);
 
-        // ---------- Name ----------
-        JTextPane title_name = new UseText(24, 400, 50, false)
-                .createSimpleText("Name: " + gameCenter.getDisplayName(), null, null, Font.BOLD);
-        title_name.setOpaque(false);
+                // ==================== Layers ====================
 
-        // ---------- IP ----------
-        JTextPane title_ip = new UseText(24, 400, 50, false)
-                .createSimpleText("IP: " + gameCenter.getIp(), null, null, Font.BOLD);
-        title_ip.setOpaque(false);
+                backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
+                layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
-        // ---------- Back ----------
-        JButton back = new UseButton(32).createButtonAndChangePage(
-                "-",
-                "Back",
-                Color.WHITE,
-                200,
-                100,
-                "hand",
-                this,
-                () -> gameCenter);
+                titleContent.setBounds(0, 0, this.getWidth(), this.getHeight());
+                titleContent.setOpaque(false);
+                layers.add(titleContent, JLayeredPane.PALETTE_LAYER);
 
-        title_name.setBounds(10, 10, 400, 50);
-        titleContent.add(title_name);
+                content.setBounds(0, 0, this.getWidth(), this.getHeight());
+                content.setOpaque(false);
+                layers.add(content, JLayeredPane.MODAL_LAYER);
 
-        title_ip.setBounds(10, 55, 400, 50);
-        titleContent.add(title_ip);
+                drawMouse = new DrawMouse();
+                drawMouse.setBounds(0, 0, this.getWidth(), this.getHeight());
+                layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
 
-        back.setBounds(10, (this.getHeight() - 100), 200, 50);
-        titleContent.add(back);
+                setContentPane(layers);
+                layers.revalidate();
+                layers.repaint();
 
-        // ==================== Layers ====================
+                new WindowResize().addWindowResize(this, new Component[] { backgroundPanel, drawMouse },
+                                new Component[] { layers });
+                new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
+                setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
-        layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
-
-        titleContent.setBounds(0, 0, this.getWidth(), this.getHeight());
-        titleContent.setOpaque(false);
-        layers.add(titleContent, JLayeredPane.PALETTE_LAYER);
-
-        content.setBounds(0, 0, this.getWidth(), this.getHeight());
-        content.setOpaque(false);
-        layers.add(content, JLayeredPane.MODAL_LAYER);
-
-        drawMouse = new DrawMouse();
-        drawMouse.setBounds(0, 0, this.getWidth(), this.getHeight());
-        layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
-
-        setContentPane(layers);
-        layers.revalidate();
-        layers.repaint();
-
-        new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-    }
+        }
 }

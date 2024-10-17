@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Stroke;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -26,6 +27,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.Timer;
+
+import client.Server;
+
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -44,17 +48,15 @@ import components.Cover;
 import models.Player;
 import models.Zombie;
 import models.State;
-import components.Sumstat;
 
 import page.home.GameCenter;
 
-import types.ZombieType;
 import utils.LoadImage;
 import utils.UseCharacter;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseGlobal;
-import utils.UseText;
 import utils.WindowClosingFrameEvent;
+import utils.WindowResize;
 
 interface GameContentProps {
     void mouseEvent(DrawMouse mouse);
@@ -69,6 +71,8 @@ interface GameContentProps {
 }
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
+    Server server;
+
     // Game State
     private State state;
 
@@ -100,7 +104,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     // Bullet
     private ArrayList<Bullet> bullets = new ArrayList<>();
 
-    public GameContent(GameCenter gameCenter) {
+    public GameContent(GameCenter gameCenter, Server server) {
+        this.server = server;
+
         System.out.println("On Create Game Center");
 
         this.gameCenter = gameCenter;
@@ -200,7 +206,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Character ====================
 
-        character = new CreateCharacter(this.gameCenter, this, false);
+        character = new CreateCharacter(this, false);
         player = new Player(character, state);
 
         // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก
@@ -269,6 +275,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         setContentPane(layers);
 
+        new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, backgroundCover, content, score, drawMouse}, new Component[]{layers});
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }
@@ -540,7 +547,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! เพิ่ม ซอมบี้เข้า Frame
     private void addZombie(String type) {
-        CreateCharacter zombie = new CreateCharacter(this.gameCenter, this);
+        CreateCharacter zombie = new CreateCharacter(this);
         zombie.setZombieType(type);
 
         Zombie zombieBehavior = new Zombie(character, zombie, this);

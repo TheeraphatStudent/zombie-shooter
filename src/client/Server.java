@@ -1,62 +1,77 @@
 package client;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 public class Server {
-
+    private ServerSocket serverSocket;
     private int serverPort;
     private String serverIp;
+    private List<ClientHandler> clients = new ArrayList<>();
 
     public Server() {
+        this.serverPort = getServerPort();
+        this.serverIp = getServerIp();
         try {
-            ServerSocket serverSocket = new ServerSocket(serverPort);
-
-            // Get the server's IP address
+            this.serverSocket = new ServerSocket(serverPort);
             System.out.println("Server IP: " + serverIp);
             System.out.println("Server is listening on port " + serverPort);
-
-            // Wait for a client to connect
-            // Socket clientSocket = serverSocket.accept();
-            // System.out.println("Client connected");
-
-            serverSocket.close();
-            // clientSocket.close();
-
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (IOException e) {
+            System.out.println("Error creating server socket: " + e.getMessage());
         }
+    }
 
+    public void start() {
+        try {
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("New client connected: " + clientSocket);
+                
+                ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+                clients.add(clientHandler);
+                new Thread(clientHandler).start();
+            }
+        } catch (IOException e) {
+            System.out.println("Error accepting client connection: " + e.getMessage());
+        }
+    }
+
+    public void broadcastMessage(String message, ClientHandler sender) {
+        for (ClientHandler client : clients) {
+            if (client != sender) {
+                client.sendMessage(message);
+            }
+        }
+    }
+
+    public void removeClient(ClientHandler clientHandler) {
+        clients.remove(clientHandler);
     }
 
     public int getServerPort() {
         try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            this.serverPort = serverSocket.getLocalPort();
-            serverSocket.close();
-            return this.serverPort;
-
+            ServerSocket tempSocket = new ServerSocket(0);
+            int port = tempSocket.getLocalPort();
+            tempSocket.close();
+            return port;
         } catch (IOException exc) {
             exc.printStackTrace();
-
         }
-
         return 0;
-
     }
 
     public String getServerIp() {
         try {
-            this.serverIp = InetAddress.getLocalHost().getHostAddress();
-            return this.serverIp;
-
-        } catch (Exception e) {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            System.out.println("Error getting server IP: " + e.getMessage());
         }
-
         return null;
+    }
 
+    public static void main(String[] args) {
+        Server server = new Server();
+        server.start();
     }
 }
