@@ -2,11 +2,14 @@ package page.home;
 
 import java.awt.*;
 import javax.swing.*;
+
+import client.Client;
 import client.Server;
 import components.CoverTitle;
 import components.DrawMouse;
 import models.ClientObj;
 import utils.LoadImage;
+import utils.UseAlert;
 import utils.UseButton;
 import utils.UseGlobal;
 import utils.UseText;
@@ -16,14 +19,18 @@ import utils.WindowResize;
 public class JoinRoom extends JFrame {
 
     Server server;
-    ClientObj client;
+    Client client;
+
+    // Models
+    ClientObj clientObj;
+
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
 
-    public JoinRoom(GameCenter gameCenter, Server server, ClientObj client) {
+    public JoinRoom(GameCenter gameCenter, Server server, ClientObj clientObj) {
         this.gameCenter = gameCenter;
         this.server = server;
-        this.client = client;
+        this.clientObj = clientObj;
         createFrame();
     }
 
@@ -45,7 +52,7 @@ public class JoinRoom extends JFrame {
         layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
         // Title Content
-        JPanel titleContent = new CoverTitle(client.getClientName(), client.getClientIp());
+        JPanel titleContent = new CoverTitle(clientObj.getClientName(), clientObj.getClientIp());
         titleContent.setLayout(null);
         titleContent.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(titleContent, JLayeredPane.PALETTE_LAYER);
@@ -64,7 +71,8 @@ public class JoinRoom extends JFrame {
         layers.revalidate();
         layers.repaint();
 
-        new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, joinRoomContent, drawMouse}, new Component[]{layers});
+        new WindowResize().addWindowResize(this, new Component[] { backgroundPanel, joinRoomContent, drawMouse },
+                new Component[] { layers });
         new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
     }
 
@@ -106,7 +114,6 @@ public class JoinRoom extends JFrame {
         gridConst.insets = new Insets(0, 20, 10, 20);
         formPanel.add(serverPortField, gridConst);
 
-
         // Buttons
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         buttonPanel.setOpaque(false);
@@ -120,29 +127,63 @@ public class JoinRoom extends JFrame {
 
         // Headers
         JButton joinRoomBtn = useButton.createSimpleButton("Join", Color.decode("#B0FFBC"), 100, 40, "hand");
+
+        joinRoomBtn.addActionListener(e -> {
+
+            String serverIp = serverIpField.getText().trim();
+            String serverPort = serverPortField.getText().trim();
+    
+            if (serverIp.isEmpty() || serverPort.isEmpty()) {
+                new UseAlert().warringAlert("Server IP or Server Port is empty! Please try again.");
+                return;
+            }
+    
+            try {
+                int port = Integer.parseInt(serverPort);
+                if (port < 0 || port > 65535) {
+                    throw new IllegalArgumentException("Port number out of valid range (0-65535)");
+                }
+    
+                System.out.println("Connecting to IP: " + serverIp);
+                System.out.println("Port: " + port);
+                System.out.println("Join Work!");
+    
+                client = new Client(serverIp, port);
+    
+            } catch (NumberFormatException numExc) {
+                new UseAlert().warringAlert("Port should be a valid number between 0 and 65535!");
+
+            } catch (IllegalArgumentException IllExc) {
+                new UseAlert().warringAlert(IllExc.getMessage());
+
+            } catch (Exception exc) {
+                new UseAlert().warringAlert(exc.getMessage());
+
+            }
+
+        });
+
         headers.add(joinRoomBtn);
 
         JButton createRoomBtn = useButton.createButtonAndChangePage(
-            "",
-            "Create Room",
-            Color.decode("#FEFFA7"),
-            250, 40,
-            "hand",
-            this,
-            () -> null
-        );
+                "",
+                "Create Room",
+                Color.decode("#FEFFA7"),
+                250, 40,
+                "hand",
+                this,
+                () -> null);
         headers.add(createRoomBtn);
 
         // Footer
         JButton back = useButton.createButtonAndChangePage(
-            "",
-            "Back",
-            Color.decode("#FFB0B0"),
-            250, 40,
-            "hand",
-            this,
-            () -> this.gameCenter
-        );
+                "",
+                "Back",
+                Color.decode("#FFB0B0"),
+                250, 40,
+                "hand",
+                this,
+                () -> this.gameCenter);
         footer.add(back);
 
         gridConst.weightx = 1;

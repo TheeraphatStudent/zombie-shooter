@@ -31,7 +31,7 @@ import utils.UseGlobal;
 import utils.UseText;
 import utils.WindowClosingFrameEvent;
 import utils.WindowResize;
-import utils.useAlert;
+import utils.UseAlert;
 
 public class Register extends JFrame implements KeyListener {
 
@@ -199,7 +199,7 @@ public class Register extends JFrame implements KeyListener {
 
             new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
         } else {
-            new useAlert().warringAlert("Please enter display name!");
+            new UseAlert().warringAlert("Please enter display name!");
         }
     }
 }
