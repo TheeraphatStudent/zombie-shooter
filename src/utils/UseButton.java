@@ -5,7 +5,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import page.controls.GameContent;
-import page.home.CreateRoom;
+import page.home.JoinRoom;
 import page.home.Developer;
 import page.home.GameCenter;
 import page.home.Register;
@@ -34,8 +34,8 @@ public class UseButton {
     public UseButton() {
     }
 
-    public UseButton(int getFontSize) {
-        this.fontSize = getFontSize;
+    public UseButton(int setFontSize) {
+        this.fontSize = setFontSize;
 
     }
 

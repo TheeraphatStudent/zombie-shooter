@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import components.objectElement.Bullet;
+import models.ClientObj;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -24,9 +25,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import page.controls.GameContent;
-import page.home.GameCenter;
 
 import utils.LoadImage;
+import utils.UseGlobal;
 import utils.UseText;
 
 interface CreateCharacterProps {
@@ -44,6 +45,9 @@ interface CreateCharacterProps {
 }
 
 public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
+
+    ClientObj client;
+    
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
@@ -70,17 +74,17 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private double weaponAngle = 0;
 
     // Ref
-    private GameCenter gameCenter;
     private GameContent gameContent;
     private CreateHpBar hpBar;
 
     // Models
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
-    public CreateCharacter(GameCenter gameCenter, GameContent gameContent, boolean isInfected) {
-        this.gameCenter = gameCenter;
+    public CreateCharacter(GameContent gameContent, boolean isInfected, ClientObj clientObj) {
         this.gameContent = gameContent;
         this.isSurvive = !isInfected;
+
+        this.client = clientObj;
 
         setLayout(null);
         setOpaque(false);
@@ -128,7 +132,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         base.setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
         // >>>>>>>>>> Player name 👋
-        displayName = gameCenter.getDisplayName();
+        displayName = client.getClientName();
         displayText = new UseText().truncateText(displayName) + " - rank " + currentRank;
 
         playerName = new UseText(16, CHARACTER_WIDTH, 40, true).createSimpleText(
@@ -186,8 +190,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // :::::::::::::::::::: Zombie ::::::::::::::::::::
-    public CreateCharacter(GameCenter gameCenter, GameContent gameContent) {
-        this.gameCenter = gameCenter;
+    public CreateCharacter(GameContent gameContent) {
         this.gameContent = gameContent;
 
         // Zombie State -> false, false

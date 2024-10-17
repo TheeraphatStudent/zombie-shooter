@@ -6,8 +6,6 @@ import components.character.CreateCharacter;
 
 public class Player {
     private State state;
-    private String name;
-    private String ip;
     private CreateCharacter character;
     private volatile int zombieHunt = 0;
 
@@ -25,11 +23,9 @@ public class Player {
     private volatile int min = 0;
     private volatile int hour = 0;
 
-    public Player(CreateCharacter character, State state,String name,String ip) {
+    public Player(CreateCharacter character, State state) {
         this.character = character;
         this.state = state;
-        this.name = name;
-        this.ip = ip;
 
         this.onSurvive = new Timer(1000, e -> {
             sec++;
@@ -63,13 +59,13 @@ public class Player {
         this.zombieHunt += number;
         this.storeZombieHunt += number;
 
-        if (storeZombieHunt >= (5 * (rank + 1))) {
+        if (storeZombieHunt >= ((5 * (rank + 1)) * 2)) {
             System.out.println("Is Rank Up!");
             rank++;
             character.setCharacterRank(rank);
-            character.setCharacterHp(character.getCharacterHp() + ((10 * (rank + 1)) * state.getLevelState()));
+            character.setCharacterHp(character.getCharacterHp() + ((10 * (rank + 1)) + state.getLevelState()));
 
-            this.damage += (5 * rank+1) + state.getLevelState();
+            this.damage += (5 * state.getLevelState()) + rank+1;
             System.out.println("Current Damage: " + this.damage);
 
             storeZombieHunt = 0;
@@ -118,21 +114,13 @@ public class Player {
     }
 
     public int getRankUpKillZombieNeeded() {
-        return (5 * (this.rank + 1));
+        return (5 * (this.rank + 1)) * 2;
 
     }
 
     public String getAliveTime() {
         return String.format("%d : %d : %d", this.hour, this.min, this.sec);
 
-    }
-
-    public String getName(){
-        return this.name;
-    }
-
-    public String getip(){
-        return this.ip;
     }
 
 }
