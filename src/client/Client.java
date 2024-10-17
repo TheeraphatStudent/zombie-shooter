@@ -19,9 +19,15 @@ public class Client {
 
         try {
             socket = new Socket(serverIp, serverPort);
+
+            // ใช้ส่งข้อมูลจาก client ไปยัง Server Socket
+            System.out.println("Socket Output");
             out = new PrintWriter(socket.getOutputStream(), true);
+
+            // ใช้รับข้อมูลจาก Socket
+            System.out.println("Socket Input");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            
+
             userInput = new BufferedReader(new InputStreamReader(System.in));
 
             System.out.println("Connected to server at " + this.serverIp + ":" + this.serverPort);

@@ -28,7 +28,7 @@ public class Server {
     public void start() {
         System.out.println("Server Start");
 
-        // Start a new thread for handling console input (messages from the server)
+        // สร้าง Thread มารอรับข้อมูลจาก Server เพื่อส่งไปยัง Client
         new Thread(this::handleServerInput).start();
 
         try {
@@ -36,6 +36,7 @@ public class Server {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected: " + clientSocket);
 
+                // สร้าง Thread สำหรับ Client เพื่อรอรับข้อมูลจาก Client ที่จะส่งเข้ามายัง Server
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                 clients.add(clientHandler);
                 new Thread(clientHandler).start();
@@ -58,9 +59,19 @@ public class Server {
     }
 
     public void broadcastMessage(String message, ClientHandler sender) {
-        for (ClientHandler client : clients) {
-            if (client != sender) {
-                client.sendMessage(message);
+        for (ClientHandler receiver : clients) {
+            if (receiver != sender) {
+                System.out.println("Sended Work!");
+                
+                // Client : A, B, C, D (Server)
+
+                // A -> B, C
+                // B -> A, C
+                // C -> A, B
+
+                // โดย D ที่เป็น Server เป็นสื่อกลางในการส่ง
+
+                receiver.sendMessage(message);
 
             }
         }
@@ -76,6 +87,7 @@ public class Server {
             ServerSocket tempSocket = new ServerSocket(0);
             int port = tempSocket.getLocalPort();
             tempSocket.close();
+
             return port;
         } catch (IOException exc) {
             exc.printStackTrace();

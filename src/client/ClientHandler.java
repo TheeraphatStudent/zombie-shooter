@@ -12,6 +12,8 @@ public class ClientHandler implements Runnable {
     private PrintWriter out;
     private BufferedReader in;
 
+    // ใช้สำหรับส่งและรับข้อมูลระหว่าง Server และ Client
+
     public ClientHandler(Socket socket, Server server) {
         this.clientSocket = socket;
         this.server = server;
@@ -26,6 +28,7 @@ public class ClientHandler implements Runnable {
             while ((message = in.readLine()) != null) {
                 System.out.println("Server > Received message: " + message);
                 server.broadcastMessage(message, this);
+
             }
         } catch (IOException e) {
             System.out.println("Error handling client: " + e.getMessage());
