@@ -13,14 +13,20 @@ public class Zombie implements ManageCharacterElement {
     private CreateCharacter character;
     private CreateCharacter zombie;
     private GameContent gameContent;
+    private State state;
+    private int level;
 
     public Zombie(
         CreateCharacter character,
         CreateCharacter zombie,
-        GameContent gameContent) {
+        GameContent gameContent,
+        State state) {
             this.character = character;
             this.zombie = zombie;
             this.gameContent = gameContent;
+            this.state = state;
+            this.level = state.getLevelState();
+
 
     }
 
@@ -75,9 +81,16 @@ public class Zombie implements ManageCharacterElement {
 
     private Map<String, ZombieType> zombieTypes = new HashMap<String, ZombieType>() {
         {
-            put("normal", new ZombieType(7, 15, 100));
-            put("fast", new ZombieType(15, 10, 60));
-            put("slow", new ZombieType(3, 20, 150));
+            if(level%5==0){
+                put("normal", new ZombieType(7, 15, 100 + ((100 * 20) / 100)));
+                put("fast", new ZombieType(15, 10, 60 + ((60 * 20) / 100)));
+                put("slow", new ZombieType(3, 20, 150 + ((150 * 20) / 100)));
+            }
+            else{
+                put("normal", new ZombieType(7, 15, 10));
+                put("fast", new ZombieType(15, 10, 6));
+                put("slow", new ZombieType(3, 20, 10));
+            }
         }
     };
 }
