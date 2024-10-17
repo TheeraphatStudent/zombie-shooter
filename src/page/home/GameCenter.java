@@ -18,6 +18,7 @@ import javax.swing.JTextPane;
 
 import client.Client;
 import client.Server;
+import components.CoverTitle;
 import components.DrawMouse;
 import models.ClientObj;
 
@@ -36,9 +37,6 @@ public class GameCenter extends JFrame {
         Server server;
         ClientObj client;
 
-        private String name = "???";
-        private String ip = "???";
-
         // Ref
         private DrawMouse drawMouse;
         private Developer developerPage;
@@ -46,9 +44,6 @@ public class GameCenter extends JFrame {
         public GameCenter(Server server, ClientObj client) {
                 this.server = server;
                 this.client = client;
-
-                this.name = this.client.getClientName();
-                this.ip = this.client.getClientIp();
 
                 developerPage = new Developer(this, client);
                 // createRoomPage = new CreateRoom(this, server);
@@ -80,37 +75,6 @@ public class GameCenter extends JFrame {
                 // Change the layout to GridBagLayout
                 backgroundPanel.setLayout(new GridBagLayout());
                 GridBagConstraints gridConst = new GridBagConstraints();
-
-                // ==================== Title Content ====================
-                JPanel titleContent = new JPanel();
-                titleContent.setLayout(null);
-
-                // ---------- Name ----------
-                JTextPane title_name = new UseText(24, 400, 50, false)
-                                .createSimpleText("Name: " + name, null, null, Font.BOLD);
-                title_name.setOpaque(false);
-
-                // ---------- IP ----------
-                JTextPane title_ip = new UseText(24, 400, 50, false)
-                                .createSimpleText("IP: " + ip, null, null, Font.BOLD);
-                title_ip.setOpaque(false);
-
-                title_name.setBounds(10, 10, 400, 50);
-                titleContent.add(title_name);
-
-                title_ip.setBounds(10, 45, 400, 50);
-                titleContent.add(title_ip);
-
-                // ==================== Actions ====================
-                // ##### Game Title #####
-                // JButton gameTItle = new UseButton(32).createSimpleButton(
-                // "Zombie Runner",
-                // Color.WHITE,
-                // 400,
-                // 100,
-                // "default");
-
-                // gameTItle.setEnabled(false);
 
                 JPanel gameIcon = new JPanel() {
                         @Override
@@ -162,7 +126,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> new CreateRoom(this, server));
+                                () -> new JoinRoom(this, server, client));
 
                 gridConst.gridy = 3;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -203,6 +167,9 @@ public class GameCenter extends JFrame {
                 backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
                 backgroundPanel.setOpaque(false);
                 layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+
+                JPanel titleContent = new CoverTitle(client.getClientName(), client.getClientIp());
+                titleContent.setLayout(null);
 
                 titleContent.setBounds(0, 0, this.getWidth(), this.getHeight());
                 titleContent.setOpaque(false);
