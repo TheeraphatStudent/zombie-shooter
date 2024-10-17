@@ -1,6 +1,8 @@
 package page.home;
 
 import java.awt.*;
+import java.util.function.Supplier;
+
 import javax.swing.*;
 
 import client.Client;
@@ -27,10 +29,11 @@ public class JoinRoom extends JFrame {
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
 
-    public JoinRoom(GameCenter gameCenter, Server server, ClientObj clientObj) {
+    public JoinRoom(GameCenter gameCenter, ClientObj clientObj) {
         this.gameCenter = gameCenter;
-        this.server = server;
         this.clientObj = clientObj;
+        this.server = this.clientObj.getClientServer();
+
         createFrame();
     }
 
@@ -132,32 +135,33 @@ public class JoinRoom extends JFrame {
 
             String serverIp = serverIpField.getText().trim();
             String serverPort = serverPortField.getText().trim();
-    
+
             if (serverIp.isEmpty() || serverPort.isEmpty()) {
                 new UseAlert().warringAlert("Server IP or Server Port is empty! Please try again.");
                 return;
             }
-    
+
             try {
                 int port = Integer.parseInt(serverPort);
                 if (port < 0 || port > 65535) {
                     throw new IllegalArgumentException("Port number out of valid range (0-65535)");
                 }
-    
+
                 System.out.println("Connecting to IP: " + serverIp);
                 System.out.println("Port: " + port);
                 System.out.println("Join Work!");
-    
+
                 client = new Client(serverIp, port);
-    
+                client.start();
+
             } catch (NumberFormatException numExc) {
                 new UseAlert().warringAlert("Port should be a valid number between 0 and 65535!");
 
             } catch (IllegalArgumentException IllExc) {
-                new UseAlert().warringAlert(IllExc.getMessage());
+                new UseAlert().warringAlert("Something went wrong! -> " + IllExc.getMessage());
 
             } catch (Exception exc) {
-                new UseAlert().warringAlert(exc.getMessage());
+                new UseAlert().warringAlert("Trying to connect fail! -> " + exc.getMessage());
 
             }
 
@@ -165,14 +169,22 @@ public class JoinRoom extends JFrame {
 
         headers.add(joinRoomBtn);
 
-        JButton createRoomBtn = useButton.createButtonAndChangePage(
-                "",
-                "Create Room",
-                Color.decode("#FEFFA7"),
-                250, 40,
-                "hand",
-                this,
-                () -> null);
+        Supplier<JButton> createRoomBtnSupplier = () -> {
+            JButton btn = useButton.createButtonAndChangePage(
+                    "", "Create Room", Color.decode("#FEFFA7"), 250, 40, "hand", this, () -> null);
+            btn.addActionListener(e -> {
+                try {
+                    server.start();
+
+                } catch (Exception exc) {
+                    new UseAlert().warringAlert("Failed to start server: " + exc.getMessage());
+                    exc.printStackTrace();
+                }
+            });
+            return btn;
+        };
+
+        JButton createRoomBtn = createRoomBtnSupplier.get();
         headers.add(createRoomBtn);
 
         // Footer

@@ -1,13 +1,15 @@
 package models;
 
+import client.Server;
+
 public class ClientObj {
 
     String clientName;
-    String clientIp;
+    Server serverOnClientSide;
 
-    public ClientObj(String clientName, String clientIp) {
+    public ClientObj(String clientName, Server serverOnClientSide) {
         this.clientName = clientName;
-        this.clientIp = clientIp;
+        this.serverOnClientSide = serverOnClientSide;
 
     }
 
@@ -17,7 +19,12 @@ public class ClientObj {
     }
 
     public String getClientIp() {
-        return this.clientIp;
+        return this.serverOnClientSide.getServerIp();
+
+    }
+
+    public Server getClientServer() {
+        return this.serverOnClientSide;
 
     }
 }

@@ -35,6 +35,8 @@ public class Client {
     }
 
     public void start() {
+        System.out.println("Client Start");
+
         try {
             // อ่านข้อความจาก Server
             new Thread(this::receiveMessages).start();
@@ -60,6 +62,7 @@ public class Client {
             String message;
             while ((message = in.readLine()) != null) {
                 System.out.println("Received: " + message);
+
             }
         } catch (IOException e) {
             System.out.println("Error receiving message: " + e.getMessage());

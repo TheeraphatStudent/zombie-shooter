@@ -189,13 +189,10 @@ public class Register extends JFrame implements KeyListener {
         getDisplayName = new UseText().truncateText(field.getText().trim());
         isValidName = !getDisplayName.isEmpty();
 
-        System.out.println("Server IP: " + server.getServerIp());
-        System.out.println("Server Port: " + server.getServerPort());
-
-        client = new ClientObj(getDisplayName, server.getServerIp());
+        client = new ClientObj(getDisplayName, server);
 
         if (isValidName) {
-            gameCenter = new GameCenter(server, client);
+            gameCenter = new GameCenter(client);
 
             new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
         } else {

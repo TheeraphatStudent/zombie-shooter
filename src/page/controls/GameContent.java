@@ -72,7 +72,6 @@ interface GameContentProps {
 }
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
-    Server server;
     ClientObj client;
 
     // Game State
@@ -110,8 +109,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private Thread bulletThread;
     private Thread characterThread;
 
-    public GameContent(GameCenter gameCenter, Server server, ClientObj client) {
-        this.server = server;
+    public GameContent(GameCenter gameCenter, ClientObj client) {
         this.client = client;
 
         System.out.println("On Create Game Center");

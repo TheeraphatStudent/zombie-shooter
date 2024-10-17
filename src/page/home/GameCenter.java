@@ -34,15 +34,14 @@ import utils.WindowResize;
 
 public class GameCenter extends JFrame {
 
-        Server server;
+        // Server server;
         ClientObj client;
 
         // Ref
         private DrawMouse drawMouse;
         private Developer developerPage;
 
-        public GameCenter(Server server, ClientObj client) {
-                this.server = server;
+        public GameCenter(ClientObj client) {
                 this.client = client;
 
                 developerPage = new Developer(this, client);
@@ -112,7 +111,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> new GameContent(this, server, client));
+                                () -> new GameContent(this, client));
 
                 gridConst.gridy = 2;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -126,7 +125,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> new JoinRoom(this, server, client));
+                                () -> new JoinRoom(this, client));
 
                 gridConst.gridy = 3;
                 gridConst.insets = new Insets(0, 0, 15, 0);

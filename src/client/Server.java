@@ -11,18 +11,24 @@ public class Server {
     private List<ClientHandler> clients = new ArrayList<>();
 
     public Server() {
+        System.out.println("Create new server");
+
         this.serverPort = getServerPort();
         this.serverIp = getServerIp();
+
         try {
             this.serverSocket = new ServerSocket(serverPort);
             System.out.println("Server IP: " + serverIp);
             System.out.println("Server is listening on port " + serverPort);
+    
         } catch (IOException e) {
             System.out.println("Error creating server socket: " + e.getMessage());
         }
     }
 
     public void start() {
+        System.out.println("Server Start");
+
         try {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -68,10 +74,5 @@ public class Server {
             System.out.println("Error getting server IP: " + e.getMessage());
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        Server server = new Server();
-        server.start();
     }
 }
