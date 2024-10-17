@@ -21,6 +21,7 @@ public class Client {
             socket = new Socket(serverIp, serverPort);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
             userInput = new BufferedReader(new InputStreamReader(System.in));
 
             System.out.println("Connected to server at " + this.serverIp + ":" + this.serverPort);
@@ -38,10 +39,8 @@ public class Client {
         System.out.println("Client Start");
 
         try {
-            // อ่านข้อความจาก Server
             new Thread(this::receiveMessages).start();
 
-            // รับข้อความจาก Servre เพื่อแสดงให้ Client
             String message;
             while ((message = userInput.readLine()) != null) {
                 out.println(message);
@@ -61,7 +60,7 @@ public class Client {
         try {
             String message;
             while ((message = in.readLine()) != null) {
-                System.out.println("Received: " + message);
+                System.out.println("Client > Received: " + message);
 
             }
         } catch (IOException e) {

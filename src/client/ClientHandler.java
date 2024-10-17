@@ -24,7 +24,7 @@ public class ClientHandler implements Runnable {
 
             String message;
             while ((message = in.readLine()) != null) {
-                System.out.println("Received message: " + message);
+                System.out.println("Server > Received message: " + message);
                 server.broadcastMessage(message, this);
             }
         } catch (IOException e) {
@@ -41,5 +41,6 @@ public class ClientHandler implements Runnable {
 
     public void sendMessage(String message) {
         out.println(message);
+    
     }
 }
