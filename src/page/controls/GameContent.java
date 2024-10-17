@@ -206,8 +206,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Character ====================
 
-        character = new CreateCharacter(this, false);
-        player = new Player(character, state);
+        character = new CreateCharacter(this.gameCenter, this, false);
+        player = new Player(character, state,UseGlobal.getName(),UseGlobal.getIp());
 
         // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก
 
@@ -732,7 +732,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         }
 
-        drawMouse.add(new Sumstat(this, this.gameCenter, true));
+        drawMouse.add(new Sumstat(this, this.gameCenter, true,player));
         drawMouse.revalidate();
         drawMouse.repaint();
 
