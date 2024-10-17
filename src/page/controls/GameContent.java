@@ -493,7 +493,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 try {
                     Thread.sleep(16);
 
-                    behavior = new Zombie(character, zombie, GameContent.this);
+                    // behavior = new Zombie(character, zombie, GameContent.this,nul);
                     behavior.updateZombiePosition();
 
                     if (!isBiting && isPlayerInRange()) {
@@ -550,7 +550,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         CreateCharacter zombie = new CreateCharacter(this);
         zombie.setZombieType(type);
 
-        Zombie zombieBehavior = new Zombie(character, zombie, this);
+        Zombie zombieBehavior = new Zombie(character, zombie, this,state);
         zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
 
         int spawnSide = (int) (Math.random() * 4);
