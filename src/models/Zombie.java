@@ -14,19 +14,31 @@ public class Zombie implements ManageCharacterElement {
     private CreateCharacter zombie;
     private GameContent gameContent;
     private State state;
-    private int level;
 
     public Zombie(
-        CreateCharacter character,
-        CreateCharacter zombie,
-        GameContent gameContent,
-        State state) {
-            this.character = character;
-            this.zombie = zombie;
-            this.gameContent = gameContent;
-            this.state = state;
-            this.level = state.getLevelState();
+            CreateCharacter character,
+            CreateCharacter zombie,
+            GameContent gameContent,
+            State state) {
+        this.character = character;
+        this.zombie = zombie;
+        this.gameContent = gameContent;
 
+        this.state = state;
+
+    }
+
+    public void updateZombieBehavior() {
+        System.out.println("Update Zombie Behavior Work!");
+
+        for (String key : zombieTypes.keySet()) {
+            ZombieType currentType = zombieTypes.get(key);
+            currentType.setDamage(currentType.getDamage() + (currentType.getDamage() * 20) / 100);
+            currentType.setHealth(currentType.getHealth() + (currentType.getHealth() / 2));
+
+            zombieTypes.replace(key, currentType);
+
+        }
 
     }
 
@@ -81,16 +93,9 @@ public class Zombie implements ManageCharacterElement {
 
     private Map<String, ZombieType> zombieTypes = new HashMap<String, ZombieType>() {
         {
-            if(level%5==0){
-                put("normal", new ZombieType(7, 15, 100 + ((100 * 20) / 100)));
-                put("fast", new ZombieType(15, 10, 60 + ((60 * 20) / 100)));
-                put("slow", new ZombieType(3, 20, 150 + ((150 * 20) / 100)));
-            }
-            else{
-                put("normal", new ZombieType(7, 15, 10));
-                put("fast", new ZombieType(15, 10, 6));
-                put("slow", new ZombieType(3, 20, 10));
-            }
+            put("normal", new ZombieType(7, 15, 80));
+            put("fast", new ZombieType(15, 10, 60));
+            put("slow", new ZombieType(5, 20, 100));
         }
     };
 }

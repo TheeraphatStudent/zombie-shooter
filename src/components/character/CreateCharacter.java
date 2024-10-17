@@ -327,8 +327,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     public void setCharacterHp(int hp) {
-        System.out.println("Set Character Hp Work!");
-        System.out.println(hp);
+        // System.out.println("Set Character Hp Work!");
+        // System.out.println(hp);
 
         this.hp = hp;
         hpBar.setHp(this.hp);
