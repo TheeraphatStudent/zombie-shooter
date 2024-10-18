@@ -11,6 +11,14 @@ public class ZombieType {
         this.health = health;
     }
 
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
     public int getSpeed() {
         return this.speed;
 

@@ -51,7 +51,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
-    private String zombieType;
 
     private CreateCharacterImage character;
     private JPanel weapon;
@@ -307,11 +306,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Control :::::::::::::::::
 
     // >>>>>>>>>> Setter >>>>>>>>>>
-
-    public void setZombieType(String zombieType) {
-        this.zombieType = zombieType;
-    }
-
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
         this.character.setCharacterMoveLeft(isMoveLeft);
@@ -327,11 +321,16 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     public void setCharacterHp(int hp) {
-        System.out.println("Set Character Hp Work!");
-        System.out.println(hp);
+        // System.out.println("Set Character Hp Work!");
+        // System.out.println(hp);
 
         this.hp = hp;
         hpBar.setHp(this.hp);
+
+    }
+
+    public void setMaxCharacterHp(int maxHp) {
+        hpBar.setMaxHp(maxHp);
 
     }
 
@@ -359,11 +358,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         return this.hp;
 
     }
-
-    public String getZombieType() {
-        return this.zombieType;
-    }
-
     private void revalidateContent() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

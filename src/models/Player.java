@@ -63,7 +63,10 @@ public class Player {
             System.out.println("Is Rank Up!");
             rank++;
             character.setCharacterRank(rank);
-            character.setCharacterHp(character.getCharacterHp() + ((10 * (rank + 1)) + state.getLevelState()));
+            
+            this.health = this.health + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
+            character.setCharacterHp(this.health);
+            System.out.println("Current Health: " + this.health);
 
             this.damage += (5 * state.getLevelState()) + rank+1;
             System.out.println("Current Damage: " + this.damage);
