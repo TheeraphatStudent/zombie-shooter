@@ -57,6 +57,7 @@ public class JoinRoom extends JFrame {
 
         // Title Content
         JPanel titleContent = new CoverTitle(clientObj.getClientName(), clientObj.getClientIp());
+        
         titleContent.setLayout(null);
         titleContent.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(titleContent, JLayeredPane.PALETTE_LAYER);
@@ -85,7 +86,7 @@ public class JoinRoom extends JFrame {
         content.setOpaque(false);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(Color.decode("#858585"));
+        formPanel.setBackground(Color.decode("#C0C0C0"));
 
         GridBagConstraints gridConst = new GridBagConstraints();
         gridConst.weightx = 1;
@@ -178,7 +179,7 @@ public class JoinRoom extends JFrame {
                 40,
                 "hand",
                 this,
-                () -> new WaitingRoom(this.server, this.client, this.clientObj, this.gameCenter));
+                () -> new Createroom(this.server, this.client, this.clientObj, this.gameCenter));
         headers.add(createRoomBtn);
 
         // Footer

@@ -88,4 +88,9 @@ public class UseText {
                 : ref;
 
     }
+
+    public JTextField createTextField(String text, javafx.scene.paint.Color white, boolean isEditable) {
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'createTextField'");
+    }
 }
