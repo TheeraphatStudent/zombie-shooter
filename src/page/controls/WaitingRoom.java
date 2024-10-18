@@ -82,6 +82,12 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         title = new UseText(24, 250, 50, true).createSimpleText("Waiting for player...", Color.BLACK, Color.WHITE, Font.BOLD);
         coverContent.add(title, gridConst);
 
+        gridConst.insets = new Insets(75, 0, 0, 0);
+        gridConst.anchor = GridBagConstraints.NORTH;
+
+        subTitle = new UseText(16, 250, 50, true).createSimpleText("Waiting for player...", Color.BLACK, null, Font.PLAIN);
+        coverContent.add(subTitle, gridConst);
+
         layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
         content = new JPanel() {
@@ -166,11 +172,11 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     
 
     private void startCountdown() {
-        title.setText("Game starting in " + countdownSeconds + "...");
+        subTitle.setText("Game starting in " + countdownSeconds + "...");
         countdownTimer = new Timer(1000, e -> {
             countdownSeconds--;
             if (countdownSeconds > 0) {
-                title.setText("Game starting in " + countdownSeconds + "...");
+                subTitle.setText("Game starting in " + countdownSeconds + "...");
 
             } else {
                 ((Timer)e.getSource()).stop();
