@@ -175,6 +175,7 @@ public class JoinRoom extends JFrame {
             btn.addActionListener(e -> {
                 try {
                     server.start();
+                    new Createroom(gameCenter, clientObj);
 
                 } catch (Exception exc) {
                     new UseAlert().warringAlert("Failed to start server: " + exc.getMessage());
