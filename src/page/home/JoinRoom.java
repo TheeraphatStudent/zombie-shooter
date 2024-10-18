@@ -171,7 +171,13 @@ public class JoinRoom extends JFrame {
         headers.add(joinRoomBtn);
 
         JButton createRoomBtn = useButton.createButtonAndChangePage(
-                "", "Create Room", Color.decode("#FEFFA7"), 250, 40, "hand", this,
+                "",
+                "Create Room",
+                Color.decode("#FEFFA7"),
+                250,
+                40,
+                "hand",
+                this,
                 () -> new WaitingRoom(this.server, this.client, this.clientObj, this.gameCenter));
         headers.add(createRoomBtn);
 

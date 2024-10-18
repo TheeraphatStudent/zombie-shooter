@@ -7,6 +7,10 @@ import components.character.CreateCharacter;
 public class Player {
     private State state;
     private CreateCharacter character;
+
+    private volatile int xDir = 0;
+    private volatile int yDir = 0;
+
     private volatile int zombieHunt = 0;
 
     private volatile int damage = 10;

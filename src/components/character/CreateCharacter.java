@@ -11,7 +11,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import components.objectElement.Bullet;
+import models.Bullet;
 import models.ClientObj;
 
 import java.awt.Point;
