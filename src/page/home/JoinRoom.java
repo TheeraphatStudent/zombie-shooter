@@ -179,7 +179,7 @@ public class JoinRoom extends JFrame {
                 40,
                 "hand",
                 this,
-                () -> new WaitingRoom(this.server, this.client, this.clientObj, this.gameCenter));
+                () -> new Createroom(this.server, this.client, this.clientObj, this.gameCenter));
         headers.add(createRoomBtn);
 
         // Footer
