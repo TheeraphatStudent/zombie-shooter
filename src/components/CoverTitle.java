@@ -24,7 +24,6 @@ public class CoverTitle extends JPanel {
         // ---------- Name ----------
         JTextPane title_name = new UseText(24, 400, 50, false)
                 .createSimpleText("Name: " + this.displayName, null, null, Font.BOLD);
-        setBounds(10, 10, 400, 50);
         title_name.setBounds(10, 10, 400, 50);
         add(title_name);
         // title_name.setOpaque(false);

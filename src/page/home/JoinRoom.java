@@ -10,6 +10,7 @@ import client.Server;
 import components.CoverTitle;
 import components.DrawMouse;
 import models.ClientObj;
+import page.controls.WaitingRoom;
 import utils.LoadImage;
 import utils.UseAlert;
 import utils.UseButton;
@@ -169,22 +170,9 @@ public class JoinRoom extends JFrame {
 
         headers.add(joinRoomBtn);
 
-        Supplier<JButton> createRoomBtnSupplier = () -> {
-            JButton btn = useButton.createButtonAndChangePage(
-                    "", "Create Room", Color.decode("#FEFFA7"), 250, 40, "hand", this, () -> null);
-            btn.addActionListener(e -> {
-                try {
-                    server.start();
-
-                } catch (Exception exc) {
-                    new UseAlert().warringAlert("Failed to start server: " + exc.getMessage());
-                    exc.printStackTrace();
-                }
-            });
-            return btn;
-        };
-
-        JButton createRoomBtn = createRoomBtnSupplier.get();
+        JButton createRoomBtn = useButton.createButtonAndChangePage(
+                "", "Create Room", Color.decode("#FEFFA7"), 250, 40, "hand", this,
+                () -> new WaitingRoom(this.server, this.client, this.clientObj, this.gameCenter));
         headers.add(createRoomBtn);
 
         // Footer
