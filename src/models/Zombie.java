@@ -15,30 +15,44 @@ public class Zombie implements ManageCharacterElement {
     private GameContent gameContent;
     private State state;
 
+    private String type = "normal";
+
     public Zombie(
             CreateCharacter character,
             CreateCharacter zombie,
             GameContent gameContent,
-            State state) {
+            State state,
+            String type) {
         this.character = character;
         this.zombie = zombie;
         this.gameContent = gameContent;
 
         this.state = state;
+        this.type = type;
+
+        updateZombieBehavior();
 
     }
 
-    public void updateZombieBehavior() {
-        System.out.println("Update Zombie Behavior Work!");
+    private void updateZombieBehavior() {
+        Map<String, ZombieType> newZombieTypes = new HashMap<>();
 
         for (String key : zombieTypes.keySet()) {
             ZombieType currentType = zombieTypes.get(key);
-            currentType.setDamage(currentType.getDamage() + (currentType.getDamage() * 20) / 100);
-            currentType.setHealth(currentType.getHealth() + (currentType.getHealth() / 2));
 
-            zombieTypes.replace(key, currentType);
+            int newDamage = currentType.getDamage() + (int) (currentType.getDamage() * .25);
+            int newHealth = currentType.getHealth() + (int) (currentType.getHealth() * this.state.getLevelState() * .25);
 
+            System.out.println(String.format("New Damage: %d\nNew Health: %d\n", newDamage, newHealth));
+
+            ZombieType updatedType = new ZombieType(
+                    currentType.getSpeed(),
+                    newDamage,
+                    newHealth);
+            newZombieTypes.put(key, updatedType);
         }
+
+        this.zombieTypes = newZombieTypes;
 
     }
 
@@ -60,7 +74,7 @@ public class Zombie implements ManageCharacterElement {
         zombie.setCharacterMoveLeft(dx < 0);
 
         // Get zombie type and speed
-        ZombieType zombieType = zombieTypes.get(zombie.getZombieType());
+        ZombieType zombieType = zombieTypes.get(this.type);
         double zombieSpeed = zombieType.getSpeed();
 
         // Move zombie
@@ -77,17 +91,17 @@ public class Zombie implements ManageCharacterElement {
     }
 
     public double getZombieSpeed() {
-        return zombieTypes.get(zombie.getZombieType()).getSpeed();
+        return zombieTypes.get(this.type).getSpeed();
 
     }
 
     public double getZombieDamage() {
-        return zombieTypes.get(zombie.getZombieType()).getDamage();
+        return zombieTypes.get(this.type).getDamage();
 
     }
 
     public double getZombieHealth() {
-        return zombieTypes.get(zombie.getZombieType()).getHealth();
+        return zombieTypes.get(this.type).getHealth();
 
     }
 

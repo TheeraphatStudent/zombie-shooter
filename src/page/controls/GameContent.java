@@ -95,9 +95,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private ArrayList<CreateCharacter> zombies = new ArrayList<>();
     private ArrayList<ZombieMovementThread> zombieThreads = new ArrayList<>();
     private Timer spawner;
-    private volatile int CREATE_ZOMBIES;
     private volatile int ZOMBIE_REMAIN;
-    private Zombie zombieBehavior;
 
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
@@ -143,14 +141,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     public void updateGameState() {
         state.setStateLevel(1);
 
-        CREATE_ZOMBIES = state.getMaxZombie();
         ZOMBIE_REMAIN = state.getMaxZombie();
 
         updateLevelScoreboard();
-        if (state.getLevelState() > 1) {
-            zombieBehavior.updateZombieBehavior();
-
-        }
 
     }
 
@@ -538,6 +531,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
             Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(player);
             return zombieHitbox.intersects(playerHitbox);
+
         }
 
         private void biteInArea() {
@@ -563,11 +557,12 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! เพิ่ม ซอมบี้เข้า Frame
     private void addZombie(String type) {
-        CreateCharacter zombie = new CreateCharacter(this);
-        zombie.setZombieType(type);
+        System.out.println("Level State: " + state.getLevelState());
 
-        zombieBehavior = new Zombie(character, zombie, this, state);
-        zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
+        CreateCharacter zombie = new CreateCharacter(this);
+        Zombie zombieBehavior = new Zombie(character, zombie, this, state, type);
+
+        zombie.setMaxCharacterHp((int) zombieBehavior.getZombieHealth());
 
         int spawnSide = (int) (Math.random() * 4);
         int x = 0, y = 0;
@@ -595,6 +590,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
 
         zombie.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
+
         content.add(zombie);
         zombies.add(zombie);
 
@@ -744,7 +741,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             revalidateContent();
 
             try {
-                Thread.sleep(12);
+                Thread.sleep(16);
 
             } catch (Exception e) {
                 // TODO: handle exception
