@@ -86,7 +86,7 @@ public class JoinRoom extends JFrame {
         content.setOpaque(false);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(Color.decode("#858585"));
+        formPanel.setBackground(Color.decode("#C0C0C0"));
 
         GridBagConstraints gridConst = new GridBagConstraints();
         gridConst.weightx = 1;

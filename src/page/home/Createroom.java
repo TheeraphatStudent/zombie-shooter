@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Font;
 import models.ClientObj;
 import utils.LoadImage;
+import utils.UseAlert;
 import utils.UseButton;
 import utils.UseGlobal;
 import utils.UseText;
@@ -57,7 +58,7 @@ public class Createroom extends JFrame {
     setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
     setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setTitle("create room ");
+    setTitle("Create room ");
     setLocationRelativeTo(null);
 
     JLayeredPane layers = new JLayeredPane();
@@ -100,6 +101,7 @@ public class Createroom extends JFrame {
     content.setOpaque(false);
 
     JPanel formPanel = new JPanel(new GridBagLayout());
+    formPanel.setBackground(Color.decode("#C0C0C0"));
 
     GridBagConstraints gridConst = new GridBagConstraints();
     gridConst.weightx = 1;
@@ -107,8 +109,8 @@ public class Createroom extends JFrame {
     gridConst.gridx = 1;
     gridConst.fill = GridBagConstraints.HORIZONTAL;
 
-    UseText useText = new UseText(24, 100, 40, false);
-    JTextField serverIpField = useText.createTextField("", Color.WHITE, true);
+    UseText useText = new UseText(24, 400, 40, false);
+    JTextField serverIpField = useText.createTextField("" + clientObj.getClientIp(), Color.WHITE, false);
     serverIpField.setPreferredSize(new Dimension(100, 50));
 
     // Server IP
@@ -125,12 +127,24 @@ public class Createroom extends JFrame {
     gridConst.insets = new Insets(0, 20, 0, 20);
     formPanel.add(useText.createSimpleText("Port: ", Color.BLACK, null, Font.BOLD), gridConst);
 
-    JTextField serverPortField = useText.createTextField("", Color.WHITE, true);
+    JTextField serverPortField = useText.createTextField("" + server.getServerPort(), Color.WHITE, false);
     serverPortField.setPreferredSize(new Dimension(100, 50));
 
     gridConst.gridy = 3;
     gridConst.insets = new Insets(0, 20, 10, 20);
     formPanel.add(serverPortField, gridConst);
+
+    // Player
+    gridConst.gridy = 4;
+    gridConst.insets = new Insets(0, 20, 0, 20);
+    formPanel.add(useText.createSimpleText("Player: ", Color.BLACK, null, Font.BOLD), gridConst);
+
+    JTextField player = useText.createTextField("", Color.WHITE, true);
+    player.setPreferredSize(new Dimension(100, 50));
+
+    gridConst.gridy = 5;
+    gridConst.insets = new Insets(0, 20, 10, 20);
+    formPanel.add(player, gridConst);
 
     JPanel buttonPanel = new JPanel(new GridBagLayout());
     buttonPanel.setOpaque(false);
@@ -141,13 +155,60 @@ public class Createroom extends JFrame {
     JPanel footer = new JPanel(new GridLayout());
 
     UseButton useButton = new UseButton(24);
-    JButton back = useButton.createSimpleButton("Back",
+    JButton back = useButton.createButtonAndChangePage(
+        "",
+        "Back",
         Color.decode("#B0FFBC"),
-        100,
-        40,
-        "hand");
+        100, 40,
+        "hand",
+        this,
+        () -> this.gameCenter);
+
     headers.add(back);
 
+    JButton start = useButton.createSimpleButton("Start", Color.decode("#B0FFBC"), 100, 40, "hand");
+
+    try {
+      start.addActionListener(e -> {
+        String playernum = player.getText();
+        System.out.println("Playernum : " + playernum);
+        int numofplayer = Integer.parseInt(playernum);
+
+        if (numofplayer < 2) {
+          new UseAlert().warringAlert("Minimum is Two");
+          return ;
+        } else if (numofplayer > 3) {
+          new UseAlert().warringAlert("Maximum is Three");
+          return ;
+        } 
+        System.out.println("Go");
+
+      });
+    } catch (NumberFormatException numExc) {
+      System.out.println("Error");
+      new UseAlert().warringAlert("Please enter the number");
+    } 
+  
+
+    headers.add(start);
+
+    gridConst.weightx = 1;
+    gridConst.weighty = 1;
+    gridConst.gridx = 1;
+    gridConst.fill = GridBagConstraints.BOTH;
+
+    gridConst.gridy = 0;
+    gridConst.insets = new Insets(0, 0, 20, 0);
+    buttonPanel.add(headers, gridConst);
+
+    gridConst.gridy = 1;
+    buttonPanel.add(footer, gridConst);
+
+    gridConst.gridy = 6;
+    gridConst.insets = new Insets(30, 20, 10, 20);
+    formPanel.add(buttonPanel, gridConst);
+
+    content.add(formPanel);
     return content;
   }
 }
