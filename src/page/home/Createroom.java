@@ -154,6 +154,7 @@ public class Createroom extends JFrame {
 
     JPanel footer = new JPanel(new GridLayout());
 
+    //Button
     UseButton useButton = new UseButton(24);
     JButton back = useButton.createButtonAndChangePage(
         "",
@@ -168,6 +169,7 @@ public class Createroom extends JFrame {
 
     JButton start = useButton.createSimpleButton("Start", Color.decode("#B0FFBC"), 100, 40, "hand");
 
+    //check player num
     try {
       start.addActionListener(e -> {
         String playernum = player.getText();
