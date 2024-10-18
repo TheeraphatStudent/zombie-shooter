@@ -11,7 +11,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import components.objectElement.Bullet;
+import models.Bullet;
 import models.ClientObj;
 
 import java.awt.Point;
@@ -51,7 +51,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
-    private String zombieType;
 
     private CreateCharacterImage character;
     private JPanel weapon;
@@ -80,8 +79,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // Models
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
-    public CreateCharacter(GameContent gameContent, boolean isInfected, ClientObj clientObj) {
-        this.gameContent = gameContent;
+    public CreateCharacter(boolean isInfected, ClientObj clientObj) {
         this.isSurvive = !isInfected;
 
         this.client = clientObj;
@@ -307,9 +305,9 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Control :::::::::::::::::
 
     // >>>>>>>>>> Setter >>>>>>>>>>
+    public void setGameContent(GameContent content) {
+        this.gameContent = content;
 
-    public void setZombieType(String zombieType) {
-        this.zombieType = zombieType;
     }
 
     public void setCharacterMoveLeft(boolean isMoveLeft) {
@@ -327,11 +325,16 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     public void setCharacterHp(int hp) {
-        System.out.println("Set Character Hp Work!");
-        System.out.println(hp);
+        // System.out.println("Set Character Hp Work!");
+        // System.out.println(hp);
 
         this.hp = hp;
         hpBar.setHp(this.hp);
+
+    }
+
+    public void setMaxCharacterHp(int maxHp) {
+        hpBar.setMaxHp(maxHp);
 
     }
 
@@ -359,11 +362,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         return this.hp;
 
     }
-
-    public String getZombieType() {
-        return this.zombieType;
-    }
-
     private void revalidateContent() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

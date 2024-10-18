@@ -10,6 +10,7 @@ import client.Server;
 import components.CoverTitle;
 import components.DrawMouse;
 import models.ClientObj;
+import page.controls.WaitingRoom;
 import utils.LoadImage;
 import utils.UseAlert;
 import utils.UseButton;
@@ -56,6 +57,7 @@ public class JoinRoom extends JFrame {
 
         // Title Content
         JPanel titleContent = new CoverTitle(clientObj.getClientName(), clientObj.getClientIp());
+        
         titleContent.setLayout(null);
         titleContent.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(titleContent, JLayeredPane.PALETTE_LAYER);
@@ -169,23 +171,15 @@ public class JoinRoom extends JFrame {
 
         headers.add(joinRoomBtn);
 
-        Supplier<JButton> createRoomBtnSupplier = () -> {
-            JButton btn = useButton.createButtonAndChangePage(
-                    "", "Create Room", Color.decode("#FEFFA7"), 250, 40, "hand", this, () -> null);
-            btn.addActionListener(e -> {
-                try {
-                    server.start();
-                    new Createroom(gameCenter, clientObj);
-
-                } catch (Exception exc) {
-                    new UseAlert().warringAlert("Failed to start server: " + exc.getMessage());
-                    exc.printStackTrace();
-                }
-            });
-            return btn;
-        };
-
-        JButton createRoomBtn = createRoomBtnSupplier.get();
+        JButton createRoomBtn = useButton.createButtonAndChangePage(
+                "",
+                "Create Room",
+                Color.decode("#FEFFA7"),
+                250,
+                40,
+                "hand",
+                this,
+                () -> new WaitingRoom(this.server, this.client, this.clientObj, this.gameCenter));
         headers.add(createRoomBtn);
 
         // Footer

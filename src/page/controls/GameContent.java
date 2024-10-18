@@ -7,29 +7,21 @@ import java.awt.GridBagConstraints;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Stroke;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Point;
-import java.awt.Font;
-import java.awt.RenderingHints;
 import java.awt.Rectangle;
 import java.awt.Insets;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Timer;
-
-import client.Server;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -43,8 +35,8 @@ import components.Scoreboard;
 import components.Sumstat;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
-import components.objectElement.Bullet;
 import components.Cover;
+import models.Bullet;
 import models.ClientObj;
 import models.Player;
 import models.Zombie;
@@ -66,7 +58,6 @@ interface GameContentProps {
 
     void updateGameState();
 
-    // Character control movement
     // boolean getCharacterMovement();
 
 }
@@ -95,7 +86,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private ArrayList<CreateCharacter> zombies = new ArrayList<>();
     private ArrayList<ZombieMovementThread> zombieThreads = new ArrayList<>();
     private Timer spawner;
-    private volatile int CREATE_ZOMBIES;
     private volatile int ZOMBIE_REMAIN;
 
     // Movement
@@ -124,6 +114,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ปิดการปรับขนาดจอ
         // setUndecorated(true);
+        // setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         addKeyListener(this);
         setFocusable(true);
         requestFocus();
@@ -140,7 +132,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     public void updateGameState() {
         state.setStateLevel(1);
 
-        CREATE_ZOMBIES = state.getMaxZombie();
         ZOMBIE_REMAIN = state.getMaxZombie();
 
         updateLevelScoreboard();
@@ -152,6 +143,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         levelState.setZombieOnState(state.getMaxZombie());
         levelState.setZombieRemain(ZOMBIE_REMAIN);
 
+        state.setZombieRemain(ZOMBIE_REMAIN);
+
     }
 
     private void updatePlayerStat() {
@@ -159,7 +152,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         scoreboard.setKilled(player.getZombieHunt());
         scoreboard.setNeededKilled(player.getStoreZombieHunt());
         scoreboard.setMaxZombie(player.getRankUpKillZombieNeeded());
-        
+
         scoreboard.setRank(player.getRank());
 
     }
@@ -211,7 +204,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Player Character ====================
 
-        character = new CreateCharacter(this, false, client);
+        character = new CreateCharacter(false, client);
+        character.setGameContent(this);
+
         player = new Player(character, state);
 
         // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก
@@ -280,7 +275,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         setContentPane(layers);
 
-        new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, backgroundCover, content, score, drawMouse}, new Component[]{layers});
+        new WindowResize().addWindowResize(this,
+                new Component[] { backgroundPanel, backgroundCover, content, score, drawMouse },
+                new Component[] { layers });
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }
@@ -290,20 +287,20 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private void updateBullets() {
         for (Bullet bullet : bullets) {
             bullet.move();
-    
+
             boolean bulletRemoved = false;
-    
+
             Iterator<CreateCharacter> zombieContain = zombies.iterator();
             while (zombieContain.hasNext() && !bulletRemoved) {
                 CreateCharacter zombie = zombieContain.next();
                 Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
-    
+
                 if (bullet.getBounds().intersects(zombieHitbox)) {
                     // Remove bullet
                     bullets.remove(bullet);
-    
+
                     zombie.setCharacterHp(zombie.getCharacterHp() - player.getPlayerBulletDamage());
-    
+
                     if (zombie.getCharacterHp() <= 0) {
                         for (ZombieMovementThread thread : zombieThreads) {
                             if (thread.zombie == zombie) {
@@ -311,27 +308,27 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                                 break;
                             }
                         }
-    
+
                         player.addZombieWasKilled(1);
                         scoreboard.setKilled(player.getZombieHunt());
-    
+
                         zombieContain.remove();
                         content.remove(zombie);
-    
+
                         this.ZOMBIE_REMAIN = ZOMBIE_REMAIN - 1;
                         if (ZOMBIE_REMAIN <= 0) {
                             updateGameState();
                         }
-    
+
                         updateLevelScoreboard();
                         updatePlayerStat();
                         revalidateContent();
                     }
-    
+
                     bulletRemoved = true;
                 }
             }
-    
+
             if (!bulletRemoved && bullet.isOutOfBounds(getWidth(), getHeight())) {
                 bullets.remove(bullet);
             }
@@ -458,7 +455,12 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private void initializeZombieSpawner() {
         spawner = new Timer(1500, e -> {
-            if (zombies.size() < CREATE_ZOMBIES && zombies.size() <= 5) {
+            if (zombies.size() >= 4) {
+                return;
+
+            }
+
+            if (zombies.size() < state.getZombieRemain()) {
                 String[] types = { "normal", "fast", "slow" };
                 String randomType = types[(int) (Math.random() * types.length)];
 
@@ -522,6 +524,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
             Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(player);
             return zombieHitbox.intersects(playerHitbox);
+
         }
 
         private void biteInArea() {
@@ -547,11 +550,12 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! เพิ่ม ซอมบี้เข้า Frame
     private void addZombie(String type) {
-        CreateCharacter zombie = new CreateCharacter(this);
-        zombie.setZombieType(type);
+        System.out.println("Level State: " + state.getLevelState());
 
-        Zombie zombieBehavior = new Zombie(character, zombie, this,state);
-        zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
+        CreateCharacter zombie = new CreateCharacter(this);
+        Zombie zombieBehavior = new Zombie(character, zombie, this, state, type);
+
+        zombie.setMaxCharacterHp((int) zombieBehavior.getZombieHealth());
 
         int spawnSide = (int) (Math.random() * 4);
         int x = 0, y = 0;
@@ -579,6 +583,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
 
         zombie.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
+
         content.add(zombie);
         zombies.add(zombie);
 
@@ -728,7 +734,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             revalidateContent();
 
             try {
-                Thread.sleep(12);
+                Thread.sleep(16);
 
             } catch (Exception e) {
                 // TODO: handle exception
@@ -736,7 +742,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         }
 
-        drawMouse.add(new Sumstat(this, this.gameCenter, true,player, client));
+        drawMouse.add(new Sumstat(this, this.gameCenter, true, player, client));
         drawMouse.revalidate();
         drawMouse.repaint();
 
