@@ -21,7 +21,6 @@ import javax.swing.JTextPane;
 
 import client.Client;
 import client.Server;
-
 import components.DrawMouse;
 import models.ClientObj;
 import utils.LoadImage;

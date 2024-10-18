@@ -7,29 +7,21 @@ import java.awt.GridBagConstraints;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Stroke;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Point;
-import java.awt.Font;
-import java.awt.RenderingHints;
 import java.awt.Rectangle;
 import java.awt.Insets;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Timer;
-
-import client.Server;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -43,8 +35,8 @@ import components.Scoreboard;
 import components.Sumstat;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
-import components.objectElement.Bullet;
 import components.Cover;
+import models.Bullet;
 import models.ClientObj;
 import models.Player;
 import models.Zombie;
@@ -66,7 +58,6 @@ interface GameContentProps {
 
     void updateGameState();
 
-    // Character control movement
     // boolean getCharacterMovement();
 
 }
@@ -213,7 +204,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Player Character ====================
 
-        character = new CreateCharacter(this, false, client);
+        character = new CreateCharacter(false, client);
+        character.setGameContent(this);
+
         player = new Player(character, state);
 
         // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก

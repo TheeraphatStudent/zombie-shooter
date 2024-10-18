@@ -11,7 +11,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import components.objectElement.Bullet;
+import models.Bullet;
 import models.ClientObj;
 
 import java.awt.Point;
@@ -79,8 +79,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // Models
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
-    public CreateCharacter(GameContent gameContent, boolean isInfected, ClientObj clientObj) {
-        this.gameContent = gameContent;
+    public CreateCharacter(boolean isInfected, ClientObj clientObj) {
         this.isSurvive = !isInfected;
 
         this.client = clientObj;
@@ -306,6 +305,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Control :::::::::::::::::
 
     // >>>>>>>>>> Setter >>>>>>>>>>
+    public void setGameContent(GameContent content) {
+        this.gameContent = content;
+
+    }
+
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
         this.character.setCharacterMoveLeft(isMoveLeft);
