@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.*;
 
 import client.helper.ClientHandler;
+import client.helper.ServerHelper;
 
 public class Server {
     private ServerSocket serverSocket;
@@ -17,7 +18,7 @@ public class Server {
     public Server() {
         System.out.println("Create new server");
 
-        this.serverPort = getServerPort();
+        this.serverPort = new ServerHelper().getAlreadyPort();
         this.serverIp = getServerIp();
 
         try {
@@ -44,7 +45,16 @@ public class Server {
                 // Server
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                 clients.add(clientHandler);
+
                 new Thread(clientHandler).start();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleNewConnection(clientHandler);
+
+                    }
+                }).start();
 
                 System.out.println("Client added. Total clients: " + clients.size());
             }
@@ -88,27 +98,21 @@ public class Server {
     }
 
     public int getServerPort() {
-        try {
-            ServerSocket tempSocket = new ServerSocket(0);
-            int port = tempSocket.getLocalPort();
-            tempSocket.close();
+        return this.serverPort;
 
-            return port;
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }
-        return 0;
     }
 
     public void handleNewConnection(ClientHandler newClient) {
         broadcastMessage("NEW_PLAYER", null);
-        if (clients.size() >= requiredPlayersToStart) {
-            broadcastMessage("START_COUNTDOWN", null);
-        }
+
+        // if (clients.size() >= requiredPlayersToStart) {
+        //     broadcastMessage("START_COUNTDOWN", null);
+        // }
     }
 
     public void handleReadyToStart(ClientHandler readyClient) {
         readyClient.setReady(true);
+
         if (allClientsReady()) {
             broadcastMessage("START_GAME", null);
         }

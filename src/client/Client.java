@@ -2,83 +2,86 @@ package client;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.*;
 
 public class Client {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private BufferedReader userInput;
-
-    // เป็น Ip และ Port ที่ต้องการ Connect ไปยัง Server
     private String serverIp;
     private int serverPort;
+    private BlockingQueue<String> messageQueue;
+    private volatile boolean isConnected;
 
     public Client(String serverIp, int serverPort) {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
+        this.messageQueue = new LinkedBlockingQueue<>();
+        this.isConnected = false;
+    }
 
+    public void start() {
         try {
             socket = new Socket(serverIp, serverPort);
-
-            // ใช้ส่งข้อมูลจาก client ไปยัง Server Socket
-            System.out.println("Socket Output");
             out = new PrintWriter(socket.getOutputStream(), true);
-
-            // ใช้รับข้อมูลจาก Socket
-            System.out.println("Socket Input");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            userInput = new BufferedReader(new InputStreamReader(System.in));
-
-            System.out.println("Connected to server at " + this.serverIp + ":" + this.serverPort);
+            isConnected = true;
+            System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
+            new Thread(this::receiveServerMessage).start();
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }
     }
 
-    public void start() {
-        System.out.println("Client Start");
-
-        try {
-            new Thread(this::receiveMessages).start();
-
-            String message;
-            while ((message = userInput.readLine()) != null) {
-                out.println(message);
-            }
-        } catch (IOException e) {
-            System.out.println("Error communicating with server: " + e.getMessage());
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public void sendMessage(String message) {
+        if (isConnected && out != null) {
+            out.println(message);
+        } else {
+            System.out.println("Cannot send message. Not connected to server.");
         }
     }
 
-    public void sendMessage(String message) {
-        out.println(message);
-    }
-    
-    public String receiveMessage() {
+    public String receiveMessageQueue() {
         try {
-            return in.readLine();
-        } catch (IOException e) {
-            System.out.println("Error receiving message: " + e.getMessage());
+            return messageQueue.poll(5, TimeUnit.SECONDS);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return null;
         }
     }
 
-    private void receiveMessages() {
+    private void receiveServerMessage() {
         try {
             String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Client > Received: " + message);
-
+            while (isConnected && (message = in.readLine()) != null) {
+                messageQueue.offer(message);
             }
         } catch (IOException e) {
             System.out.println("Error receiving message: " + e.getMessage());
+        } finally {
+            disconnect();
         }
+    }
+
+    public void disconnect() {
+        isConnected = false;
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error during disconnection: " + e.getMessage());
+        }
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 }
