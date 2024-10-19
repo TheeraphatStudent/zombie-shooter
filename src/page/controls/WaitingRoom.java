@@ -26,38 +26,62 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     private JTextPane title;
     private JTextPane subTitle;
 
+    private int numOfPlayers;
+
     private List<CreateCharacter> playerCharacters;
     private Timer countdownTimer;
     private int countdownSeconds = 15;
 
-    public WaitingRoom(Server server, Client client, ClientObj clientObj, GameCenter gameCenter) {
-        setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
-        setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setTitle("Zombie Shooter - Waiting Room");
-        setLocationRelativeTo(null);
-
+    public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, int numOfPlayers) {
         this.gameCenter = gameCenter;
         this.server = server;
-        this.client = client;
         this.playerCharacters = new ArrayList<>();
         this.clientObj = clientObj;
+
+        this.numOfPlayers = numOfPlayers;
+
+        this.server.start();
+
+        // Host ใส่ IP และ  Port ของตัวเอง
+        this.client = new Client(server.getServerIp(), server.getServerPort());
+
+        this.client.connect();
+
+        setupLayout();
+        startListeningForPlayers();
+    }
+
+    public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, String joinToIp, int onPort) {
+        this.gameCenter = gameCenter;
+        this.server = server;
+        this.playerCharacters = new ArrayList<>();
+        this.clientObj = clientObj;
+
+        this.client = new Client(joinToIp, onPort);
+        this.client.start();
 
         setupLayout();
         startListeningForPlayers();
     }
 
 
+
     private void setupLayout() {
+        setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
+        setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setTitle("Zombie Shooter - Waiting Room");
+        setLocationRelativeTo(null);
+
         JLayeredPane layers = new JLayeredPane();
-    
+
         // Background
         String backgroundPath = "resource/images/background/plain.png";
         LoadImage.BackgroundPanel backgroundPanel = new LoadImage.BackgroundPanel(
                 backgroundPath, getWidth(), getHeight(), 1, .5, false);
         backgroundPanel.setLayout(new GridBagLayout());
         backgroundPanel.setBounds(0, 0, getWidth(), getHeight());
-    
+
         DrawMouse drawMouse = new DrawMouse();
         drawMouse.setBounds(0, 0, getWidth(), getHeight());
 
@@ -79,13 +103,15 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         gridConst.insets = new Insets(15, 0, 0, 0);
         gridConst.anchor = GridBagConstraints.NORTH;
 
-        title = new UseText(24, 250, 50, true).createSimpleText("Waiting for player...", Color.BLACK, Color.WHITE, Font.BOLD);
+        title = new UseText(24, 250, 50, true).createSimpleText("Waiting for player...", Color.BLACK, Color.WHITE,
+                Font.BOLD);
         coverContent.add(title, gridConst);
 
         gridConst.insets = new Insets(75, 0, 0, 0);
         gridConst.anchor = GridBagConstraints.NORTH;
 
-        subTitle = new UseText(16, 250, 50, true).createSimpleText("Waiting for player...", Color.BLACK, null, Font.PLAIN);
+        subTitle = new UseText(16, 250, 50, true).createSimpleText("Waiting for player...", Color.BLACK, null,
+                Font.PLAIN);
         coverContent.add(subTitle, gridConst);
 
         layers.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
@@ -114,14 +140,14 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
 
         coverContent.setBounds(0, 0, this.getWidth(), this.getHeight());
         layers.add(coverContent, JLayeredPane.POPUP_LAYER);
-    
+
         layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
         setContentPane(layers);
-    
+
         new WindowResize().addWindowResize(
                 this,
-                new Component[]{backgroundPanel, drawMouse},
-                new Component[]{layers});
+                new Component[] { backgroundPanel, drawMouse },
+                new Component[] { layers });
         new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
     }
 
@@ -134,42 +160,32 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         return btn;
     }
 
-    private void addPlayer() {
-        CreateCharacter playerCharacter = new CreateCharacter(false, clientObj); 
+    private void startListeningForPlayers() {
+        new Thread(() -> {
+            while (playerCharacters.size() < numOfPlayers) {
+                String message = client.receiveMessage();
+                if (message.startsWith("NEW_PLAYER")) {
+                    SwingUtilities.invokeLater(this::addPlayer);
+                }
+            }
+            SwingUtilities.invokeLater(this::startCountdown);
+        }).start();
+    }
 
+    private void addPlayer() {
+        CreateCharacter playerCharacter = new CreateCharacter(false, clientObj);
         playerCharacter.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(playerCharacter);
         content.revalidate();
         content.repaint();
 
         playerCharacters.add(playerCharacter);
-
         updatePlayerCount();
     }
 
-    private void startListeningForPlayers() {
-        Timer joinTimer = new Timer(2000, e -> {
-            if (playerCharacters.size() < 3) {
-                addPlayer();
-            }
-            
-
-            if (playerCharacters.size() >= 2) {
-                ((Timer)e.getSource()).stop();
-            }
-        });
-        joinTimer.start();
-    }
-    
     private void updatePlayerCount() {
-        System.out.println("Update PLayer Count!");
-
-        title.setText("Player " + playerCharacters.size() + " / 3");
-        if (playerCharacters.size() >= 2) {
-            startCountdown();
-        }
+        title.setText(String.format("Player %d / %d", playerCharacters.size(), numOfPlayers));
     }
-    
 
     private void startCountdown() {
         subTitle.setText("Game starting in " + countdownSeconds + "...");
@@ -177,19 +193,16 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
             countdownSeconds--;
             if (countdownSeconds > 0) {
                 subTitle.setText("Game starting in " + countdownSeconds + "...");
-
             } else {
-                ((Timer)e.getSource()).stop();
+                ((Timer) e.getSource()).stop();
                 startGame();
-
             }
         });
         countdownTimer.start();
     }
 
     private void startGame() {
+        client.sendMessage("READY_TO_START");
         new WindowClosingFrameEvent().navigateTo(this, new GameContent(gameCenter, clientObj), false);
-        // dispose();
-
     }
 }

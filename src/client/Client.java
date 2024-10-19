@@ -28,7 +28,7 @@ public class Client {
             System.out.println("Socket Input");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            userInput = new BufferedReader(new InputStreamReader(System.in));
+            // userInput = new BufferedReader(new InputStreamReader(System.in));
 
             System.out.println("Connected to server at " + this.serverIp + ":" + this.serverPort);
         } catch (IOException e) {
@@ -59,6 +59,19 @@ public class Client {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void sendMessage(String message) {
+        out.println(message);
+    }
+    
+    public String receiveMessage() {
+        try {
+            return in.readLine();
+        } catch (IOException e) {
+            System.out.println("Error receiving message: " + e.getMessage());
+            return null;
         }
     }
 
