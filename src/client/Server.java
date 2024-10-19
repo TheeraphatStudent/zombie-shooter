@@ -33,7 +33,7 @@ public class Server {
         System.out.println("Server Start");
 
         // สร้าง Thread มารอรับข้อมูลจาก Server เพื่อส่งไปยัง Client
-        // new Thread(this::handleServerInput).start();
+        new Thread(this::handleServerInput).start();
 
         try {
             while (true) {

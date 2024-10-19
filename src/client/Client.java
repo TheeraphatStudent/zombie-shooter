@@ -28,17 +28,12 @@ public class Client {
             System.out.println("Socket Input");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // userInput = new BufferedReader(new InputStreamReader(System.in));
+            userInput = new BufferedReader(new InputStreamReader(System.in));
 
             System.out.println("Connected to server at " + this.serverIp + ":" + this.serverPort);
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }
-    }
-
-    public void connect() {
-
-
     }
 
     public void start() {

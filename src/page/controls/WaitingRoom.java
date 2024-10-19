@@ -40,12 +40,19 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
 
         this.numOfPlayers = numOfPlayers;
 
-        this.server.start();
+        new Thread(new Runnable() {
 
-        // Host ใส่ IP และ  Port ของตัวเอง
-        this.client = new Client(server.getServerIp(), server.getServerPort());
+            @Override
+            public void run() {
+                server.start();
 
-        this.client.connect();
+                // Host ใส่ IP และ Port ของตัวเอง
+                client = new Client(server.getServerIp(), server.getServerPort());
+                client.start();
+
+            }
+
+        }).start();
 
         setupLayout();
         startListeningForPlayers();
@@ -57,16 +64,24 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         this.playerCharacters = new ArrayList<>();
         this.clientObj = clientObj;
 
-        this.client = new Client(joinToIp, onPort);
-        this.client.start();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                client = new Client(joinToIp, onPort);
+                client.start();
+
+            }
+
+        }).start();
 
         setupLayout();
         startListeningForPlayers();
     }
 
-
-
     private void setupLayout() {
+        System.out.println("On Waiting...");
+
         setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
         setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -174,7 +189,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
 
     private void addPlayer() {
         CreateCharacter playerCharacter = new CreateCharacter(false, clientObj);
-        playerCharacter.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        playerCharacter.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH,
+                CHARACTER_HEIGHT);
         content.add(playerCharacter);
         content.revalidate();
         content.repaint();
@@ -202,7 +218,15 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     }
 
     private void startGame() {
+        SwingUtilities.invokeLater(() -> {
+            subTitle.setText("Game starting...");
+            content.removeAll();
+
+            revalidate();
+            repaint();
+        });
         client.sendMessage("READY_TO_START");
         new WindowClosingFrameEvent().navigateTo(this, new GameContent(gameCenter, clientObj), false);
     }
+
 }

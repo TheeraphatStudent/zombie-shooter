@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import client.Client;
 import client.Server;
@@ -174,29 +175,31 @@ public class Createroom extends JFrame {
 
     // check player num
     start.addActionListener(e -> {
-      try {
+    try {
         String playernum = player.getText();
-        System.out.println("Playernum : " + playernum);
+        System.out.println("Playernum: " + playernum);
         int numofplayer = Integer.parseInt(playernum);
-    
+
         if (numofplayer < 2) {
-          new UseAlert().warringAlert("Minimum is Two");
-          return;
-
+            new UseAlert().warringAlert("Minimum is Two");
+            return;
         } else if (numofplayer > 3) {
-          new UseAlert().warringAlert("Maximum is Three");
-          return;
-
+            new UseAlert().warringAlert("Maximum is Three");
+            return;
         }
-        
-        new WindowClosingFrameEvent().navigateTo(Createroom.this, new WaitingRoom(server, clientObj, gameCenter, numofplayer), false);
-    
-      } catch (NumberFormatException numExc) {
-        System.out.println("Error");
-        new UseAlert().warringAlert("Please enter a valid number");
 
-      }
-    });
+        System.out.println("Server IP: " + server.getServerIp() + ", Server Port: " + server.getServerPort());
+        
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("Navigating to WaitingRoom...");
+            new WindowClosingFrameEvent().navigateTo(Createroom.this, new WaitingRoom(server, clientObj, gameCenter, numofplayer), false);
+        });
+
+    } catch (NumberFormatException numExc) {
+        System.out.println("Error parsing number of players");
+        new UseAlert().warringAlert("Please enter a valid number");
+    }
+});
 
     actions.add(start);
 
