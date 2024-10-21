@@ -2,6 +2,8 @@ package client.helper;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerHelper {
     public int getAlreadyPort() {

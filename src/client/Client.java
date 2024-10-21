@@ -2,32 +2,68 @@ package client;
 
 import java.io.*;
 import java.net.*;
+import java.util.UUID;
 import java.util.concurrent.*;
 
-public class Client {
-    private Socket socket;
+import components.character.CreateCharacter;
+import models.ClientObj;
+import models.Player;
+
+public class Client implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private Socket clientSocket;
+    private Socket serverSocket;
     private PrintWriter out;
     private BufferedReader in;
+
     private String serverIp;
     private int serverPort;
+
+    // รับ - ส่ง ข้อมูล
+    private ObjectOutputStream objOutSteam;
+    private ObjectInputStream objectSteamIn;
+
     private BlockingQueue<String> messageQueue;
     private volatile boolean isConnected;
 
-    public Client(String serverIp, int serverPort) {
+    // Character
+    private ClientObj clientObj;
+    private CreateCharacter character;
+    private Player player;
+
+    public Client(String serverIp, int serverPort, ClientObj clientObj) {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
         this.messageQueue = new LinkedBlockingQueue<>();
         this.isConnected = false;
+        this.clientObj = clientObj;
+        
+        this.character = new CreateCharacter(false, this.clientObj);
     }
 
     public void start() {
         try {
-            socket = new Socket(serverIp, serverPort);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            clientSocket = new Socket(serverIp, serverPort);
             isConnected = true;
+
+            // Initialize output streams first
+            objOutSteam = new ObjectOutputStream(clientSocket.getOutputStream());
+            objOutSteam.flush(); // This is important
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+
+            // Then initialize input streams
+            objectSteamIn = new ObjectInputStream(clientSocket.getInputStream());
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
+
+            sendObject(character);
+
+            // Get content from server
             new Thread(this::receiveServerMessage).start();
+            new Thread(this::receiveServerObject).start();
+
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }
@@ -46,8 +82,37 @@ public class Client {
             return messageQueue.poll(5, TimeUnit.SECONDS);
 
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            // Thread.currentThread().interrupt();
             return null;
+        }
+    }
+
+    // รับ Object ?ี่ส่งมาจาก Server
+    private void receiveServerObject() {
+        try {
+            while (isConnected) {
+                Object object = objectSteamIn.readObject();
+                System.out.println("Received object: " + object.toString());
+
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error receiving object: " + e.getMessage());
+        } finally {
+            disconnect();
+        }
+    }
+
+    public void sendObject(Object object) {
+        System.out.println("Client Send Object > " + object.toString());
+
+        try {
+            objOutSteam.writeObject(object);
+            objOutSteam.flush();
+
+        } catch (IOException e) {
+            System.out.println("Error sending object: " + e.getMessage());
+            e.printStackTrace();
+
         }
     }
 
@@ -59,16 +124,19 @@ public class Client {
             }
         } catch (IOException e) {
             System.out.println("Error receiving message: " + e.getMessage());
+            e.printStackTrace();
+
         } finally {
             disconnect();
         }
     }
 
+    // Connection
     public void disconnect() {
         isConnected = false;
         try {
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                clientSocket.close();
             }
             if (in != null) {
                 in.close();

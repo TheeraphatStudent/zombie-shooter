@@ -56,7 +56,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
             @Override
             public void run() {
                 // Host ใส่ IP และ Port ของตัวเอง
-                WaitingRoom.this.client = new Client(server.getServerIp(), server.getServerPort());
+                WaitingRoom.this.client = new Client(server.getServerIp(), server.getServerPort(), clientObj);
                 WaitingRoom.this.client.start();
 
             }
@@ -72,11 +72,12 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         this.playerCharacters = new ArrayList<>();
         this.clientObj = clientObj;
 
+        this.client = new Client(joinToIp, onPort, clientObj);
+
         new Thread(new Runnable() {
 
             @Override
             public void run() {
-                WaitingRoom.this.client = new Client(joinToIp, onPort);
                 WaitingRoom.this.client.start();
 
             }

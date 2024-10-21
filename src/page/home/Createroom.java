@@ -59,7 +59,7 @@ public class Createroom extends JFrame {
     setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
     setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setTitle("Create room ");
+    setTitle("Zombie Shooter - Create room ");
     setLocationRelativeTo(null);
 
     JLayeredPane layers = new JLayeredPane();

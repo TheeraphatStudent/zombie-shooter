@@ -1,14 +1,23 @@
 package client.helper;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.Socket;
 
 import client.Server;
+import models.ClientObj;
 
-public class ClientHandler implements Runnable {
+public class ClientHandler implements Runnable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Socket clientSocket;
     private Server server;
     private PrintWriter out;
@@ -17,39 +26,83 @@ public class ClientHandler implements Runnable {
     private boolean isReady;
 
     // ใช้สำหรับส่งและรับข้อมูลระหว่าง Server และ Client
+    private InputStream clientInSteam;
+    private OutputStream clientOutSteam;
+
+    private ObjectOutputStream objectOut;
+    private ObjectInputStream objectIn;
+
+    // Game Content
+    private Object receivedObject;
 
     public ClientHandler(Socket socket, Server server) {
         this.clientSocket = socket;
         this.server = server;
+
     }
 
     public void run() {
         try {
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            clientOutSteam = clientSocket.getOutputStream();
+            objectOut = new ObjectOutputStream(clientOutSteam);
+            objectOut.flush();
+            out = new PrintWriter(clientOutSteam, true);
 
-            String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Server > Received message: " + message);
-                server.broadcastMessage(message, this);
+            clientInSteam = clientSocket.getInputStream();
+            
+            objectIn = new ObjectInputStream(clientInSteam);
+            // in = new BufferedReader(new InputStreamReader(clientInSteam));
 
-            }
+            // String message;
+            // while ((message = in.readLine()) != null) {
+            // System.out.println("Server > Received message: " + message);
+            // server.broadcastMessage(message, this);
+
+            // }
+
+            new Thread(this::receiveObjectsFromClient).start();
         } catch (IOException e) {
             System.out.println("Error handling client: " + e.getMessage());
-        } 
+
+        }
         // finally {
-        //     try {
-        //         clientSocket.close();
-        //     } catch (IOException e) {
-        //         e.printStackTrace();
-        //     }
-        //     server.removeClient(this);
+        // try {
+        // clientSocket.close();
+        // } catch (IOException e) {
+        // e.printStackTrace();
         // }
+        // server.removeClient(this);
+        // }
+    }
+
+    private void receiveObjectsFromClient() {
+        System.out.println("Prepare Receive Object From Client!");
+        try {
+            while (!clientSocket.isClosed()) {
+                receivedObject = objectIn.readObject();
+                System.out.println("Server > Received object: " + receivedObject.toString());
+                // Process the received object as needed
+            }
+        } catch (EOFException e) {
+            System.out.println("Client disconnected.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error receiving object: " + e.getMessage());
+        }
     }
 
     public void sendMessage(String message) {
         out.println(message);
 
+    }
+
+    public void sendObject(Object object) {
+        try {
+            objectOut.writeObject(object);
+            objectOut.flush();
+
+        } catch (IOException e) {
+            System.out.println("Error sending object: " + e.getMessage());
+        }
     }
 
     public void setReady(boolean isReady) {
@@ -59,6 +112,17 @@ public class ClientHandler implements Runnable {
 
     public boolean isReady() {
         return this.isReady;
+
+    }
+
+    public ClientObj getClientObj() {
+        if (receivedObject instanceof ClientObj) {
+            return (ClientObj) receivedObject;
+
+        } else {
+            return null;
+
+        }
 
     }
 }
