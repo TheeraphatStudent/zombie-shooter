@@ -81,7 +81,7 @@ public class ClientHandler implements Runnable, Serializable {
             while (!clientSocket.isClosed()) {
                 receivedObject = objectIn.readObject();
                 System.out.println("Server > Received object: " + receivedObject.toString());
-                // Process the received object as needed
+                
             }
         } catch (EOFException e) {
             System.out.println("Client disconnected.");

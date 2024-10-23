@@ -33,12 +33,13 @@ public class Client implements Serializable {
     private Player player;
 
     public Client(String serverIp, int serverPort, ClientObj clientObj) {
+        super();
         this.serverIp = serverIp;
         this.serverPort = serverPort;
         this.messageQueue = new LinkedBlockingQueue<>();
         this.isConnected = false;
         this.clientObj = clientObj;
-        
+
         this.character = new CreateCharacter(false, this.clientObj);
     }
 
@@ -49,7 +50,7 @@ public class Client implements Serializable {
 
             // Initialize output streams first
             objOutSteam = new ObjectOutputStream(clientSocket.getOutputStream());
-            objOutSteam.flush(); // This is important
+            objOutSteam.flush();
             out = new PrintWriter(clientSocket.getOutputStream(), true);
 
             // Then initialize input streams
@@ -58,7 +59,8 @@ public class Client implements Serializable {
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
-            sendObject(character);
+            sendObject(this.character);
+            sendObject(this.clientObj);
 
             // Get content from server
             new Thread(this::receiveServerMessage).start();
@@ -77,31 +79,6 @@ public class Client implements Serializable {
         }
     }
 
-    public String receiveMessageQueue() {
-        try {
-            return messageQueue.poll(5, TimeUnit.SECONDS);
-
-        } catch (InterruptedException e) {
-            // Thread.currentThread().interrupt();
-            return null;
-        }
-    }
-
-    // รับ Object ?ี่ส่งมาจาก Server
-    private void receiveServerObject() {
-        try {
-            while (isConnected) {
-                Object object = objectSteamIn.readObject();
-                System.out.println("Received object: " + object.toString());
-
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error receiving object: " + e.getMessage());
-        } finally {
-            disconnect();
-        }
-    }
-
     public void sendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
 
@@ -116,20 +93,48 @@ public class Client implements Serializable {
         }
     }
 
+    public String receiveMessageQueue() {
+        try {
+            return messageQueue.poll(5, TimeUnit.SECONDS);
+
+        } catch (InterruptedException e) {
+            // Thread.currentThread().interrupt();
+            return null;
+        }
+    }
+
+    // รับ Object ?ี่ส่งมาจาก Server
+    private void receiveServerObject() {
+        try {
+            Object object;
+            while (isConnected && !clientSocket.isClosed() && (object = objectSteamIn.readObject()) != null) {
+                object = objectSteamIn.readObject();
+                System.out.println("Received object: " + object.getClass().getName() + " with hashcode: " + object.hashCode());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error receiving object: " + e.getMessage());
+            e.printStackTrace();
+
+        } finally {
+            disconnect();
+
+        }
+    }
+
     private void receiveServerMessage() {
         try {
             String message;
-            while (isConnected && (message = in.readLine()) != null) {
+            while (isConnected && !clientSocket.isClosed() && (message = in.readLine()) != null) {
                 messageQueue.offer(message);
             }
         } catch (IOException e) {
             System.out.println("Error receiving message: " + e.getMessage());
             e.printStackTrace();
-
         } finally {
-            disconnect();
+            disconnect(); 
         }
     }
+    
 
     // Connection
     public void disconnect() {

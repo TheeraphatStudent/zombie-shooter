@@ -7,6 +7,7 @@ import java.util.*;
 import client.helper.ClientHandler;
 import client.helper.ServerHelper;
 import components.character.CreateCharacter;
+import models.ClientObj;
 
 public class Server extends ServerHelper implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -16,12 +17,16 @@ public class Server extends ServerHelper implements Serializable {
     private String serverIp;
     private List<ClientHandler> clients = new ArrayList<>();
 
+    // !Test
+    private List<ClientObj> clientObjs = new ArrayList<>();
+
     private ObjectInputStream objectIn;
     private ObjectInputStream objectOut;
 
     int requiredPlayersToStart = 1;
 
     public Server() {
+        super();
         System.out.println("Create new server");
 
         this.serverPort = getAlreadyPort();
@@ -102,13 +107,16 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     public void handleNewConnection(ClientHandler newClient) {
-        System.out.println(newClient);
+        System.out.println("New Client: " + newClient);
+        System.out.println("Get Client Object: " + newClient.getClientObj());
+
+        clientObjs.add(newClient.getClientObj());
 
         broadcastMessage("NEW_PLAYER", null);
         // broadcastObject(new CreateCharacter(false, newClient.getClientObj()), newClient);
 
         // if (clients.size() >= requiredPlayersToStart) {
-        // broadcastMessage("START_COUNTDOWN", null);
+        //     broadcastMessage("START_COUNTDOWN", null);
         // }
     }
 
@@ -172,13 +180,13 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     // private void receiveObjectsFromClient() {
-    //     try {
-    //         while (true) {
-    //             Object receivedObject = objectIn.readObject();
-    //             System.out.println("Server > Received object: " + receivedObject.toString());
-    //         }
-    //     } catch (IOException | ClassNotFoundException e) {
-    //         System.out.println("Error receiving object: " + e.getMessage());
-    //     }
+    // try {
+    // while (true) {
+    // Object receivedObject = objectIn.readObject();
+    // System.out.println("Server > Received object: " + receivedObject.toString());
+    // }
+    // } catch (IOException | ClassNotFoundException e) {
+    // System.out.println("Error receiving object: " + e.getMessage());
+    // }
     // }
 }
