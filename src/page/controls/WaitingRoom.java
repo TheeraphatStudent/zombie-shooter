@@ -39,6 +39,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         this.playerCharacters = new ArrayList<>();
         this.clientObj = clientObj;
 
+        this.server.setRequiredPlayersToStart(numOfPlayers);
         this.numOfPlayers = numOfPlayers;
 
         new Thread(new Runnable() {
@@ -244,9 +245,11 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
             countdownSeconds--;
             if (countdownSeconds > 0) {
                 subTitle.setText("Game starting in " + countdownSeconds + "...");
+
             } else {
                 ((Timer) e.getSource()).stop();
                 startGame();
+
             }
         });
         countdownTimer.start();

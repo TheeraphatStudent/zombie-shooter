@@ -77,6 +77,8 @@ public class ClientHandler implements Runnable, Serializable {
 
     private void receiveObjectsFromClient() {
         System.out.println("Prepare Receive Object From Client!");
+        System.out.println(objectIn);
+
         try {
             while (!clientSocket.isClosed()) {
                 receivedObject = objectIn.readObject();
@@ -116,6 +118,8 @@ public class ClientHandler implements Runnable, Serializable {
     }
 
     public ClientObj getClientObj() {
+        System.out.println(">>>>>>>>>> Received Object: " + receivedObject);
+
         if (receivedObject instanceof ClientObj) {
             return (ClientObj) receivedObject;
 
