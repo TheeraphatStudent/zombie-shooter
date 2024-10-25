@@ -36,7 +36,7 @@ public class Server extends ServerHelper implements Serializable {
 
     public void start() {
         System.out.println("Server Start");
-        
+
         // Start server input handler in daemon thread
         Thread inputHandler = new Thread(this::handleServerInput);
         inputHandler.setDaemon(true);
@@ -57,6 +57,7 @@ public class Server extends ServerHelper implements Serializable {
                 }
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+
                 synchronized (clients) {
                     clients.add(clientHandler);
                     System.out.println("Client added. Total clients: " + clients.size());
@@ -66,14 +67,14 @@ public class Server extends ServerHelper implements Serializable {
                 handlerThread.setDaemon(true);
                 handlerThread.start();
 
-                Thread handleNewThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        handleNewConnection(clientHandler);
-                    }
-                });
-                handleNewThread.setDaemon(true);
-                handleNewThread.start();
+                // Thread handleNewThread = new Thread(new Runnable() {
+                // @Override
+                // public void run() {
+                // handleNewConnection(clientHandler);
+                // }
+                // });
+                // handleNewThread.setDaemon(true);
+                // handleNewThread.start();
 
                 checkGameStart();
             } catch (IOException e) {
@@ -97,12 +98,11 @@ public class Server extends ServerHelper implements Serializable {
         System.out.println("!!!!! New Client Connect !!!!!");
 
         ClientObj clientObj = newClient.getClientObj();
-        System.out.println("Client Object: " + clientObj);
 
         if (clientObj != null) {
             clientObjs.add(clientObj);
             broadcastMessage("NEW_PLAYER", null);
-            
+
             // Send existing players to the new client
             for (ClientObj existingClient : clientObjs) {
                 if (existingClient != clientObj) {
@@ -123,7 +123,6 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     public synchronized void handleReadyToStart(ClientHandler readyClient) {
-        readyClient.setReady(true);
         if (allClientsReady()) {
             broadcastMessage("START_GAME", null);
             // Give clients time to process START_GAME message
@@ -142,18 +141,30 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     public void broadcastMessage(String message, ClientHandler sender) {
+        System.out.println();
+        System.out.println("On Broadcast Message!");
+        System.out.println("Message (Server): " + message);
+        System.out.println("Client Handler (Sender): " + sender);
+
         synchronized (clients) {
+            System.out.println("===== All Client =====");
             for (ClientHandler receiver : clients) {
+                System.out.println(receiver);
+
                 if (receiver != sender && receiver.isReady()) {
                     try {
                         receiver.sendMessage(message);
+
                     } catch (Exception e) {
                         System.out.println("Error broadcasting to client: " + e.getMessage());
                         removeClient(receiver);
                     }
                 }
             }
+            System.out.println("===============");
         }
+
+        System.out.println();
     }
 
     public void broadcastObject(Object object, ClientHandler sender) {
@@ -177,10 +188,10 @@ public class Server extends ServerHelper implements Serializable {
             clientObjs.remove(clientHandler.getClientObj());
         }
         System.out.println("Client removed. Total clients: " + clients.size());
-        
+
         // Notify remaining clients about the disconnection
         broadcastMessage("PLAYER_DISCONNECTED", clientHandler);
-        
+
         // Check if we need to abort game start
         if (gameStarting && clients.size() < requiredPlayersToStart) {
             gameStarting = false;
@@ -189,14 +200,14 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     // private void closeServer() {
-    //     try {
-    //         for (ClientHandler client : clients) {
-    //             client.close();
-    //         }
-    //         serverSocket.close();
-    //     } catch (IOException e) {
-    //         System.out.println("Error closing server: " + e.getMessage());
-    //     }
+    // try {
+    // for (ClientHandler client : clients) {
+    // client.close();
+    // }
+    // serverSocket.close();
+    // } catch (IOException e) {
+    // System.out.println("Error closing server: " + e.getMessage());
+    // }
     // }
 
     // Getters

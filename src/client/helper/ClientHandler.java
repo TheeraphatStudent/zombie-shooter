@@ -23,7 +23,7 @@ public class ClientHandler implements Runnable, Serializable {
     private PrintWriter out;
     private BufferedReader in;
 
-    private boolean isReady;
+    private boolean isReady = true;
 
     // ใช้สำหรับส่งและรับข้อมูลระหว่าง Server และ Client
     private InputStream clientInSteam;
@@ -43,6 +43,8 @@ public class ClientHandler implements Runnable, Serializable {
 
     public void run() {
         try {
+            System.out.println("!-!-!-!-! On Handler Run !-!-!-!-!");
+
             clientOutSteam = clientSocket.getOutputStream();
             objectOut = new ObjectOutputStream(clientOutSteam);
             objectOut.flush();
@@ -77,12 +79,17 @@ public class ClientHandler implements Runnable, Serializable {
 
     private void receiveObjectsFromClient() {
         System.out.println("Prepare Receive Object From Client!");
-        System.out.println(objectIn);
+        // System.out.println(objectIn);
 
         try {
             while (!clientSocket.isClosed()) {
                 receivedObject = objectIn.readObject();
-                System.out.println("Server > Received object: " + receivedObject.toString());
+                System.out.println("Client Handler > Received object: " + receivedObject.toString());
+
+                if (receivedObject instanceof ClientObj) {
+                    server.handleNewConnection(this);
+
+                }
                 
             }
         } catch (EOFException e) {
@@ -93,7 +100,14 @@ public class ClientHandler implements Runnable, Serializable {
     }
 
     public void sendMessage(String message) {
+        System.out.println();
+
+        System.out.println("Client Handler > Send Message: " + message);
+
+        System.out.println();
+
         out.println(message);
+        out.flush();
 
     }
 

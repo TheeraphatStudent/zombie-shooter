@@ -200,7 +200,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         new Thread(() -> {
             while (playerCharacters.size() < numOfPlayers) {
                 if (client != null && client.isConnected()) {
-                    System.out.println("On Client Connect!");
+                    System.out.println();
+                    System.out.println("Waiting Room > On Client Connect!");
 
                     String message = client.receiveMessageQueue();
                     System.out.println("Waiting Room > On Received Message: " + message);

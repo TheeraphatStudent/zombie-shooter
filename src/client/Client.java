@@ -45,12 +45,15 @@ public class Client implements Serializable {
 
     public void start() {
         try {
+            System.out.println("On Client Start!");
+
             clientSocket = new Socket(serverIp, serverPort);
             isConnected = true;
 
             // Initialize output streams first
             objOutSteam = new ObjectOutputStream(clientSocket.getOutputStream());
             objOutSteam.flush();
+
             out = new PrintWriter(clientSocket.getOutputStream(), true);
 
             // Then initialize input streams
@@ -59,8 +62,8 @@ public class Client implements Serializable {
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
-            sendObject(this.character);
             sendObject(this.clientObj);
+            // sendObject(this.character);
 
             // Get content from server
             new Thread(this::receiveServerMessage).start();
@@ -93,6 +96,19 @@ public class Client implements Serializable {
         }
     }
 
+    // public String receiveMessageQueue() {
+    // try {
+    // String message = in.readLine();
+    // if (message != null) {
+    // System.out.println("Received from server: " + message);
+    // }
+    // return message;
+    // } catch (IOException e) {
+    // System.out.println("Error receiving message: " + e.getMessage());
+    // return null;
+    // }
+    // }
+
     public String receiveMessageQueue() {
         try {
             return messageQueue.poll(5, TimeUnit.SECONDS);
@@ -109,7 +125,8 @@ public class Client implements Serializable {
             Object object;
             while (isConnected && !clientSocket.isClosed() && (object = objectSteamIn.readObject()) != null) {
                 object = objectSteamIn.readObject();
-                System.out.println("Received object: " + object.getClass().getName() + " with hashcode: " + object.hashCode());
+                System.out.println(
+                        "Received object: " + object.getClass().getName() + " with hashcode: " + object.hashCode());
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
@@ -131,10 +148,9 @@ public class Client implements Serializable {
             System.out.println("Error receiving message: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            disconnect(); 
+            disconnect();
         }
     }
-    
 
     // Connection
     public void disconnect() {
