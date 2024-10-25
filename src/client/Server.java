@@ -3,6 +3,7 @@ package client;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import client.helper.ClientHandler;
 import client.helper.ServerHelper;
@@ -12,10 +13,15 @@ import models.ClientObj;
 public class Server extends ServerHelper implements Serializable {
     private static final long serialVersionUID = 1L;
     private final ServerSocket serverSocket;
-    private final List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
-    private final List<ClientObj> clientObjs = Collections.synchronizedList(new ArrayList<>());
     private final int serverPort;
     private final String serverIp;
+
+    // Communication Contain
+    // private final List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
+    // private final List<ClientObj> clientObjs = Collections.synchronizedList(new ArrayList<>());
+    private final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
+    private final List<ClientObj> clientObjs = new CopyOnWriteArrayList<>();
+
     private volatile int requiredPlayersToStart = 1;
     private volatile boolean gameStarting = false;
 
@@ -29,8 +35,10 @@ public class Server extends ServerHelper implements Serializable {
             this.serverSocket = new ServerSocket(serverPort);
             System.out.println("Server IP: " + serverIp);
             System.out.println("Server is listening on port " + serverPort);
+
         } catch (IOException e) {
             throw new RuntimeException("Error creating server socket: " + e.getMessage(), e);
+
         }
     }
 
@@ -58,10 +66,8 @@ public class Server extends ServerHelper implements Serializable {
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
 
-                synchronized (clients) {
-                    clients.add(clientHandler);
-                    System.out.println("Client added. Total clients: " + clients.size());
-                }
+                clients.add(clientHandler);
+                System.out.println("Client added. Total clients: " + clients.size());
 
                 Thread handlerThread = new Thread(clientHandler);
                 handlerThread.setDaemon(true);
@@ -102,13 +108,8 @@ public class Server extends ServerHelper implements Serializable {
         if (clientObj != null) {
             clientObjs.add(clientObj);
             broadcastMessage("NEW_PLAYER", null);
+            broadcastObject(clientObj, null);
 
-            // Send existing players to the new client
-            for (ClientObj existingClient : clientObjs) {
-                if (existingClient != clientObj) {
-                    newClient.sendObject(existingClient);
-                }
-            }
         } else {
             // Not found client obj
 
@@ -141,51 +142,55 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     public void broadcastMessage(String message, ClientHandler sender) {
-        System.out.println();
-        System.out.println("On Broadcast Message!");
+        System.out.println("\nOn Broadcast Message!");
         System.out.println("Message (Server): " + message);
-        System.out.println("Client Handler (Sender): " + sender);
+        System.out.println("Client Handler (Sender): " + sender + "\n");
 
-        synchronized (clients) {
-            System.out.println("===== All Client =====");
-            for (ClientHandler receiver : clients) {
-                System.out.println(receiver);
+        for (ClientHandler receiver : clients) {
+            if (receiver != sender && receiver.isReady() && message != null) {
+                try {
+                    receiver.sendMessage(message);
 
-                if (receiver != sender && receiver.isReady()) {
-                    try {
-                        receiver.sendMessage(message);
-
-                    } catch (Exception e) {
-                        System.out.println("Error broadcasting to client: " + e.getMessage());
-                        removeClient(receiver);
-                    }
+                } catch (Exception e) {
+                    System.out.println("Error broadcasting to client: " + e.getMessage());
+                    // removeClient(receiver);
                 }
             }
-            System.out.println("===============");
         }
-
-        System.out.println();
     }
 
     public void broadcastObject(Object object, ClientHandler sender) {
-        synchronized (clients) {
-            for (ClientHandler receiver : clients) {
-                if (receiver != sender && receiver.isReady()) {
+        System.out.println();
+        System.out.println("On Broadcast Object!");
+        System.out.println("Object (Server): " + object);
+        System.out.println("Client Handler (Sender): " + sender);
+        System.out.println();
+
+        for (ClientHandler receiver : clients) {
+            // System.out.println(receiver);
+
+            if (receiver != sender && receiver.isReady() && object != null) {
+                synchronized (receiver) {
                     try {
                         receiver.sendObject(object);
+    
                     } catch (Exception e) {
                         System.out.println("Error broadcasting object to client: " + e.getMessage());
-                        removeClient(receiver);
+                        // removeClient(receiver);
                     }
+
                 }
             }
         }
     }
+    
 
     public synchronized void removeClient(ClientHandler clientHandler) {
         clients.remove(clientHandler);
         if (clientHandler.getClientObj() != null) {
             clientObjs.remove(clientHandler.getClientObj());
+            clients.remove(clientHandler);
+
         }
         System.out.println("Client removed. Total clients: " + clients.size());
 

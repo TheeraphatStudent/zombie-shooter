@@ -21,26 +21,33 @@ public class Client implements Serializable {
     private int serverPort;
 
     // รับ - ส่ง ข้อมูล
+    private BufferedOutputStream buffOut;
     private ObjectOutputStream objOutSteam;
-    private ObjectInputStream objectSteamIn;
+
+    private BufferedInputStream buffIn;
+    private ObjectInputStream objInSteam;
 
     private BlockingQueue<String> messageQueue;
+    private BlockingQueue<Object> objectQueue;
+
     private volatile boolean isConnected;
 
     // Character
     private ClientObj clientObj;
-    private CreateCharacter character;
-    private Player player;
+    // private CreateCharacter character;
+    // private Player player;
 
     public Client(String serverIp, int serverPort, ClientObj clientObj) {
         super();
         this.serverIp = serverIp;
         this.serverPort = serverPort;
         this.messageQueue = new LinkedBlockingQueue<>();
+        this.objectQueue = new LinkedBlockingQueue<>();
+
         this.isConnected = false;
         this.clientObj = clientObj;
 
-        this.character = new CreateCharacter(false, this.clientObj);
+        // this.character = new CreateCharacter(false, this.clientObj);
     }
 
     public void start() {
@@ -50,49 +57,63 @@ public class Client implements Serializable {
             clientSocket = new Socket(serverIp, serverPort);
             isConnected = true;
 
-            // Initialize output streams first
-            objOutSteam = new ObjectOutputStream(clientSocket.getOutputStream());
+            buffOut = new BufferedOutputStream(clientSocket.getOutputStream());
+            objOutSteam = new ObjectOutputStream(buffOut);
             objOutSteam.flush();
 
+            buffIn = new BufferedInputStream(clientSocket.getInputStream());
+            objInSteam = new ObjectInputStream(buffIn);
+            
             out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-            // Then initialize input streams
-            objectSteamIn = new ObjectInputStream(clientSocket.getInputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
-            sendObject(this.clientObj);
-            // sendObject(this.character);
+            clientSideSendObject(this.clientObj);
+            // clientSideSendObject(this.character);
 
             // Get content from server
-            new Thread(this::receiveServerMessage).start();
-            new Thread(this::receiveServerObject).start();
+            Thread messageThread = new Thread(this::receiveServerMessage);
+            Thread objectThread = new Thread(this::receiveServerObject);
+
+            messageThread.setDaemon(true);
+
+            objectThread.setPriority(Thread.MAX_PRIORITY);
+            objectThread.setDaemon(true);
+
+            messageThread.start();
+            objectThread.start();
 
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
+            disconnect();
+
         }
     }
 
-    public void sendMessage(String message) {
+    public void clientSideSendMessage(String message) {
         if (isConnected && out != null) {
             out.println(message);
+            out.flush();
+
         } else {
             System.out.println("Cannot send message. Not connected to server.");
         }
     }
 
-    public void sendObject(Object object) {
+    public void clientSideSendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
 
-        try {
-            objOutSteam.writeObject(object);
-            objOutSteam.flush();
+        synchronized (objOutSteam) {
+            try {
+                objOutSteam.writeObject(object);
+                objOutSteam.flush();
+                objOutSteam.reset();
 
-        } catch (IOException e) {
-            System.out.println("Error sending object: " + e.getMessage());
-            e.printStackTrace();
-
+            } catch (IOException e) {
+                System.out.println("Error sending object: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -110,6 +131,8 @@ public class Client implements Serializable {
     // }
 
     public String receiveMessageQueue() {
+        System.out.println(messageQueue);
+
         try {
             return messageQueue.poll(5, TimeUnit.SECONDS);
 
@@ -119,41 +142,71 @@ public class Client implements Serializable {
         }
     }
 
-    // รับ Object ?ี่ส่งมาจาก Server
-    private synchronized void receiveServerObject() {
+    public Object receiveObjectQueue() {
+        System.out.println(objectQueue);
+
         try {
-            Object object;
-            while (isConnected && !clientSocket.isClosed() && (object = objectSteamIn.readObject()) != null) {
-                object = objectSteamIn.readObject();
-                System.out.println(
-                        "Received object: " + object.getClass().getName() + " with hashcode: " + object.hashCode());
+            return objectQueue.poll(5, TimeUnit.SECONDS);
+
+        } catch (Exception e) {
+            return null;
+
+        }
+
+    }
+
+    // รับ Object ?ี่ส่งมาจาก Server
+    private void receiveServerObject() {
+        System.out.println(">>>>> Receive Server Object Work! <<<<<");
+        
+        try {
+            synchronized (objInSteam) {
+                Object object = null;
+
+                while (isConnected && !clientSocket.isClosed()) {
+                    System.out.println(objInSteam);
+
+                    object = objInSteam.readObject();
+
+                    if (object != null) {
+                        System.out.println("Get Object >>> " + object);
+                        objectQueue.offer(object);
+
+                    }
+                }
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
             e.printStackTrace();
 
-        } finally {
-            disconnect();
-
         }
     }
 
-    private synchronized void receiveServerMessage() {
+    private void receiveServerMessage() {
+        System.out.println(">>>>> Receive Server Message Work! <<<<<");
+
         try {
-            String message;
-            while (isConnected && !clientSocket.isClosed() && (message = in.readLine()) != null) {
-                messageQueue.offer(message);
+            synchronized (in) {
+                String message = null;
+                while (isConnected && !clientSocket.isClosed()) {
+                    message = in.readLine();
+                    if (message != null) {
+                        messageQueue.offer(message);
+
+                    }
+                }
             }
         } catch (IOException e) {
             System.out.println("Error receiving message: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            disconnect();
+
         }
     }
 
     // Connection
     public void disconnect() {
+        System.out.println("Client Disconnect!");
+
         isConnected = false;
         try {
             if (clientSocket != null && !clientSocket.isClosed()) {

@@ -34,6 +34,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     private int countdownSeconds = 15;
 
     public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, int numOfPlayers) {
+        System.out.println("Prepare for host!");
+
         this.gameCenter = gameCenter;
         this.server = server;
         this.playerCharacters = new ArrayList<>();
@@ -68,6 +70,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     }
 
     public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, String joinToIp, int onPort) {
+        System.out.println("Prepare for client!");
+
         this.gameCenter = gameCenter;
         this.server = server;
         this.playerCharacters = new ArrayList<>();
@@ -204,9 +208,24 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                     System.out.println("Waiting Room > On Client Connect!");
 
                     String message = client.receiveMessageQueue();
+                    Object obj = client.receiveObjectQueue();
+
                     System.out.println("Waiting Room > On Received Message: " + message);
+                    System.out.println("Waiting Room > On Received Object: " + obj);
+
                     if (message != null && message.startsWith("NEW_PLAYER")) {
-                        SwingUtilities.invokeLater(this::addPlayer);
+                        if (obj instanceof ClientObj) {
+                            ClientObj getClientObj = (ClientObj) obj;
+                            
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    addPlayer(getClientObj);
+
+                                }
+                                
+                            });
+                        }
 
                     }
                 }
@@ -222,7 +241,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         }).start();
     }
 
-    private void addPlayer() {
+    private void addPlayer(ClientObj requireClientObj) {
         System.out.println("Added Players Work!");
 
         CreateCharacter playerCharacter = new CreateCharacter(false, clientObj);
@@ -264,7 +283,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
             revalidate();
             repaint();
         });
-        client.sendMessage("READY_TO_START");
+        client.clientSideSendMessage("READY_TO_START");
         new WindowClosingFrameEvent().navigateTo(this, new GameContent(gameCenter, clientObj), false);
     }
 

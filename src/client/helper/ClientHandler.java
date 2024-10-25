@@ -1,5 +1,7 @@
 package client.helper;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.io.Serializable;
 import java.net.Socket;
 
 import client.Server;
+import components.character.CreateCharacter;
 import models.ClientObj;
 
 public class ClientHandler implements Runnable, Serializable {
@@ -29,7 +32,10 @@ public class ClientHandler implements Runnable, Serializable {
     private InputStream clientInSteam;
     private OutputStream clientOutSteam;
 
+    private BufferedOutputStream buffOutSteam;
     private ObjectOutputStream objectOut;
+    
+    private BufferedInputStream buffInSteam;
     private ObjectInputStream objectIn;
 
     // Game Content
@@ -46,14 +52,17 @@ public class ClientHandler implements Runnable, Serializable {
             System.out.println("!-!-!-!-! On Handler Run !-!-!-!-!");
 
             clientOutSteam = clientSocket.getOutputStream();
-            objectOut = new ObjectOutputStream(clientOutSteam);
+            buffOutSteam = new BufferedOutputStream(clientOutSteam);
+            objectOut = new ObjectOutputStream(buffOutSteam);
             objectOut.flush();
-            out = new PrintWriter(clientOutSteam, true);
+            objectOut.reset();
 
             clientInSteam = clientSocket.getInputStream();
-            
-            objectIn = new ObjectInputStream(clientInSteam);
+            buffInSteam = new BufferedInputStream(clientInSteam);
+            objectIn = new ObjectInputStream(buffInSteam);
+
             // in = new BufferedReader(new InputStreamReader(clientInSteam));
+            out = new PrintWriter(clientOutSteam, true);
 
             // String message;
             // while ((message = in.readLine()) != null) {
@@ -87,13 +96,11 @@ public class ClientHandler implements Runnable, Serializable {
                 System.out.println("Client Handler > Received object: " + receivedObject.toString());
 
                 if (receivedObject instanceof ClientObj) {
-                    server.handleNewConnection(this);
+                    server.handleNewConnection(ClientHandler.this);
 
                 }
-                
+
             }
-        } catch (EOFException e) {
-            System.out.println("Client disconnected.");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
         }
@@ -101,21 +108,25 @@ public class ClientHandler implements Runnable, Serializable {
 
     public void sendMessage(String message) {
         System.out.println();
-
         System.out.println("Client Handler > Send Message: " + message);
-
         System.out.println();
 
         out.println(message);
-        out.flush();
+        // out.flush();
 
     }
 
     public void sendObject(Object object) {
         try {
-            objectOut.writeObject(object);
-            objectOut.flush();
+            synchronized (objectOut) {
+                System.out.println();
+                System.out.println("Client Handler > Send Object: " + object);
+                System.out.println();
 
+                objectOut.writeObject(object);
+                objectOut.flush();
+                objectOut.reset();
+            }
         } catch (IOException e) {
             System.out.println("Error sending object: " + e.getMessage());
         }
@@ -132,9 +143,10 @@ public class ClientHandler implements Runnable, Serializable {
     }
 
     public ClientObj getClientObj() {
-        System.out.println(">>>>>>>>>> Received Object: " + receivedObject);
+        // System.out.println(">>>>>>>>>> Received Object: " + receivedObject);
 
         if (receivedObject instanceof ClientObj) {
+
             return (ClientObj) receivedObject;
 
         } else {
