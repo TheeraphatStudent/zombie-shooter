@@ -120,7 +120,7 @@ public class Client implements Serializable {
     }
 
     // รับ Object ?ี่ส่งมาจาก Server
-    private void receiveServerObject() {
+    private synchronized void receiveServerObject() {
         try {
             Object object;
             while (isConnected && !clientSocket.isClosed() && (object = objectSteamIn.readObject()) != null) {
@@ -138,7 +138,7 @@ public class Client implements Serializable {
         }
     }
 
-    private void receiveServerMessage() {
+    private synchronized void receiveServerMessage() {
         try {
             String message;
             while (isConnected && !clientSocket.isClosed() && (message = in.readLine()) != null) {
