@@ -2,6 +2,7 @@ package components.character;
 
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -44,7 +45,8 @@ interface CreateCharacterProps {
 
 }
 
-public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
+public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement, Serializable {
+    private static final long serialVersionUID = 1L;
 
     ClientObj client;
     
@@ -80,6 +82,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(boolean isInfected, ClientObj clientObj) {
+        super();
+
         this.isSurvive = !isInfected;
 
         this.client = clientObj;
@@ -189,6 +193,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // :::::::::::::::::::: Zombie ::::::::::::::::::::
     public CreateCharacter(GameContent gameContent) {
+        super();
+
         this.gameContent = gameContent;
 
         // Zombie State -> false, false

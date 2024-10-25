@@ -2,75 +2,175 @@ package client;
 
 import java.io.*;
 import java.net.*;
+import java.util.UUID;
+import java.util.concurrent.*;
 
-public class Client {
-    private Socket socket;
+import components.character.CreateCharacter;
+import models.ClientObj;
+import models.Player;
+
+public class Client implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private Socket clientSocket;
+    private Socket serverSocket;
     private PrintWriter out;
     private BufferedReader in;
-    private BufferedReader userInput;
 
-    // เป็น Ip และ Port ที่ต้องการ Connect ไปยัง Server
     private String serverIp;
     private int serverPort;
 
-    public Client(String serverIp, int serverPort) {
+    // รับ - ส่ง ข้อมูล
+    private ObjectOutputStream objOutSteam;
+    private ObjectInputStream objectSteamIn;
+
+    private BlockingQueue<String> messageQueue;
+    private volatile boolean isConnected;
+
+    // Character
+    private ClientObj clientObj;
+    private CreateCharacter character;
+    private Player player;
+
+    public Client(String serverIp, int serverPort, ClientObj clientObj) {
+        super();
         this.serverIp = serverIp;
         this.serverPort = serverPort;
+        this.messageQueue = new LinkedBlockingQueue<>();
+        this.isConnected = false;
+        this.clientObj = clientObj;
 
+        this.character = new CreateCharacter(false, this.clientObj);
+    }
+
+    public void start() {
         try {
-            socket = new Socket(serverIp, serverPort);
+            System.out.println("On Client Start!");
 
-            // ใช้ส่งข้อมูลจาก client ไปยัง Server Socket
-            System.out.println("Socket Output");
-            out = new PrintWriter(socket.getOutputStream(), true);
+            clientSocket = new Socket(serverIp, serverPort);
+            isConnected = true;
 
-            // ใช้รับข้อมูลจาก Socket
-            System.out.println("Socket Input");
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // Initialize output streams first
+            objOutSteam = new ObjectOutputStream(clientSocket.getOutputStream());
+            objOutSteam.flush();
 
-            userInput = new BufferedReader(new InputStreamReader(System.in));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-            System.out.println("Connected to server at " + this.serverIp + ":" + this.serverPort);
+            // Then initialize input streams
+            objectSteamIn = new ObjectInputStream(clientSocket.getInputStream());
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
+
+            sendObject(this.clientObj);
+            // sendObject(this.character);
+
+            // Get content from server
+            new Thread(this::receiveServerMessage).start();
+            new Thread(this::receiveServerObject).start();
+
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }
     }
 
-    public void connect() {
-
-
-    }
-
-    public void start() {
-        System.out.println("Client Start");
-
-        try {
-            new Thread(this::receiveMessages).start();
-
-            String message;
-            while ((message = userInput.readLine()) != null) {
-                out.println(message);
-            }
-        } catch (IOException e) {
-            System.out.println("Error communicating with server: " + e.getMessage());
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public void sendMessage(String message) {
+        if (isConnected && out != null) {
+            out.println(message);
+        } else {
+            System.out.println("Cannot send message. Not connected to server.");
         }
     }
 
-    private void receiveMessages() {
+    public void sendObject(Object object) {
+        System.out.println("Client Send Object > " + object.toString());
+
+        try {
+            objOutSteam.writeObject(object);
+            objOutSteam.flush();
+
+        } catch (IOException e) {
+            System.out.println("Error sending object: " + e.getMessage());
+            e.printStackTrace();
+
+        }
+    }
+
+    // public String receiveMessageQueue() {
+    // try {
+    // String message = in.readLine();
+    // if (message != null) {
+    // System.out.println("Received from server: " + message);
+    // }
+    // return message;
+    // } catch (IOException e) {
+    // System.out.println("Error receiving message: " + e.getMessage());
+    // return null;
+    // }
+    // }
+
+    public String receiveMessageQueue() {
+        try {
+            return messageQueue.poll(5, TimeUnit.SECONDS);
+
+        } catch (InterruptedException e) {
+            // Thread.currentThread().interrupt();
+            return null;
+        }
+    }
+
+    // รับ Object ?ี่ส่งมาจาก Server
+    private synchronized void receiveServerObject() {
+        try {
+            Object object;
+            while (isConnected && !clientSocket.isClosed() && (object = objectSteamIn.readObject()) != null) {
+                object = objectSteamIn.readObject();
+                System.out.println(
+                        "Received object: " + object.getClass().getName() + " with hashcode: " + object.hashCode());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error receiving object: " + e.getMessage());
+            e.printStackTrace();
+
+        } finally {
+            disconnect();
+
+        }
+    }
+
+    private synchronized void receiveServerMessage() {
         try {
             String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Client > Received: " + message);
-
+            while (isConnected && !clientSocket.isClosed() && (message = in.readLine()) != null) {
+                messageQueue.offer(message);
             }
         } catch (IOException e) {
             System.out.println("Error receiving message: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            disconnect();
         }
+    }
+
+    // Connection
+    public void disconnect() {
+        isConnected = false;
+        try {
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                clientSocket.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error during disconnection: " + e.getMessage());
+        }
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 }

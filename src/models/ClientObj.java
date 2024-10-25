@@ -1,11 +1,15 @@
 package models;
 
+import java.io.Serializable;
+
 import client.Server;
 
-public class ClientObj {
+public class ClientObj implements Serializable {
 
-    String clientName;
-    Server serverOnClientSide;
+    private static final long serialVersionUID = 1L;
+
+    private transient String clientName;
+    private transient Server serverOnClientSide;
 
     public ClientObj(String clientName, Server serverOnClientSide) {
         this.clientName = clientName;

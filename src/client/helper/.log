@@ -1,0 +1,101 @@
+Client Send Object > components.character.CreateCharacter[,0,0,0x0,invalid,alignmentX=0.0,alignmentY=0.0,border=,flags=16777217,maximumSize=,minimumSize=,preferredSize=java.awt.Dimension[width=250,height=250]]
+Server > Received message: ��sr$components.character.CreateCharacterH��ëO�kI
+currentRankIhpZisDeadZ
+Server > Received message: isInfectedZ
+Server > Received message: isMoveLeftZ  isSurviveI
+useCharacterD
+weaponAngleIxIyLbasetLjavax/swing/JLayeredPane;L    charactert+Lcomponents/character/CreateCharacterImage;LclienttLmodels/ClientObj;LcompressConten     ntq~L
+displayNametLjava/lang/String;L
+displayTextq~L
+gameContenttpage/controls/GameContent;LhpBart"Lcomponents/character/CreateHpBar;L
+Server > Received message: playerNametLjavax/swing/JTextPane;LweapontLjavax/swing/JPanel;xrjavax.swing.JPanel]D
+Server > Received message: ??B$xrjavax.swing.JComponent3�c&l�?F
+Server > Received message: alignmentXF
+Server > Received message: alignmentYZ
+autoscrollsIflagsZisAlignmentXSetZisAlignmentYSetZverifyInputWhenFocusTargetL actionMaptLjavax/swing/ActionMap;LancestorInputMaptLjavax/swing/InputM    Map;Lbordertjavax/swing/border/Border;L
+Server > Received message: focusInputMapq~
+L
+Server > Received message: inputVerifiertjavax/swing/InputVerifier;L
+listenerListt%Ljavax/swing/event/EventListenerList;L    popupMenutLjavax/swing/JPopupMenu;LvetoableChangeSupportt"Ljava/beans/VetoableChangeSupport;Lwi indowInputMaptLjavax/swing/ComponentInputMap;xrjava.awt.Container@�s?
+'IcontainerSerializedDataVersionZfocusCycleRootZfocusTraversalPolicyProviderI
+ncomponents[    componentt[Ljava/awt/Component;L
+Server > Received message: dispatchert Ljava/awt/LightweightDispatcher;L        layoutMgrtLjava/awt/LayoutManager;LmaxSizetLjava/awt/Dimension;xrjava.  .awt.Component��Y�<�?$ZutoFocusTransferOnDisposalboundsOpIcomponentSerializedDataVersionZenabledJ      eventMaskZfocusTraversalKeysEnabledZ   focusable  eIheightZ
+Server > Received message: ignoreRepaintIisFocusTraversableOverriddenisPackedZ
+Server > Received message: maxSizeSetZ
+Server > Received message: minSizeSetZnameExplicitlySetZ
+Server > Received message: newEventsOnlyZ
+prefSizeSetZvalidZvisibleIwidthIxIyLaccessibleContextt'Ljavax/accessibility/AccessibleContext;L
+On Client Connect!
+Server > Received message: backgroundtLjava/awt/Color;L
+Server > Received message: changeSupportt"Ljava/beans/PropertyChangeSupport;LcursortLjava/awt/Cursor;L
+Server > Received message: dropTargettLjava/awt/dnd/DropTarget;[focusTraversalKeyst[Ljava/util/Set;LfonttLjava/awt/Font;L
+Server > Received message: foregroundq~LlocaletLjava/util/Locale;LmaxSizeq~LminSizeq~Lnameq~peerFontq~LpopupstLjava/util/Vector;prefSizeq~xp            psr javax.swing.plaf.ColorUIResourcekS�?���xrjava.awt.Color�??3uFfalphaIvalueLcstjava/awt/color/ColorSpace;[    frgbvaluet[F[fvalueq~&x                  xp?���pppppppsrjavax.swing.plaf.FontUIResourceB�?�"?Gxr
+Server > Received message: java.awt.Fontš5��?VsIfontSerializedDataVersionF   pointSizeIsizeIstyleLfRequestedAttributestLjava/util/Hashtable;Lname       eq~xpA@
+ptDialogxsq~#?333pppsrjava.util.Locale~�`?0��hashcodeLcountryq~L
+Server > Received message: extensionsq~languageq~Lscriptq~Lvariantq~xp????tUSttenq~1q~1xpppppsrjava.awt.DimensionA?�׬_DIheightIwidthxp��psr             java.awt.ComponentOrientation��E�?c�I
+orientationxpppxur[Ljava.awt.Component;?
+Server > Received message: �uxpsr&components.character.CreateCharacter$2.tCl�0v�Lthis$0t&Lcomponents/character/CreateCharacter;xrjavax.swing.JLaye      eredPane        <9���mZoptimizedDrawingPossibleLcomponentToLayerq~*xq~
+Server > Received message: ��ppppppppq~/pppppsq~3��pq~6ppxuq~7sr&components.character.CreateCharacter$3oA?�l�
+=Lthis$0q~:xq~       ��pq~'ppppq~+q~-q~/pppppsq~3��pq~6ppxuq~7psrjava.awt.FlowLayout?6K[�9IalignZalignOnBaselineIhgapnewAlignIserial                    lVersionOnStreamIvgapxppppx@pppppsr#javax.swing.event.EventListenerList�6�}?��DxppxpppwtlayeredContainerLayersrjava.lang.Integer⠤�??8Iva                 aluexrjava.lang.Number?��
+��?xp?xxq~"sr&components.character.CreateCharacter$1Y?���g�Lthis$0q~:xq~;��ppppppppq~/pppppsq~3��pq~6ppxuq~7srjavax.swing.JTextPane�@�                  ��/_�xrjavax.swing.JEditorPane�]Je[YZisUserSetEditorKitLkittLjavax/swing/text/EditorKit;L
+Server > Received message: pageLoadertLjavax/swing/SwingWorker;LpagePropertiesq~*L
+typeHandlersq~*xrjavax.swing.text.JTextComponent?`@v��}?ZcheckedInputOverrideZ
+dragEnablededitableCfocusAcceleratorZneedToSendKeyTypedEventL
+Server > Received message: caretColorq~LcomposedTextAttributet%Ljavax/swing/text/SimpleAttributeSet;LcomposedTextCarett3Ljavax/swing/text/JTextCompone  ent$ComposedTextCaret;LcomposedTextContentq~LcomposedTextEndtjavax/swing/text/Position;LcomposedTextStartq~VLdisabledTextColorq~dropModetLjavax/swin     ng/DropMode;LlatestCommittedTextEndq~VLlatestCommittedTextStartq~VLmargintLjava/awt/Insets;Lmodeltjavax/swing/text/Document;LnavigationFiltert#Ljava     ax/swing/text/NavigationFilter;LselectedTextColorq~LselectionColorq~xq~
+Server > Received message: 8(�psq~$pppsr java.beans.PropertyChangeSupportX��dWH`�I*propertyChangeSupportSerializedDataVersionchildrenq~*Lsour           rcetLjava/lang/Object;xppq~[sr1javax.swing.text.StyledEditorKit$AttributeTrackerr�ˬ_ȠLthis$0t"Ljavax/swing/text/StyledEditorKit;xpsr javax.swing.tex     xt.StyledEditorKita-~S?z��LcurrentParagraphtLjavax/swing/text/Element;L
+Server > Received message: currentRunq~dLinputAttributeUpdatert3Ljavax/swing/text/StyledEditorKit$AttributeTracker;LinputAttributest&Ljavax/swing/text/MMutableAttributeSet;xr!javax.swing.text.DefaultEditorKit(���bzxrjavax.swing.text.EditorKit�?�[8�Q�xpsr/javax.swing.text.AbstractDocument$BranchElement   tQ)f�<��I      lastIndexI      nchildrenchildrent4[Ljavax/swing/text/AbstractDocument$AbstractElement;Lthis$0t#Ljavax/swing/text/AbstractDocument;xr1ja  avax.swing.text.AbstractDocument$AbstractElementϲx�7��Lparentq~dLthis$0q~lxpsr5javax.swing.text.DefaultStyledDocument$SectionElement(���z�4#Lthis$0      0t(Ljavax/swing/text/DefaultStyledDocument;xq~jpsr&javax.swing.text.DefaultStyledDocumentj��%�Lbuffert6Ljavax/swing/text/DefaultStyledDocument$Elemen    ntBuffer;xr!javax.swing.text.AbstractDocumentc  a4L�Lcontextt4Ljavax/swing/text/AbstractDocument$AttributeContext;Ldatat+Ljavax/swing/text/AbstractDoc   cument$Content;LdocumentFiltert!Ljavax/swing/text/DocumentFilter;LdocumentPropertiestLjava/util/Dictionary;L
+listenerListq~xpsrjavax.swing.text.StyleContexto?�~{�x�I
+Server > Received message: unusedSetsLstylestLjavax/swing/text/Style;xpsr(javax.swing.text.StyleContext$NamedStyle�
+N��?��L
+listenerListq~Lthis$0tLjavax/swing/text/StyleContext;xpsq~Epxq~|wtdefaultsq~}sq~Epxq~|wt$javax.swing.text.StyleConstants.nameq~?t4javax.swing.text.S    StyleConstants$FontConstants.familytArialt2javax.swing.text.StyleConstants$FontConstants.sizesq~Ht2javax.swing.text.StyleConstants$FontConstants.boldsr  java.lang.Boolean� r��?��Zvaluexpt4javax.swing.text.StyleConstants$FontConstants.italicq~?tFONT_ATTRIBUTE_KEYsq~)A�pq~?xt9javax.swing.text.StyleCon      nstants$ColorConstants.foregroundsq~$????pppxxxsravax.swing.text.GapContent0�?�oi
+Server > Received message: xrjavax.swing.text.GapVector;#?�6V�Ig0Ig1Larrayq~^xp?ur[C�&f��]?�xpHello World - rank 0
+Server > Received message: psrjava.util.Hashtable�%!J�F
+Server > Received message: loadFactorI  thresholdxp?@t
+Server > Received message: __EndOfLine__t
+Server > Received message: srava.awt.font.TextAttributekx??
+Server > Received message: �
+Server > Received message: Fxr/java.text.AttributedCharacterIterator$Attribute?t&�G\Lnameq~xpt
+Server > Received message: run_directionq~?ti18nq~?xsq~Epxsr4javax.swing.text.DefaultStyledDocument$ElementBuffer����-��Lrootq~dLthis$0q~pxpq~qq~yw     wxur4[Ljavax.swing.text.AbstractDocument$AbstractElement;�t9w:�?xpq~npq~yq~yq~ywt(javax.swing.text.StyleConstants.resolverq~?t<javax.swing.text.Sty      yleConstants$ParagraphConstants.Alignmentsq~Hxuq~�sr-javax.swing.text.AbstractDocument$LeafElementj���?c��Lthis$0q~lxq~mq~nq~ywxq~yxpq~yq~�q~bsr"j       javax.swing.text.StyledEditorKit$1��C�mB��Lthis$0q~axr#javax.swing.text.SimpleAttributeSet��?D���xpwxq~ipxppur[Ljava.util.Set;>?0gjהxpsr%java.ut         til.Collections$UnmodifiableSet���??�Uxr,java.util.Collections$UnmodifiableCollectionB��^�LctLjava/util/Collection;xpsrjava.util.HashSet�D�����4         xpw
+?@srjavax.swing.KeyStroke?Cŗuv       >xrjava.awt.AWTKeyStroke��"8��|�CkeyCharIkeyCodeI   modifiersZ
+onKeyReleasexp??        sq~�??  ?xsq~�sq~�w
+?@sq~�??      �sq~�?? Axppq~?q~?q~/pppppsq~3(�tfocusLsr1javax.swing.text.JTextComponent$MutableCaretEvent���GY|?IdotZ
+Server > Received message: dragActiveImarkxrjavax.swing.event.CaretEvent�     �[rV�Pxrjava.util.EventObjectL?       Nm}�xptmouseLq~�pq~6ppxq~Bpp        pppsrjavax.swing.JEditorPane$1c�S��?c\Lthis$0tLjavax/swing/JEditorPane;xr&javax.swing.LayoutFocusTraversalPolicy;���?]��xpsrjavax.swing.LayoutCompa      aratorrW�UO?jZ
+Server > Received message: horizontalZ
+leftToRightxpwxq~[xA srjavax.swing.ActionMap���?z���Lparentq~
+xppwxpsrjavax.swing.border.EtchedBorderv�?@N??etchTypeL    highlightq~Lshadowq~xr!javax.swing.border.AbstractBorder?\�?j�?3xpppsrjavax.swing.I          InputMap��!�?Lparentq~
+xpsr#javax.swing.plaf.InputMapUIResource�H�M�?�xq~�sq~�pw=sq~�??&At
+selection-upsq~�???Atpaste-from-clipboardsq~�??'?tcaret-next-wordsq~�??%�tselection-previous-wordsq~�??�Aq~�sq~�??(t
+Server > Received message: caret-downsq~�??T�tprevious-link-actionsq~�??%?tcaret-previous-wordsq~�???�tcut-to-clipboardsq~�??#tcaret-end-linesq~�??!At  tselection-page-upsq~�??�caret-upsq~�??t
+delete-nextsq~�??$?t
+caret-beginsq~�????tcopy-to-clipboardsq~�??%Atselection-backwardsq~�??#?t     caret-endsq~�?tdelete-previoussq~�??'�tselection-next-wordsq~�??%tcaret-  -backwardsq~�??�q~�sq~�??�Atselection-forwardsq~�?? ?tactivate-link-actionsq~�??H?q~�sq~�??\?unselectsq~�??
+Server > Received message: t
+insert-breaksq~�??Aq~�sq~�??$Atselection-begin-linesq~�??'t
+Server > Received message: caret-forwardsq~�??!�tselection-page-leftsq~�??(Atselection-downsq~�??"t    page-downsq~�??tdelete-previous-wordsq~�???tdel  lete-next-wordsq~�??�Aq~�sq~�??O�toggle-componentOrientationsq~�??X?q~�sq~�??"�tselection-page-rightsq~�??C?q~�sq~�??�?q~�sq~�??#Atselection-end-linesq~ ~�??�?q~�sq~�??$tcaret-begin-linesq~�??V?q~�sq~�??�q~?sq~�??A?t
+Server > Received message: select-allsq~�??'Aq~?sq~�??#�t
+Server > Received message: selection-endsq~�???�q~�sq~�??��q~?sq~�??T?tnext-link-actionsq~�??�Aq~
+Server > Received message: q~�t
+Server > Received message: insert-tabsq~�??&q~�sq~�??$�tselection-beginsq~�??"Atselection-page-downsq~�?Aq~�sq~�??�q~ sq~�??��q~�sq~�??!tpage-upsq~�??? ?�q~�xwxwxpsq~Etjavax.swing.event.CaretListenerq~bpxpppwxppppppp~rjavax.swing.DropModexrjava.lang.Enumxpt
+Server > Received message: USE_SELECTIONpppq~ypppq~ippsq~�?@t
+Server > Received message: text/plainq~ixxxsr)components.character.CreateCharacterImage9?q?jPZ
+Server > Received message: isMoveLeftZ  isSurviveI
+useCharacterxq~ ?PS:pq~'ppppq~+q~-q~/pppppppq~6ppxq~Bpsq~Cpppx@pppppsq~Epxpppwxxsr components.character.CreateHpBar��??pYI        c                     currentHpImaxHpcolorBarq~xq~   dK�pq~'ppppq~+q~-q~/pppppsq~3dpq~6ppxq~Bpsq~Cpppx@     pppppsq~Epxpppwxxddsq~$??ppppppppx@pppppsq~Ep                      pxpppwxpq~"pppppx@pppppsq~Epxpppwxpq~"pppppx@pppppsq~Epxpppwxxdq~Lq~B{sr java.io.NotSerializableException(Vx�?5xrjava.io.ObjectStreamExcept              tiond��k?9��xrjava.io.IOExceptionl�sde%�xrjava.lang.Exception�?>;�xrjava.lang.Throwable��5'9w��LcausetLjava/lang/Throwable;L
+Server > Received message: detailMessagetLjava/lang/String;[
+Server > Received message: stackTracet[Ljava/lang/StackTraceElement;LsuppressedExceptionstLjava/util/List;xpq~       tmodels.ClientObjur[Ljava.lang.    .StackTraceElement;F*<<?"9xp
+Server > Received message: srava.lang.StackTraceElementa        �?&6?�I
+Server > Received message: lineNumberLdeclaringClassq~fileNameq~L
+Server > Received message: methodNameq~xp????tjava.io.ObjectOutputStreampt
+writeObject0sq~
+Server > Received message: ????q~ptdefaultWriteFieldssq~
+Server > Received message: ????q~ptwriteSerialDatasq~
+Server > Received message: ????q~ptwriteOrdinaryObjectsq~
+Error sending object: models.ClientObj
+Server > Received message: ????q~pq~sq~
+Server > Received message: ????q~pt
+writeObjectsq~
+Server > Received message: nt
+Server > Received message: client.Clientt
+Client.javat
+Server > Received message: sendObjectsq~
+Server > Received message: >q~~tstartsq~
+Server > Received message: <tage.controls.WaitingRoom$2tWaitingRoom.javatrunsq~
+Waiting Room > On Received Message: NEW_PLAYER

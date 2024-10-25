@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.io.Serializable;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,7 +12,8 @@ import java.awt.Graphics2D;
 
 import utils.LoadImage;
 
-public class CreateCharacterImage extends JPanel implements ManageCharacterElement {
+public class CreateCharacterImage extends JPanel implements ManageCharacterElement, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private boolean isSurvive;
     private boolean isMoveLeft;

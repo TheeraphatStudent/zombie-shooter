@@ -153,8 +153,9 @@ public class JoinRoom extends JFrame {
                 System.out.println("Port: " + port);
                 System.out.println("Join Work!");
 
-                client = new Client(serverIp, port);
-                client.start();
+                // client = new Client(serverIp, port);
+                // client.start();
+                new WindowClosingFrameEvent().navigateTo(JoinRoom.this, new WaitingRoom(server, clientObj, gameCenter, serverIp, port), false);
 
             } catch (NumberFormatException numExc) {
                 new UseAlert().warringAlert("Port should be a valid number between 0 and 65535!");
@@ -179,7 +180,7 @@ public class JoinRoom extends JFrame {
                 40,
                 "hand",
                 this,
-                () -> new Createroom(this.server, this.client, this.clientObj, this.gameCenter));
+                () -> new Createroom(server, client, clientObj, gameCenter)); 
         headers.add(createRoomBtn);
 
         // Footer
