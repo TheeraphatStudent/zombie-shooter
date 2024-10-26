@@ -67,7 +67,7 @@ public class Client implements Serializable, ManageCharacterElement {
             int frameWidth = UseGlobal.getWidth();
             int frameHeight = UseGlobal.getHeight();
 
-            // Spawn Position
+            // ! Spawn Position
             int spawnPositionX = new Random().nextInt(frameWidth - CHARACTER_WIDTH);
             int spawnPositionY = new Random().nextInt(frameHeight - CHARACTER_HEIGHT);
 
@@ -75,10 +75,13 @@ public class Client implements Serializable, ManageCharacterElement {
             spawnPositionY = Math.max(0, Math.min(spawnPositionY, frameHeight - CHARACTER_HEIGHT));
             System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
 
-            System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
-
             character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
-            this.clientObj.setPlayer(new Player(character, null));
+
+            // ! Player
+            Player player = new Player(character, null);
+            player.setPlayerDirecter(spawnPositionX, spawnPositionY);
+
+            this.clientObj.setPlayer(player);
 
             clientSideSendObject(this.clientObj);
 
@@ -97,7 +100,7 @@ public class Client implements Serializable, ManageCharacterElement {
 
     public void clientSideSendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
-        System.out.println("Before Send Object > Client Name: " + ((ClientObj) object).getClientName());
+        // System.out.println("Before Send Object > Client Name: " + ((ClientObj) object).getClientName());
 
         try {
             synchronized (objOutStream) {

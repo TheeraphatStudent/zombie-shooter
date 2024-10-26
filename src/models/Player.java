@@ -1,6 +1,7 @@
 package models;
 
 import java.io.Serializable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Timer;
 
@@ -17,6 +18,7 @@ public class Player implements Serializable {
 
     private volatile int zombieHunt = 0;
 
+    private CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private volatile int damage = 10;
     private volatile int health = 100;
 
@@ -63,6 +65,16 @@ public class Player implements Serializable {
 
     // >>>>>>>>>> Setter >>>>>>>>>>
 
+    public void setState(State state) {
+        this.state = state;
+
+    }
+
+    public void setBullets(CopyOnWriteArrayList<Bullet> bullets) {
+        this.bullets = bullets;
+
+    }
+
     public void addZombieWasKilled(int number) {
         this.zombieHunt += number;
         this.storeZombieHunt += number;
@@ -98,6 +110,8 @@ public class Player implements Serializable {
     }
 
     public void setPlayerDirecter(int x, int y) {
+        System.out.printf("Set Player Position: x=%d | y=%d\n", x, y);
+
         this.xDir = x;
         this.yDir = y;
 
@@ -152,6 +166,16 @@ public class Player implements Serializable {
 
     public int geDirectionY() {
         return this.yDir;
+
+    }
+
+    public State getState() {
+        return this.state;
+
+    }
+
+    public CopyOnWriteArrayList<Bullet> getBullets() {
+        return this.bullets;
 
     }
 

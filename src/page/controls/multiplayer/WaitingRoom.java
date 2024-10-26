@@ -43,6 +43,9 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     // ! Communication Contain !
     private Communication communication;
 
+    private List<ClientObj> clientObjs;
+    private List<Integer> requirePlayers;
+
     public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, int numOfPlayers) {
         System.out.println("Prepare for host!");
 
@@ -242,8 +245,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                         Map<String, List> contents = communication.getContent();
                         System.out.println(contents.entrySet());
 
-                        List<ClientObj> clientObjs = contents.get("NEW_PLAYER");
-                        List<Integer> requirePlayers = contents.get("REQUIRE_PLAYERS");
+                        this.clientObjs = contents.get("NEW_PLAYER");
+                        this.requirePlayers = contents.get("REQUIRE_PLAYERS");
 
                         if (requirePlayers != null && !requirePlayers.isEmpty()) {
                             this.numOfPlayers = requirePlayers.get(0);
@@ -340,8 +343,9 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
             revalidate();
             repaint();
         });
-        // client.clientSideSendMessage("READY_TO_START");
-        new WindowClosingFrameEvent().navigateTo(this, new GameContent(gameCenter, clientObj), false);
+        client.clientSideSendObject("READY_TO_START");
+        // new WindowClosingFrameEvent().navigateTo(this, new GameContent(gameCenter, clientObj), false);
+        new WindowClosingFrameEvent().navigateTo(this, new MultiplayerGameContent(this.gameCenter, this.clientObj, this.clientObjs), false);
     }
 
 }
