@@ -32,10 +32,7 @@ public class ClientHandler implements Runnable, Serializable {
     private InputStream clientInSteam;
     private OutputStream clientOutSteam;
 
-    private BufferedOutputStream buffOutSteam;
     private ObjectOutputStream objectOut;
-    
-    private BufferedInputStream buffInSteam;
     private ObjectInputStream objectIn;
 
     // Game Content
@@ -52,14 +49,12 @@ public class ClientHandler implements Runnable, Serializable {
             System.out.println("!-!-!-!-! On Handler Run !-!-!-!-!");
 
             clientOutSteam = clientSocket.getOutputStream();
-            buffOutSteam = new BufferedOutputStream(clientOutSteam);
-            objectOut = new ObjectOutputStream(buffOutSteam);
+            objectOut = new ObjectOutputStream(new BufferedOutputStream(clientOutSteam));
             objectOut.flush();
             objectOut.reset();
 
             clientInSteam = clientSocket.getInputStream();
-            buffInSteam = new BufferedInputStream(clientInSteam);
-            objectIn = new ObjectInputStream(buffInSteam);
+            objectIn = new ObjectInputStream(new BufferedInputStream(clientInSteam));
 
             // in = new BufferedReader(new InputStreamReader(clientInSteam));
             out = new PrintWriter(clientOutSteam, true);

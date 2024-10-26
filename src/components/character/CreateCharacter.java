@@ -82,7 +82,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(boolean isInfected, ClientObj clientObj) {
-        super();
+        // super();
 
         this.isSurvive = !isInfected;
 
@@ -193,7 +193,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // :::::::::::::::::::: Zombie ::::::::::::::::::::
     public CreateCharacter(GameContent gameContent) {
-        super();
+        // super();
 
         this.gameContent = gameContent;
 

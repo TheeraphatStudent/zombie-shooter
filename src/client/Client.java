@@ -21,11 +21,8 @@ public class Client implements Serializable {
     private int serverPort;
 
     // รับ - ส่ง ข้อมูล
-    private BufferedOutputStream buffOut;
-    private ObjectOutputStream objOutSteam;
-
-    private BufferedInputStream buffIn;
-    private ObjectInputStream objInSteam;
+    private ObjectOutputStream objOutSteam = null;
+    private ObjectInputStream objInSteam = null;
 
     private BlockingQueue<String> messageQueue;
     private BlockingQueue<Object> objectQueue;
@@ -57,12 +54,10 @@ public class Client implements Serializable {
             clientSocket = new Socket(serverIp, serverPort);
             isConnected = true;
 
-            buffOut = new BufferedOutputStream(clientSocket.getOutputStream());
-            objOutSteam = new ObjectOutputStream(buffOut);
+            objOutSteam = new ObjectOutputStream( new BufferedOutputStream(clientSocket.getOutputStream()));
             objOutSteam.flush();
 
-            buffIn = new BufferedInputStream(clientSocket.getInputStream());
-            objInSteam = new ObjectInputStream(buffIn);
+            objInSteam = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
             
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -77,8 +72,6 @@ public class Client implements Serializable {
             Thread objectThread = new Thread(this::receiveServerObject);
 
             messageThread.setDaemon(true);
-
-            objectThread.setPriority(Thread.MAX_PRIORITY);
             objectThread.setDaemon(true);
 
             messageThread.start();
@@ -116,7 +109,6 @@ public class Client implements Serializable {
             }
         }
     }
-
     // public String receiveMessageQueue() {
     // try {
     // String message = in.readLine();
@@ -158,29 +150,24 @@ public class Client implements Serializable {
     // รับ Object ?ี่ส่งมาจาก Server
     private void receiveServerObject() {
         System.out.println(">>>>> Receive Server Object Work! <<<<<");
-        
         try {
             synchronized (objInSteam) {
                 Object object = null;
-
                 while (isConnected && !clientSocket.isClosed()) {
-                    System.out.println(objInSteam);
-
+                    System.out.println("Waiting to read object...");
                     object = objInSteam.readObject();
-
                     if (object != null) {
                         System.out.println("Get Object >>> " + object);
                         objectQueue.offer(object);
-
                     }
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
             e.printStackTrace();
-
         }
     }
+    
 
     private void receiveServerMessage() {
         System.out.println(">>>>> Receive Server Message Work! <<<<<");

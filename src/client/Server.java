@@ -17,8 +17,10 @@ public class Server extends ServerHelper implements Serializable {
     private final String serverIp;
 
     // Communication Contain
-    // private final List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
-    // private final List<ClientObj> clientObjs = Collections.synchronizedList(new ArrayList<>());
+    // private final List<ClientHandler> clients = Collections.synchronizedList(new
+    // ArrayList<>());
+    // private final List<ClientObj> clientObjs = Collections.synchronizedList(new
+    // ArrayList<>());
     private final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
     private final List<ClientObj> clientObjs = new CopyOnWriteArrayList<>();
 
@@ -26,7 +28,7 @@ public class Server extends ServerHelper implements Serializable {
     private volatile boolean gameStarting = false;
 
     public Server() {
-        super();
+        // super();
         System.out.println("Create new server");
         this.serverPort = getAlreadyPort();
         this.serverIp = getServerIp();
@@ -165,25 +167,20 @@ public class Server extends ServerHelper implements Serializable {
         System.out.println("Object (Server): " + object);
         System.out.println("Client Handler (Sender): " + sender);
         System.out.println();
-
         for (ClientHandler receiver : clients) {
-            // System.out.println(receiver);
-
             if (receiver != sender && receiver.isReady() && object != null) {
                 synchronized (receiver) {
                     try {
+                        System.out.println("Sending object to receiver: " + receiver);
                         receiver.sendObject(object);
-    
                     } catch (Exception e) {
                         System.out.println("Error broadcasting object to client: " + e.getMessage());
-                        // removeClient(receiver);
+                        e.printStackTrace();
                     }
-
                 }
             }
         }
     }
-    
 
     public synchronized void removeClient(ClientHandler clientHandler) {
         clients.remove(clientHandler);
