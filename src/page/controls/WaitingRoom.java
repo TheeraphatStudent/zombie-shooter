@@ -212,6 +212,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
 
                     System.out.println("Waiting Room > On Received Message: " + message);
                     System.out.println("Waiting Room > On Received Object: " + obj);
+                    System.out.println();
 
                     if (message != null && message.startsWith("NEW_PLAYER")) {
                         if (obj instanceof ClientObj) {
@@ -231,7 +232,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                 }
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -283,7 +284,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
             revalidate();
             repaint();
         });
-        client.clientSideSendMessage("READY_TO_START");
+        // client.clientSideSendMessage("READY_TO_START");
         new WindowClosingFrameEvent().navigateTo(this, new GameContent(gameCenter, clientObj), false);
     }
 

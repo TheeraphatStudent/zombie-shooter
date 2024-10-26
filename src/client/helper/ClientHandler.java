@@ -23,8 +23,6 @@ public class ClientHandler implements Runnable, Serializable {
 
     private Socket clientSocket;
     private Server server;
-    private PrintWriter out;
-    private BufferedReader in;
 
     private boolean isReady = true;
 
@@ -55,16 +53,6 @@ public class ClientHandler implements Runnable, Serializable {
 
             clientInSteam = clientSocket.getInputStream();
             objectIn = new ObjectInputStream(new BufferedInputStream(clientInSteam));
-
-            // in = new BufferedReader(new InputStreamReader(clientInSteam));
-            out = new PrintWriter(clientOutSteam, true);
-
-            // String message;
-            // while ((message = in.readLine()) != null) {
-            // System.out.println("Server > Received message: " + message);
-            // server.broadcastMessage(message, this);
-
-            // }
 
             new Thread(this::receiveObjectsFromClient).start();
         } catch (IOException e) {
@@ -99,16 +87,6 @@ public class ClientHandler implements Runnable, Serializable {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
         }
-    }
-
-    public void sendMessage(String message) {
-        System.out.println();
-        System.out.println("Client Handler > Send Message: " + message);
-        System.out.println();
-
-        out.println(message);
-        // out.flush();
-
     }
 
     public void sendObject(Object object) {
