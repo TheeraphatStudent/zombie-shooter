@@ -3,13 +3,18 @@ package client;
 import java.io.*;
 import java.net.*;
 import java.util.Map;
+import java.util.Random;
 import java.util.List;
 import java.util.concurrent.*;
 
 import client.helper.Communication;
+import components.character.CreateCharacter;
+import components.character.ManageCharacterElement;
 import models.ClientObj;
+import models.Player;
+import utils.UseGlobal;
 
-public class Client implements Serializable {
+public class Client implements Serializable, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
 
     private Socket clientSocket;
@@ -56,6 +61,24 @@ public class Client implements Serializable {
             objInStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
+
+            CreateCharacter character = new CreateCharacter(false, clientObj);
+
+            int frameWidth = UseGlobal.getWidth();
+            int frameHeight = UseGlobal.getHeight();
+
+            // Spawn Position
+            int spawnPositionX = new Random().nextInt(frameWidth - CHARACTER_WIDTH);
+            int spawnPositionY = new Random().nextInt(frameHeight - CHARACTER_HEIGHT);
+
+            spawnPositionX = Math.max(0, Math.min(spawnPositionX, frameWidth - CHARACTER_WIDTH));
+            spawnPositionY = Math.max(0, Math.min(spawnPositionY, frameHeight - CHARACTER_HEIGHT));
+            System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
+
+            System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
+
+            character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+            this.clientObj.setPlayer(new Player(character, null));
 
             clientSideSendObject(this.clientObj);
 

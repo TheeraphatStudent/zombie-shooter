@@ -105,6 +105,11 @@ public class Player implements Serializable {
 
     // <<<<<<<<<< Getter <<<<<<<<<<
 
+    public CreateCharacter getCharacter() {
+        return this.character;
+
+    }
+
     public int getPlayerBulletDamage() {
         return this.damage;
 
