@@ -5,25 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import models.ClientObj;
-
-public class Communication implements Serializable {
+public class Communication<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Map<String, List<ClientObj>> models;
+    private Map<String, List<T>> models;
 
     public Communication() {
-        models = new HashMap<String, List<ClientObj>>();
-
+        models = new HashMap<>();
     }
 
-    public void setContent(String key, List<ClientObj> values) {
+    public void setContent(String key, List<T> values) {
         this.models.put(key, values);
-        
     }
 
-    public Map<String, List<ClientObj>> getContent() {
+    public Map<String, List<T>> getContent() {
         return this.models;
-
     }
 }

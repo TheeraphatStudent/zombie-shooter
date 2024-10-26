@@ -43,7 +43,7 @@ public class Zombie implements ManageCharacterElement {
             int newDamage = currentType.getDamage() + (int) (currentType.getDamage() * .25);
             int newHealth = currentType.getHealth() + (int) (currentType.getHealth() * this.state.getLevelState() * .25);
 
-            System.out.println(String.format("New Damage: %d\nNew Health: %d\n", newDamage, newHealth));
+            // System.out.println(String.format("New Damage: %d\nNew Health: %d\n", newDamage, newHealth));
 
             ZombieType updatedType = new ZombieType(
                     currentType.getSpeed(),

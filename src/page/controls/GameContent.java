@@ -529,7 +529,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         private void biteInArea() {
             if (isPlayerInRange()) {
-                System.out.println("Bite!");
+                // System.out.println("Bite!");
 
                 player.setCharacterHp(player.getCharacterHp() - (int) behavior.getZombieDamage());
                 if (player.getCharacterHp() <= 0) {

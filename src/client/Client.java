@@ -21,6 +21,7 @@ public class Client implements Serializable {
 
     // ! Communication Contain
     private Communication communication;
+    private String message = "";
 
     // Queue
     // private BlockingQueue<String> messageQueue;
@@ -51,7 +52,7 @@ public class Client implements Serializable {
             isConnected = true;
 
             objOutStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
-            objOutStream.flush();  // Ensure the stream is ready
+            objOutStream.flush(); // Ensure the stream is ready
             objInStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
@@ -88,22 +89,32 @@ public class Client implements Serializable {
     }
 
     // public String receiveMessageQueue() {
-    //     System.out.println(messageQueue);
-    //     try {
-    //         return messageQueue.poll(5, TimeUnit.MINUTES);
-    //     } catch (InterruptedException e) {
-    //         return null;
-    //     }
+    // System.out.println(messageQueue);
+    // try {
+    // return messageQueue.poll(5, TimeUnit.MINUTES);
+    // } catch (InterruptedException e) {
+    // return null;
+    // }
     // }
 
     // public Object receiveObjectQueue() {
-    //     System.out.println(objectQueue);
-    //     try {
-    //         return objectQueue.poll(5, TimeUnit.MINUTES);
-    //     } catch (Exception e) {
-    //         return null;
-    //     }
+    // System.out.println(objectQueue);
+    // try {
+    // return objectQueue.poll(5, TimeUnit.MINUTES);
+    // } catch (Exception e) {
+    // return null;
     // }
+    // }
+
+    public String getMessage() {
+        return this.message;
+
+    }
+
+    public void resetMessage() {
+        this.message = "";
+
+    }
 
     public Communication getCommunication() {
         return this.communication;
@@ -117,27 +128,15 @@ public class Client implements Serializable {
                 Object object = (Object) objInStream.readObject();
                 if (object != null) {
                     System.out.println("Received object from server: " + object);
-
-                    // if (object instanceof String) {
-                    //     messageQueue.offer((String) object);
-
-                    // } else {
-                    //     objectQueue.offer(object);
-
-                    // }
+                    System.out.println(object.getClass());
+                    System.out.println(object.toString());
 
                     if (object instanceof Communication) {
-                        // System.out.println("\n/*/*/*/*/ Receive Communication! /*/*/*/*/\n");
-
                         this.communication = (Communication) object;
-                        // Map<String, List<ClientObj>> content = communication.getContent();
-                        // // System.out.println(content.entrySet());
-                        
-                        // for (Object obj : content.entrySet()) {
-                        //     System.out.println(obj);
 
-                        // }
-
+                    } else if (object instanceof String) {
+                        this.message = (String) object;
+                        // System.out.println("????? Message > " + this.message);
                     }
 
                 }

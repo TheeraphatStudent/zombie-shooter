@@ -90,7 +90,6 @@ public class Server extends ServerHelper {
                 // handleNewThread.setDaemon(true);
                 // handleNewThread.start();
 
-                checkGameStart();
             } catch (IOException e) {
                 if (!serverSocket.isClosed()) {
                     System.out.println("Error accepting client connection: " + e.getMessage());
@@ -130,13 +129,19 @@ public class Server extends ServerHelper {
                 this.communication.setContent("NEW_PLAYER", clientObjs);
                 broadcastObject(communication, null);
 
+                checkGameStart();
             }
 
         }
     }
 
     private synchronized void checkGameStart() {
+        System.out.println();
+        System.out.println("Check Game Start Work!");
+
         if (!gameStarting && clients.size() >= requiredPlayersToStart) {
+            System.out.println(">>>>> Start Countdown!");
+
             gameStarting = true;
             broadcastObject("START_COUNTDOWN", null);
         }
@@ -220,5 +225,10 @@ public class Server extends ServerHelper {
 
     public void setRequiredPlayersToStart(int numOfPlayers) {
         this.requiredPlayersToStart = numOfPlayers;
+        List<Integer> listAccept = new ArrayList<>();
+        listAccept.add(this.requiredPlayersToStart);
+
+        this.communication.setContent("REQUIRE_PLAYERS", listAccept);
+
     }
 }
