@@ -35,7 +35,7 @@ import utils.WindowResize;
 public class GameCenter extends JFrame {
 
         // Server server;
-        ClientObj client;
+        private ClientObj client;
 
         // Ref
         private DrawMouse drawMouse;
@@ -43,6 +43,7 @@ public class GameCenter extends JFrame {
 
         public GameCenter(ClientObj client) {
                 this.client = client;
+                System.out.println("Game Center > Client: " + this.client.getClientName());
 
                 developerPage = new Developer(this, client);
                 // createRoomPage = new CreateRoom(this, server);

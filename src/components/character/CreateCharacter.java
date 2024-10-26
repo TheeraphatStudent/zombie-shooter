@@ -45,7 +45,7 @@ interface CreateCharacterProps {
 
 }
 
-public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement, Serializable {
+public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
 
     ClientObj client;
@@ -82,7 +82,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(boolean isInfected, ClientObj clientObj) {
-        super();
+        // super();
 
         this.isSurvive = !isInfected;
 
@@ -193,7 +193,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // :::::::::::::::::::: Zombie ::::::::::::::::::::
     public CreateCharacter(GameContent gameContent) {
-        super();
+        // super();
 
         this.gameContent = gameContent;
 

@@ -1,9 +1,13 @@
 package client.helper;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ServerHelper {
     public int getAlreadyPort() {
@@ -19,4 +23,15 @@ public class ServerHelper {
         return 0;
 
     }
+
+    public String getServerIp() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+
+        } catch (UnknownHostException e) {
+            return null;
+
+        }
+    }
 }
+

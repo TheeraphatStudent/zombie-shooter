@@ -1,10 +1,14 @@
 package models;
 
+import java.io.Serializable;
+
 import javax.swing.Timer;
 
 import components.character.CreateCharacter;
 
-public class Player {
+public class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private State state;
     private CreateCharacter character;
 
@@ -93,6 +97,12 @@ public class Player {
 
     }
 
+    public void setPlayerDirecter(int x, int y) {
+        this.xDir = x;
+        this.yDir = y;
+
+    }
+
     // <<<<<<<<<< Getter <<<<<<<<<<
 
     public int getPlayerBulletDamage() {
@@ -127,6 +137,16 @@ public class Player {
 
     public String getAliveTime() {
         return String.format("%d : %d : %d", this.hour, this.min, this.sec);
+
+    }
+
+    public int geDirectionX() {
+        return this.xDir;
+
+    }
+
+    public int geDirectionY() {
+        return this.yDir;
 
     }
 

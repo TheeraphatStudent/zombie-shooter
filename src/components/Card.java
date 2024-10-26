@@ -102,7 +102,7 @@ class RoundedPanel extends JPanel {
 
             g2d.drawImage(image, x, y, this);
         } else {
-            System.err.println("Image not found: " + imgName); 
+            System.out.println("Image not found: " + imgName); 
         }
 
         g2d.setClip(null); 

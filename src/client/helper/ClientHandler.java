@@ -1,5 +1,7 @@
 package client.helper;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.io.Serializable;
 import java.net.Socket;
 
 import client.Server;
+import components.character.CreateCharacter;
 import models.ClientObj;
 
 public class ClientHandler implements Runnable, Serializable {
@@ -20,8 +23,6 @@ public class ClientHandler implements Runnable, Serializable {
 
     private Socket clientSocket;
     private Server server;
-    private PrintWriter out;
-    private BufferedReader in;
 
     private boolean isReady = true;
 
@@ -33,7 +34,7 @@ public class ClientHandler implements Runnable, Serializable {
     private ObjectInputStream objectIn;
 
     // Game Content
-    private Object receivedObject;
+    private Object receivedObject = null;
 
     public ClientHandler(Socket socket, Server server) {
         this.clientSocket = socket;
@@ -46,21 +47,12 @@ public class ClientHandler implements Runnable, Serializable {
             System.out.println("!-!-!-!-! On Handler Run !-!-!-!-!");
 
             clientOutSteam = clientSocket.getOutputStream();
-            objectOut = new ObjectOutputStream(clientOutSteam);
+            objectOut = new ObjectOutputStream(new BufferedOutputStream(clientOutSteam));
             objectOut.flush();
-            out = new PrintWriter(clientOutSteam, true);
+            objectOut.reset();
 
             clientInSteam = clientSocket.getInputStream();
-            
-            objectIn = new ObjectInputStream(clientInSteam);
-            // in = new BufferedReader(new InputStreamReader(clientInSteam));
-
-            // String message;
-            // while ((message = in.readLine()) != null) {
-            // System.out.println("Server > Received message: " + message);
-            // server.broadcastMessage(message, this);
-
-            // }
+            objectIn = new ObjectInputStream(new BufferedInputStream(clientInSteam));
 
             new Thread(this::receiveObjectsFromClient).start();
         } catch (IOException e) {
@@ -83,41 +75,33 @@ public class ClientHandler implements Runnable, Serializable {
 
         try {
             while (!clientSocket.isClosed()) {
-                receivedObject = objectIn.readObject();
-                System.out.println("Client Handler > Received object: " + receivedObject.toString());
+                this.receivedObject = objectIn.readObject();
+                System.out.println("Client Handler > Received object: " + this.receivedObject.toString());
 
-                if (receivedObject instanceof ClientObj) {
-                    server.handleNewConnection(this);
+                if (this.receivedObject instanceof ClientObj) {
+                    server.handleNewConnection(ClientHandler.this);
 
                 }
-                
+
             }
-        } catch (EOFException e) {
-            System.out.println("Client disconnected.");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
         }
     }
 
-    public void sendMessage(String message) {
-        System.out.println();
-
-        System.out.println("Client Handler > Send Message: " + message);
-
-        System.out.println();
-
-        out.println(message);
-        out.flush();
-
-    }
-
     public void sendObject(Object object) {
         try {
-            objectOut.writeObject(object);
-            objectOut.flush();
+            synchronized (objectOut) {
+                System.out.println();
+                System.out.println("Client Handler > Send Object: " + object);
 
+                objectOut.writeObject(object);
+                objectOut.flush();
+                objectOut.reset();
+            }
         } catch (IOException e) {
             System.out.println("Error sending object: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -131,16 +115,8 @@ public class ClientHandler implements Runnable, Serializable {
 
     }
 
-    public ClientObj getClientObj() {
-        System.out.println(">>>>>>>>>> Received Object: " + receivedObject);
-
-        if (receivedObject instanceof ClientObj) {
-            return (ClientObj) receivedObject;
-
-        } else {
-            return null;
-
-        }
+    public Object getClientReceiveObject() {
+        return receivedObject;
 
     }
 }

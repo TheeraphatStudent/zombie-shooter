@@ -2,45 +2,46 @@ package client;
 
 import java.io.*;
 import java.net.*;
-import java.util.UUID;
+import java.util.Map;
+import java.util.List;
 import java.util.concurrent.*;
 
-import components.character.CreateCharacter;
+import client.helper.Communication;
 import models.ClientObj;
-import models.Player;
 
 public class Client implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Socket clientSocket;
-    private Socket serverSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private ObjectOutputStream objOutStream;
+    private ObjectInputStream objInStream;
 
     private String serverIp;
     private int serverPort;
 
-    // รับ - ส่ง ข้อมูล
-    private ObjectOutputStream objOutSteam;
-    private ObjectInputStream objectSteamIn;
+    // ! Communication Contain
+    private Communication communication;
+    private String message = "";
 
-    private BlockingQueue<String> messageQueue;
+    // Queue
+    // private BlockingQueue<String> messageQueue;
+    // private BlockingQueue<Object> objectQueue;
+
     private volatile boolean isConnected;
 
     // Character
     private ClientObj clientObj;
-    private CreateCharacter character;
-    private Player player;
 
     public Client(String serverIp, int serverPort, ClientObj clientObj) {
-        super();
         this.serverIp = serverIp;
         this.serverPort = serverPort;
-        this.messageQueue = new LinkedBlockingQueue<>();
+        // this.messageQueue = new LinkedBlockingQueue<>();
+        // this.objectQueue = new LinkedBlockingQueue<>();
+
+        this.communication = new Communication();
+
         this.isConnected = false;
         this.clientObj = clientObj;
-
-        this.character = new CreateCharacter(false, this.clientObj);
     }
 
     public void start() {
@@ -50,120 +51,114 @@ public class Client implements Serializable {
             clientSocket = new Socket(serverIp, serverPort);
             isConnected = true;
 
-            // Initialize output streams first
-            objOutSteam = new ObjectOutputStream(clientSocket.getOutputStream());
-            objOutSteam.flush();
-
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-            // Then initialize input streams
-            objectSteamIn = new ObjectInputStream(clientSocket.getInputStream());
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            objOutStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
+            objOutStream.flush(); // Ensure the stream is ready
+            objInStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
-            sendObject(this.clientObj);
-            // sendObject(this.character);
+            clientSideSendObject(this.clientObj);
 
-            // Get content from server
-            new Thread(this::receiveServerMessage).start();
-            new Thread(this::receiveServerObject).start();
+            Thread objectThread = new Thread(this::receiveServerObject);
+
+            objectThread.setPriority(Thread.MAX_PRIORITY);
+            objectThread.setDaemon(true);
+
+            objectThread.start();
 
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
+            disconnect();
         }
     }
 
-    public void sendMessage(String message) {
-        if (isConnected && out != null) {
-            out.println(message);
-        } else {
-            System.out.println("Cannot send message. Not connected to server.");
-        }
-    }
-
-    public void sendObject(Object object) {
+    public void clientSideSendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
+        System.out.println("Before Send Object > Client Name: " + ((ClientObj) object).getClientName());
 
         try {
-            objOutSteam.writeObject(object);
-            objOutSteam.flush();
-
+            synchronized (objOutStream) {
+                objOutStream.writeObject(object);
+                objOutStream.flush();
+                objOutStream.reset();
+            }
         } catch (IOException e) {
             System.out.println("Error sending object: " + e.getMessage());
             e.printStackTrace();
-
         }
     }
 
     // public String receiveMessageQueue() {
+    // System.out.println(messageQueue);
     // try {
-    // String message = in.readLine();
-    // if (message != null) {
-    // System.out.println("Received from server: " + message);
-    // }
-    // return message;
-    // } catch (IOException e) {
-    // System.out.println("Error receiving message: " + e.getMessage());
+    // return messageQueue.poll(5, TimeUnit.MINUTES);
+    // } catch (InterruptedException e) {
     // return null;
     // }
     // }
 
-    public String receiveMessageQueue() {
-        try {
-            return messageQueue.poll(5, TimeUnit.SECONDS);
+    // public Object receiveObjectQueue() {
+    // System.out.println(objectQueue);
+    // try {
+    // return objectQueue.poll(5, TimeUnit.MINUTES);
+    // } catch (Exception e) {
+    // return null;
+    // }
+    // }
 
-        } catch (InterruptedException e) {
-            // Thread.currentThread().interrupt();
-            return null;
-        }
+    public String getMessage() {
+        return this.message;
+
     }
 
-    // รับ Object ?ี่ส่งมาจาก Server
-    private synchronized void receiveServerObject() {
+    public void resetMessage() {
+        this.message = "";
+
+    }
+
+    public Communication getCommunication() {
+        return this.communication;
+
+    }
+
+    private void receiveServerObject() {
+        System.out.println(">>>>> Receive Server Object Work! <<<<<");
         try {
-            Object object;
-            while (isConnected && !clientSocket.isClosed() && (object = objectSteamIn.readObject()) != null) {
-                object = objectSteamIn.readObject();
-                System.out.println(
-                        "Received object: " + object.getClass().getName() + " with hashcode: " + object.hashCode());
+            while (isConnected && !clientSocket.isClosed()) {
+                Object object = (Object) objInStream.readObject();
+                if (object != null) {
+                    System.out.println("Received object from server: " + object);
+                    System.out.println(object.getClass());
+                    System.out.println(object.toString());
+
+                    if (object instanceof Communication) {
+                        this.communication = (Communication) object;
+
+                    } else if (object instanceof String) {
+                        this.message = (String) object;
+                        // System.out.println("????? Message > " + this.message);
+                    }
+
+                }
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
             e.printStackTrace();
-
-        } finally {
-            disconnect();
-
         }
     }
 
-    private synchronized void receiveServerMessage() {
-        try {
-            String message;
-            while (isConnected && !clientSocket.isClosed() && (message = in.readLine()) != null) {
-                messageQueue.offer(message);
-            }
-        } catch (IOException e) {
-            System.out.println("Error receiving message: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            disconnect();
-        }
-    }
-
-    // Connection
     public void disconnect() {
+        System.out.println("Client Disconnect!");
         isConnected = false;
         try {
             if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
             }
-            if (in != null) {
-                in.close();
+            if (objInStream != null) {
+                objInStream.close();
             }
-            if (out != null) {
-                out.close();
+            if (objOutStream != null) {
+                objOutStream.close();
             }
         } catch (IOException e) {
             System.out.println("Error during disconnection: " + e.getMessage());
