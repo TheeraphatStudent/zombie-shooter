@@ -1,10 +1,14 @@
 package models;
 
+import java.io.Serializable;
+
 import javax.swing.Timer;
 
 import components.character.CreateCharacter;
 
-public class Player {
+public class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private State state;
     private CreateCharacter character;
 

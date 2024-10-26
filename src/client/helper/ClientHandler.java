@@ -94,7 +94,6 @@ public class ClientHandler implements Runnable, Serializable {
             synchronized (objectOut) {
                 System.out.println();
                 System.out.println("Client Handler > Send Object: " + object);
-                System.out.println();
 
                 objectOut.writeObject(object);
                 objectOut.flush();
@@ -102,6 +101,7 @@ public class ClientHandler implements Runnable, Serializable {
             }
         } catch (IOException e) {
             System.out.println("Error sending object: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

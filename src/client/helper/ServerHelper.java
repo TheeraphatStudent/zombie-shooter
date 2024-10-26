@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ServerHelper {
-
-    private Map<String, Object[]> models;
-
     public int getAlreadyPort() {
         try {
             ServerSocket tempSocket = new ServerSocket(0);

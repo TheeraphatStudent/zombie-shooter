@@ -10,6 +10,7 @@ import client.helper.Communication;
 import client.helper.ServerHelper;
 import components.character.CreateCharacter;
 import models.ClientObj;
+import models.Player;
 
 public class Server extends ServerHelper {
 
@@ -115,6 +116,8 @@ public class Server extends ServerHelper {
         if (newClient.getClientReceiveObject() instanceof ClientObj) {
             clientObj = (ClientObj) newClient.getClientReceiveObject();
             System.out.println("Client Object: " + clientObj);
+
+            clientObj.setPlayer(new Player(null, null));
 
             if (clientObj != null) {
                 clientObjs.add(clientObj);
