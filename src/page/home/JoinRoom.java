@@ -10,7 +10,7 @@ import client.Server;
 import components.CoverTitle;
 import components.DrawMouse;
 import models.ClientObj;
-import page.controls.WaitingRoom;
+import page.controls.multiplayer.WaitingRoom;
 import utils.LoadImage;
 import utils.UseAlert;
 import utils.UseButton;
@@ -22,10 +22,9 @@ import utils.WindowResize;
 public class JoinRoom extends JFrame {
 
     Server server;
-    Client client;
 
     // Models
-    ClientObj clientObj;
+    private ClientObj clientObj;
 
     private GameCenter gameCenter;
     private DrawMouse drawMouse;
@@ -33,6 +32,8 @@ public class JoinRoom extends JFrame {
     public JoinRoom(GameCenter gameCenter, ClientObj clientObj) {
         this.gameCenter = gameCenter;
         this.clientObj = clientObj;
+        System.out.println("Join Room > Client: " + this.clientObj.getClientName());
+
         this.server = this.clientObj.getClientServer();
 
         createFrame();
@@ -180,7 +181,7 @@ public class JoinRoom extends JFrame {
                 40,
                 "hand",
                 this,
-                () -> new Createroom(server, client, clientObj, gameCenter)); 
+                () -> new Createroom(server, clientObj, gameCenter)); 
         headers.add(createRoomBtn);
 
         // Footer

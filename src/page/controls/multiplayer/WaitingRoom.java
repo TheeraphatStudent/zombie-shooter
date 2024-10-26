@@ -1,19 +1,23 @@
-package page.controls;
+package page.controls.multiplayer;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.ArrayList;
 import javax.swing.*;
 
 import client.Client;
 import client.Server;
+import client.helper.Communication;
 import components.CoverTitle;
 import components.DrawBulletLine;
 import components.DrawMouse;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import models.ClientObj;
+import page.controls.GameContent;
 import page.home.GameCenter;
 import utils.*;
 
@@ -21,7 +25,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     private GameCenter gameCenter;
     private Server server;
     private Client client;
-    private ClientObj clientObj;
+    private transient ClientObj clientObj;
 
     private JPanel content;
     private JTextPane title;
@@ -33,6 +37,9 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     private Timer countdownTimer;
     private int countdownSeconds = 15;
 
+    // ! Communication Contain
+    private Communication communication;
+
     public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, int numOfPlayers) {
         System.out.println("Prepare for host!");
 
@@ -41,32 +48,14 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         this.playerCharacters = new ArrayList<>();
         this.clientObj = clientObj;
 
+        System.out.println("Waiting Room > Client : " + this.clientObj.getClientName());
+
         this.server.setRequiredPlayersToStart(numOfPlayers);
         this.numOfPlayers = numOfPlayers;
 
-        new Thread(new Runnable() {
+        this.client = new Client(server.getServerIp(), server.getServerPort(), clientObj);
 
-            @Override
-            public void run() {
-                WaitingRoom.this.server.start();
-
-            }
-
-        }).start();
-
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                // Host ใส่ IP และ Port ของตัวเอง
-                WaitingRoom.this.client = new Client(server.getServerIp(), server.getServerPort(), clientObj);
-                WaitingRoom.this.client.start();
-
-            }
-
-        }).start();
-
-        initialMoment();
+        initialMoment(true);
     }
 
     public WaitingRoom(Server server, ClientObj clientObj, GameCenter gameCenter, String joinToIp, int onPort) {
@@ -79,21 +68,48 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
 
         this.client = new Client(joinToIp, onPort, clientObj);
 
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                WaitingRoom.this.client.start();
-
-            }
-
-        }).start();
-
-        initialMoment();
+        initialMoment(false);
 
     }
 
-    private void initialMoment() {
+    private void initialMoment(boolean isHost) {
+        this.communication = new Communication();
+
+        if (isHost) {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    WaitingRoom.this.server.start();
+
+                }
+
+            }).start();
+
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    // Host ใส่ IP และ Port ของตัวเอง
+                    WaitingRoom.this.client.start();
+
+                }
+
+            }).start();
+
+        } else {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    WaitingRoom.this.client.start();
+
+                }
+
+            }).start();
+
+        }
+
         setupLayout();
         startListeningForPlayers();
 
@@ -137,7 +153,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
 
         gridConst.insets = new Insets(75, 0, 0, 0);
 
-        subTitle = new UseText(16, 270, 50, true).createSimpleText(String.format("Server IP: %s | Port: %d", "192.168.0.0", 00000), Color.BLACK, null,
+        subTitle = new UseText(16, 270, 50, true).createSimpleText(
+                String.format("Server IP: %s | Port: %d", "192.168.0.0", 00000), Color.BLACK, null,
                 Font.PLAIN);
         coverContent.add(subTitle, gridConst);
 
@@ -207,32 +224,28 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                     System.out.println();
                     System.out.println("Waiting Room > On Client Connect!");
 
-                    String message = client.receiveMessageQueue();
-                    Object obj = client.receiveObjectQueue();
+                    this.communication = client.getCommunication();
+                    Map<String, List<ClientObj>> contents = communication.getContent();
 
-                    System.out.println("Waiting Room > On Received Message: " + message);
-                    System.out.println("Waiting Room > On Received Object: " + obj);
-                    System.out.println();
+                    // Assume NEW_PLAYER key indicates newly joined players
+                    List<ClientObj> clientObjs = contents.get("NEW_PLAYER");
 
-                    if (message != null && message.startsWith("NEW_PLAYER")) {
-                        if (obj instanceof ClientObj) {
-                            ClientObj getClientObj = (ClientObj) obj;
-                            
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    addPlayer(getClientObj);
+                    if (clientObjs != null && clientObjs.size() > playerCharacters.size()) {
+                        System.out.println("Key: NEW_PLAYER");
 
-                                }
-                                
-                            });
+                        // Add only the new players who aren't yet in playerCharacters
+                        for (int i = playerCharacters.size(); i < clientObjs.size(); i++) {
+                            ClientObj newClient = (ClientObj) clientObjs.get(i);
+                            System.out.println("Adding New Client Object: " + newClient);
+                            System.out.println("New Client Name: " + newClient.getClientName());
+
+                            SwingUtilities.invokeLater(() -> addPlayer(newClient));
                         }
-
                     }
                 }
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -243,11 +256,13 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     }
 
     private void addPlayer(ClientObj requireClientObj) {
-        System.out.println("Added Players Work!");
+        System.out.println("Added Player: " + requireClientObj);
 
-        CreateCharacter playerCharacter = new CreateCharacter(false, clientObj);
-        playerCharacter.setBounds(new Random().nextInt(this.getWidth()) - 100, new Random().nextInt(this.getHeight()) - 100, CHARACTER_WIDTH,
-                CHARACTER_HEIGHT);
+        CreateCharacter playerCharacter = new CreateCharacter(false, requireClientObj);
+        playerCharacter.setBounds(
+                new Random().nextInt(this.getWidth() - CHARACTER_WIDTH),
+                new Random().nextInt(this.getHeight() - CHARACTER_HEIGHT),
+                CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(playerCharacter);
         content.revalidate();
         content.repaint();

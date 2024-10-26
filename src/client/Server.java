@@ -6,18 +6,20 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import client.helper.ClientHandler;
+import client.helper.Communication;
 import client.helper.ServerHelper;
 import components.character.CreateCharacter;
 import models.ClientObj;
 
-public class Server extends ServerHelper implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Server extends ServerHelper {
 
     private final ServerSocket serverSocket;
     private final int serverPort;
     private final String serverIp;
 
-    // Communication Contain
+    // ! Communication Contain
+    private Communication communication;
+
     // private final List<ClientHandler> clients = Collections.synchronizedList(new
     // ArrayList<>());
     // private final List<ClientObj> clientObjs = Collections.synchronizedList(new
@@ -33,6 +35,8 @@ public class Server extends ServerHelper implements Serializable {
         System.out.println("Create new server");
         this.serverPort = getAlreadyPort();
         this.serverIp = getServerIp();
+
+        this.communication = new Communication();
 
         try {
             this.serverSocket = new ServerSocket(serverPort);
@@ -104,17 +108,26 @@ public class Server extends ServerHelper implements Serializable {
     }
 
     public synchronized void handleNewConnection(ClientHandler newClient) {
-        System.out.println("!!!!! New Client Connect !!!!!");
+        System.out.println("!!!!! New Client Connect !!!!!\n");
 
-        ClientObj clientObj = newClient.getClientObj();
+        ClientObj clientObj = null;
 
-        if (clientObj != null) {
-            clientObjs.add(clientObj);
-            broadcastObject("NEW_PLAYER", null);
-            broadcastObject(clientObj, null);
+        if (newClient.getClientReceiveObject() instanceof ClientObj) {
+            clientObj = (ClientObj) newClient.getClientReceiveObject();
+            System.out.println("Client Object: " + clientObj);
 
-        } else {
-            // Not found client obj
+            if (clientObj != null) {
+                clientObjs.add(clientObj);
+                // broadcastObject("NEW_PLAYER", null);
+                // broadcastObject(clientObj, null);
+
+                System.out.println(clientObj.getClientName());
+
+                System.out.println("==============================");
+                this.communication.setContent("NEW_PLAYER", clientObjs);
+                broadcastObject(communication, null);
+
+            }
 
         }
     }
@@ -168,8 +181,8 @@ public class Server extends ServerHelper implements Serializable {
 
     public synchronized void removeClient(ClientHandler clientHandler) {
         clients.remove(clientHandler);
-        if (clientHandler.getClientObj() != null) {
-            clientObjs.remove(clientHandler.getClientObj());
+        if (clientHandler.getClientReceiveObject() != null) {
+            clientObjs.remove(clientHandler.getClientReceiveObject());
             clients.remove(clientHandler);
 
         }
@@ -197,13 +210,6 @@ public class Server extends ServerHelper implements Serializable {
     // }
 
     // Getters
-    public String getServerIp() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            return "127.0.0.1";
-        }
-    }
 
     public int getServerPort() {
         return this.serverPort;

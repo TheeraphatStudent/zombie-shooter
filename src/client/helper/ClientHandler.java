@@ -34,7 +34,7 @@ public class ClientHandler implements Runnable, Serializable {
     private ObjectInputStream objectIn;
 
     // Game Content
-    private Object receivedObject;
+    private Object receivedObject = null;
 
     public ClientHandler(Socket socket, Server server) {
         this.clientSocket = socket;
@@ -75,10 +75,10 @@ public class ClientHandler implements Runnable, Serializable {
 
         try {
             while (!clientSocket.isClosed()) {
-                receivedObject = objectIn.readObject();
-                System.out.println("Client Handler > Received object: " + receivedObject.toString());
+                this.receivedObject = objectIn.readObject();
+                System.out.println("Client Handler > Received object: " + this.receivedObject.toString());
 
-                if (receivedObject instanceof ClientObj) {
+                if (this.receivedObject instanceof ClientObj) {
                     server.handleNewConnection(ClientHandler.this);
 
                 }
@@ -115,17 +115,8 @@ public class ClientHandler implements Runnable, Serializable {
 
     }
 
-    public ClientObj getClientObj() {
-        // System.out.println(">>>>>>>>>> Received Object: " + receivedObject);
-
-        if (receivedObject instanceof ClientObj) {
-
-            return (ClientObj) receivedObject;
-
-        } else {
-            return null;
-
-        }
+    public Object getClientReceiveObject() {
+        return receivedObject;
 
     }
 }

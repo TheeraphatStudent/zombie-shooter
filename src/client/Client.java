@@ -2,8 +2,11 @@ package client;
 
 import java.io.*;
 import java.net.*;
+import java.util.Map;
+import java.util.List;
 import java.util.concurrent.*;
 
+import client.helper.Communication;
 import models.ClientObj;
 
 public class Client implements Serializable {
@@ -16,8 +19,12 @@ public class Client implements Serializable {
     private String serverIp;
     private int serverPort;
 
-    private BlockingQueue<String> messageQueue;
-    private BlockingQueue<Object> objectQueue;
+    // ! Communication Contain
+    private Communication communication;
+
+    // Queue
+    // private BlockingQueue<String> messageQueue;
+    // private BlockingQueue<Object> objectQueue;
 
     private volatile boolean isConnected;
 
@@ -27,8 +34,10 @@ public class Client implements Serializable {
     public Client(String serverIp, int serverPort, ClientObj clientObj) {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
-        this.messageQueue = new LinkedBlockingQueue<>();
-        this.objectQueue = new LinkedBlockingQueue<>();
+        // this.messageQueue = new LinkedBlockingQueue<>();
+        // this.objectQueue = new LinkedBlockingQueue<>();
+
+        this.communication = new Communication();
 
         this.isConnected = false;
         this.clientObj = clientObj;
@@ -64,6 +73,8 @@ public class Client implements Serializable {
 
     public void clientSideSendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
+        System.out.println("Before Send Object > Client Name: " + ((ClientObj) object).getClientName());
+
         try {
             synchronized (objOutStream) {
                 objOutStream.writeObject(object);
@@ -76,22 +87,27 @@ public class Client implements Serializable {
         }
     }
 
-    public String receiveMessageQueue() {
-        System.out.println(messageQueue);
-        try {
-            return messageQueue.poll(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            return null;
-        }
-    }
+    // public String receiveMessageQueue() {
+    //     System.out.println(messageQueue);
+    //     try {
+    //         return messageQueue.poll(5, TimeUnit.MINUTES);
+    //     } catch (InterruptedException e) {
+    //         return null;
+    //     }
+    // }
 
-    public Object receiveObjectQueue() {
-        System.out.println(objectQueue);
-        try {
-            return objectQueue.poll(5, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            return null;
-        }
+    // public Object receiveObjectQueue() {
+    //     System.out.println(objectQueue);
+    //     try {
+    //         return objectQueue.poll(5, TimeUnit.MINUTES);
+    //     } catch (Exception e) {
+    //         return null;
+    //     }
+    // }
+
+    public Communication getCommunication() {
+        return this.communication;
+
     }
 
     private void receiveServerObject() {
@@ -102,11 +118,25 @@ public class Client implements Serializable {
                 if (object != null) {
                     System.out.println("Received object from server: " + object);
 
-                    if (object instanceof String) {
-                        messageQueue.offer((String) object);
+                    // if (object instanceof String) {
+                    //     messageQueue.offer((String) object);
 
-                    } else {
-                        objectQueue.offer(object);
+                    // } else {
+                    //     objectQueue.offer(object);
+
+                    // }
+
+                    if (object instanceof Communication) {
+                        // System.out.println("\n/*/*/*/*/ Receive Communication! /*/*/*/*/\n");
+
+                        this.communication = (Communication) object;
+                        // Map<String, List<ClientObj>> content = communication.getContent();
+                        // // System.out.println(content.entrySet());
+                        
+                        // for (Object obj : content.entrySet()) {
+                        //     System.out.println(obj);
+
+                        // }
 
                     }
 

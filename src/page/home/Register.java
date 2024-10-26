@@ -188,6 +188,7 @@ public class Register extends JFrame implements KeyListener {
         getDisplayName = new UseText().truncateText(field.getText().trim());
         isValidName = !getDisplayName.isEmpty();
 
+        // สร้าง Client Object ไว้สำหรับติดต่อสื่อสารระหว่าง Client และ Server
         client = new ClientObj(getDisplayName, server);
 
         if (isValidName) {

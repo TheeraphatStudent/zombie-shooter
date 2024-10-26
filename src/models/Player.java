@@ -93,6 +93,12 @@ public class Player {
 
     }
 
+    public void setPlayerDirecter(int x, int y) {
+        this.xDir = x;
+        this.yDir = y;
+
+    }
+
     // <<<<<<<<<< Getter <<<<<<<<<<
 
     public int getPlayerBulletDamage() {
@@ -127,6 +133,16 @@ public class Player {
 
     public String getAliveTime() {
         return String.format("%d : %d : %d", this.hour, this.min, this.sec);
+
+    }
+
+    public int geDirectionX() {
+        return this.xDir;
+
+    }
+
+    public int geDirectionY() {
+        return this.yDir;
 
     }
 
