@@ -7,11 +7,12 @@ import java.util.Random;
 import java.util.List;
 import java.util.concurrent.*;
 
-import client.helper.Communication;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import models.ClientObj;
+import models.Communication;
 import models.Player;
+import utils.UseCharacter;
 import utils.UseGlobal;
 
 public class Client implements Serializable, ManageCharacterElement {
@@ -64,15 +65,10 @@ public class Client implements Serializable, ManageCharacterElement {
 
             CreateCharacter character = new CreateCharacter(false, clientObj);
 
-            int frameWidth = UseGlobal.getWidth();
-            int frameHeight = UseGlobal.getHeight();
-
             // ! Spawn Position
-            int spawnPositionX = new Random().nextInt(frameWidth - CHARACTER_WIDTH);
-            int spawnPositionY = new Random().nextInt(frameHeight - CHARACTER_HEIGHT);
+            int spawnPositionX = new UseCharacter().getCharacterRandSpawnX();
+            int spawnPositionY = new UseCharacter().getCharacterRandSpawnY();
 
-            spawnPositionX = Math.max(0, Math.min(spawnPositionX, frameWidth - CHARACTER_WIDTH));
-            spawnPositionY = Math.max(0, Math.min(spawnPositionY, frameHeight - CHARACTER_HEIGHT));
             System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
 
             character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
@@ -100,7 +96,8 @@ public class Client implements Serializable, ManageCharacterElement {
 
     public void clientSideSendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
-        // System.out.println("Before Send Object > Client Name: " + ((ClientObj) object).getClientName());
+        // System.out.println("Before Send Object > Client Name: " + ((ClientObj)
+        // object).getClientName());
 
         try {
             synchronized (objOutStream) {

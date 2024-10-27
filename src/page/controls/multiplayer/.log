@@ -1,0 +1,146 @@
+Create new server
+Create New Communication!
+Server IP: 192.168.1.11
+Server is listening on port 58352
+Game Center > Client: Hello World
+Image not found
+Join Room > Client: Hello World
+Playernum: 1
+Server IP: 192.168.1.11, Server Port: 58352
+Navigating to WaitingRoom...
+Prepare for host!
+Create New Communication!
+Waiting Room > Client : Hello World
+Create New Communication!
+Server Start
+On Waiting...
+On Client Start!
+New client connected: Socket[addr=/192.168.1.11,port=58354,localport=58352]
+Client added. Total clients: 1
+!-!-!-!-! On Handler Run !-!-!-!-!
+Connected to 192.168.1.11:58352
+Prepare Receive Object From Client!
+Spawn: x=1150 | y=38
+Set Player Position: x=1150 | y=38
+Client Send Object > models.ClientObj@710d8378
+$$$$$ Preparing Start Listening For PLayers! $$$$$
+---------------------------------------------------
+Thread Start Work!
+
+Waiting Room > On Client Connect!
+[]
+requirePlayers list is null or empty.
+>>>>> Receive Server Object Work! <<<<<
+Client Handler > Received object: models.ClientObj@2840f68f
+!!!!! New Client Connect !!!!!
+
+Client Object: models.ClientObj@2840f68f
+Hello World
+==============================
+
+On Broadcast Object!
+Object (Server): models.Communication@7d2b06a4
+Client Handler (Sender): null
+
+Sending object to receiver: client.helper.ClientHandler@71cd6111
+
+Client Handler > Send Object: models.Communication@7d2b06a4
+
+Check Game Start Work!
+>>>>> Start Countdown!
+
+On Broadcast Object!
+Object (Server): START_COUNTDOWN
+Client Handler (Sender): null
+
+Sending object to receiver: client.helper.ClientHandler@71cd6111
+
+Client Handler > Send Object: START_COUNTDOWN
+Received object from server: models.Communication@1ad7e31c
+class models.Communication
+models.Communication@1ad7e31c
+Received object from server: START_COUNTDOWN
+class java.lang.String
+START_COUNTDOWN
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+Key: NEW_PLAYER
+Adding New Client Object: models.ClientObj@6afb9f9c
+New Client Name: Hello World
+Added Player: models.ClientObj@6afb9f9c
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+Client Send Object > READY_TO_START
+Client Handler > Received object: READY_TO_START
+On Create Game Center
+
+Waiting Room > On Client Connect!
+[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+Set Needed Killed: 0
+-=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-
+*/*/*/*/ ! On Game Thread Start ! /*/*/*/*
+Client Send Object > READY_TO_START
+Client Handler > Received object: READY_TO_START
+On Create Game Center
+Set Needed Killed: 0
+-=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-
+*/*/*/*/ ! On Game Thread Start ! /*/*/*/*
+Player is dead!
+Create Sum Stat Work!
+!>!<!>!<! On Thread Run !>!<!>!<!
+Multiplayer Initialize Moment Work!
+Exception in thread "Thread-10" java.lang.NullPointerException
+        at page.controls.multiplayer.MultiplayerGameContent.initializeMoment(MultiplayerGameContent.java:93)
+        at page.controls.multiplayer.MultiplayerGameContent.run(MultiplayerGameContent.java:134)
+        at java.lang.Thread.run(Unknown Source)
+Player is dead!
+Create Sum Stat Work!
+!>!<!>!<! On Thread Run !>!<!>!<!
+Multiplayer Initialize Moment Work!
+Exception in thread "Thread-95" java.lang.NullPointerException
+        at page.controls.multiplayer.MultiplayerGameContent.initializeMoment(MultiplayerGameContent.java:93)
+        at page.controls.multiplayer.MultiplayerGameContent.run(MultiplayerGameContent.java:134)
+        at java.lang.Thread.run(Unknown Source)
+Dispose Work!
+Dispose Work!

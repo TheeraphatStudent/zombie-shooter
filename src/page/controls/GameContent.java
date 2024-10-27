@@ -36,6 +36,7 @@ import components.Sumstat;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import components.Cover;
+
 import models.Bullet;
 import models.ClientObj;
 import models.Player;
@@ -63,25 +64,28 @@ interface GameContentProps {
 }
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
-    ClientObj client;
+    // Multiplayer
+    protected boolean spawnToCenter = true;
+
+    public ClientObj parentClient;
 
     // Game State
-    private State state;
+    protected State state;
 
-    private JPanel content;
-    private JLayeredPane layers;
-    private Cover backgroundCover;
+    protected JPanel content;
+    protected JLayeredPane layers;
+    protected Cover backgroundCover;
 
     // Stat
-    private LevelState levelState;
-    private Scoreboard scoreboard;
+    protected LevelState levelState;
+    protected Scoreboard scoreboard;
 
     private GameCenter gameCenter;
-    private DrawMouse drawMouse;
+    protected DrawMouse drawMouse;
 
     // Character Content
-    private CreateCharacter character;
-    private Player player;
+    protected CreateCharacter character;
+    protected Player player;
 
     private ArrayList<CreateCharacter> zombies = new ArrayList<>();
     private ArrayList<ZombieMovementThread> zombieThreads = new ArrayList<>();
@@ -90,7 +94,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
-    private Point mousePosition;
+    public Point mousePosition;
 
     // Bullet
     private CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
@@ -100,7 +104,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private Thread characterThread;
 
     public GameContent(GameCenter gameCenter, ClientObj client) {
-        this.client = client;
+        this.parentClient = client;
 
         System.out.println("On Create Game Center");
 
@@ -157,11 +161,10 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
-    private void createFrame() {
+    public void createFrame() {
         setSize(new Dimension(UseGlobal.getWidth(), UseGlobal.getHeight()));
         setMinimumSize(new Dimension(UseGlobal.getMinWidth(), UseGlobal.getHeight()));
 
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle("Zombie Shooter - Let's Survive");
         setLocationRelativeTo(null);
 
@@ -204,13 +207,14 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Player Character ====================
 
-        character = new CreateCharacter(false, client);
+        // character = new CreateCharacter(false, this.parentClient);
+        character = this.parentClient.getPlayer().getCharacter();
         character.setGameContent(this);
 
-        player = new Player(character, state);
+        player = this.parentClient.getPlayer();
+        player.setState(state);
 
         // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก
-
         int bulletDamage = 10;
         int playerHealth = 100;
 
@@ -219,9 +223,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         character.setCharacterHp(100);
 
-        // # Set Character To Center
-        character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
         content.add(character);
+
+        // CreateCharacter anotherPlayer = new CreateCharacter(false, client);
+        // anotherPlayer.setBounds(100, 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        // content.add(anotherPlayer);
 
         // ! Add Zombie
         initializeZombieSpawner();
@@ -282,6 +288,14 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
+    public void setPlayerToCenter(boolean isCenter) {
+        System.out.println(">`>`>`> Set Player To Center <`<`<`<`<");
+
+        this.spawnToCenter = isCenter;
+        revalidateContent();
+
+    }
+
     // ----*----*----*---- Bullet Management ----*----*----*----
 
     private void updateBullets() {
@@ -335,7 +349,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
     }
 
-    private void drawBullets(Graphics2D g2d) {
+    public void drawBullets(Graphics2D g2d) {
         for (Bullet bullet : bullets) {
             bullet.drawContent(g2d);
 
@@ -356,12 +370,14 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         stopAllZombies();
 
         spawner.stop();
+        zombieThreads.forEach(ZombieMovementThread::stopMovement);
         player.onGameFinish();
 
     }
 
     @Override
     public void dispose() {
+        System.out.println("Dispose Work!");
         disposeContent();
 
         this.removeAll();
@@ -453,7 +469,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! ----*----*----*---- Zombie Control ----*----*----*----
 
-    private void initializeZombieSpawner() {
+    protected void initializeZombieSpawner() {
         spawner = new Timer(1500, e -> {
             if (zombies.size() >= 4) {
                 return;
@@ -550,7 +566,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ! เพิ่ม ซอมบี้เข้า Frame
     private void addZombie(String type) {
-        System.out.println("Level State: " + state.getLevelState());
+        // System.out.println("Level State: " + state.getLevelState());
 
         CreateCharacter zombie = new CreateCharacter(this);
         Zombie zombieBehavior = new Zombie(character, zombie, this, state, type);
@@ -690,7 +706,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
-    private void revalidateContent() {
+    public void revalidateContent() {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -705,6 +721,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     @Override
     public void run() {
+        System.out.println("*/*/*/*/ ! On Game Thread Start ! /*/*/*/*");
+
         while (character.getCharacterHp() > 0) {
 
             // ใช้ Thread A เพื่อควบคุมกระสุน
@@ -742,7 +760,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         }
 
-        drawMouse.add(new Sumstat(this, this.gameCenter, true, player, client));
+        drawMouse.add(new Sumstat(this, this.gameCenter, true, player, this.parentClient));
         drawMouse.revalidate();
         drawMouse.repaint();
 

@@ -177,7 +177,7 @@ public class Createroom extends JFrame {
                 System.out.println("Playernum: " + playernum);
                 int numofplayer = Integer.parseInt(playernum);
 
-                if (numofplayer < 2) {
+                if (numofplayer < 1) {
                     new UseAlert().warringAlert("Minimum is Two");
                     return;
                 } else if (numofplayer > 3) {

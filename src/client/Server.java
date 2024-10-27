@@ -6,10 +6,10 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import client.helper.ClientHandler;
-import client.helper.Communication;
 import client.helper.ServerHelper;
 import components.character.CreateCharacter;
 import models.ClientObj;
+import models.Communication;
 import models.Player;
 import utils.UseGlobal;
 
@@ -34,7 +34,7 @@ public class Server extends ServerHelper {
 
     public Server() {
         // super();
-        System.out.println("Create new server");
+        System.out.println(")(+)(+)( Create new server )(+)(+)(");
         this.serverPort = getAlreadyPort();
         this.serverIp = getServerIp();
 
@@ -45,6 +45,12 @@ public class Server extends ServerHelper {
             System.out.println("Server IP: " + serverIp);
             System.out.println("Server is listening on port " + serverPort);
 
+            List<String> serverInfo = new ArrayList<String>();
+            serverInfo.add(serverIp);
+            serverInfo.add(String.valueOf(serverPort));
+
+            this.communication.setContent("SERVER_INFO", serverInfo);
+
         } catch (IOException e) {
             throw new RuntimeException("Error creating server socket: " + e.getMessage(), e);
 
@@ -52,7 +58,7 @@ public class Server extends ServerHelper {
     }
 
     public void start() {
-        System.out.println("Server Start");
+        System.out.println("-#-#-# Server Start #-#-#-");
 
         // Start server input handler in daemon thread
         Thread inputHandler = new Thread(this::handleServerInput);

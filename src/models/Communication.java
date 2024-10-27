@@ -1,4 +1,4 @@
-package client.helper;
+package models;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ public class Communication<T> implements Serializable {
     private Map<String, List<T>> models;
 
     public Communication() {
+        System.out.println("Create New Communication!");
         models = new HashMap<>();
     }
 
