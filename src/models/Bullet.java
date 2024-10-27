@@ -42,6 +42,9 @@ public class Bullet extends JPanel implements ManageBulletElement {
 
         x += dx;
         y += dy;
+
+        // System.out.printf("Dx: %f | Dy: %f\nX: %f | Y: %f\n", dx, dy, x, y);
+        // System.out.println();
     }
 
     // วาดลูกกระสุน

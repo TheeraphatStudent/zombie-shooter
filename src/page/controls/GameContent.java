@@ -65,7 +65,7 @@ interface GameContentProps {
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
     // Multiplayer
-    protected boolean spawnToCenter = true;
+    // ...
 
     public ClientObj parentClient;
 
@@ -291,7 +291,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     public void setPlayerToCenter(boolean isCenter) {
         System.out.println(">`>`>`> Set Player To Center <`<`<`<`<");
 
-        this.spawnToCenter = isCenter;
         revalidateContent();
 
     }
@@ -716,6 +715,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
             }
         });
+
+    }
+
+    public ClientObj getClientObjParent() {
+        return this.parentClient;
 
     }
 

@@ -115,7 +115,7 @@ public class Server extends ServerHelper {
     }
 
     public synchronized void handleNewConnection(ClientHandler newClient) {
-        System.out.println("!!!!! New Client Connect !!!!!\n");
+        System.out.println("-!-!-!-!-! New Client Connect !-!-!-!-!-\n");
 
         ClientObj clientObj = null;
 

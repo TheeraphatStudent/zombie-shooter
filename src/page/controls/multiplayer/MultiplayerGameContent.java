@@ -1,6 +1,7 @@
 package page.controls.multiplayer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,6 @@ public class MultiplayerGameContent extends GameContent {
             Communication communication) {
         // ส่ง Client เรียกใช้งาน Super เพื่อสร้างหน้า GUI ของตัวเอง
         super(gameCenter, clientObjSide);
-        super.setPlayerToCenter(false);
 
         this.clientConnect = clientConnect;
         this.serverConnect = serverConnect;
@@ -53,10 +53,14 @@ public class MultiplayerGameContent extends GameContent {
         // players.add(player);
 
         // }
+        this.players = new ArrayList<>();
+        this.characters = new ArrayList<>();
 
         // this.communication.setContent("CHARACTERS_INFO", players);
 
         System.out.println("-=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-\n");
+        System.out.println(contents.entrySet());
+        System.out.println(clientObjs);
 
     }
 
@@ -68,7 +72,6 @@ public class MultiplayerGameContent extends GameContent {
             Communication communication) {
         // ส่ง Client เรียกใช้งาน Super เพื่อสร้างหน้า GUI ของตัวเอง
         super(gameCenter, clientObjSide);
-        super.setPlayerToCenter(false);
 
         this.clientConnect = clientConnect;
         this.isHost = false;
@@ -78,6 +81,8 @@ public class MultiplayerGameContent extends GameContent {
         this.contents = this.communication.getContent();
 
         this.clientObjs = clientObjs;
+        this.players = new ArrayList<>();
+        this.characters = new ArrayList<>();
 
         // this.communication.setContent("CHARACTERS_INFO", players);
         System.out.println("-=-=-=-=-=| On Game Start - Client |=-=-=-=-=-\n");
@@ -91,47 +96,61 @@ public class MultiplayerGameContent extends GameContent {
 
         for (ClientObj clientObj : clientObjs) {
             Player player = clientObj.getPlayer();
-            players.add(player);
+            if (!players.contains(player)) {
+                System.out.println("Adding Player: " + player);
+                players.add(player);
+            }
 
             CreateCharacter character = player.getCharacter();
-            characters.add(character);
+            if (!characters.contains(character)) {
+                System.out.println("Adding Character: " + character);
+                characters.add(character);
+            }
 
-            if (!(clientObj == super.parentClient)) {
+            if (!(clientObj.equals(super.getClientObjParent()))) {
                 System.out.println("Client Name: " + clientObj.getClientName());
                 content.add(character);
-
             }
-
-            revalidateContent();
-
         }
 
+        revalidateContent();
     }
 
-    public void eventListener() {
-        System.out.println("On Event Listening...");
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                clientConnect.clientSideSendObject(communication);
-
+    private void eventListener() {
+        Thread listenerThread = new Thread(() -> {
+            System.out.println("On Event Listening...\n");
+            while (true) {
                 try {
-                    Thread.sleep(1);
-                } catch (Exception e) {
-                    // TODO: handle exception
-                }
+                    // clientConnect.clientSideSendObject(communication);
 
+                    // this.contents = communication.getContent();
+                    // clientObjs = this.contents.get("");
+
+                    initializeMoment();
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("Event listener interrupted: " + e.getMessage());
+                    e.printStackTrace();
+                    break;
+                } catch (Exception e) {
+                    System.err.println("Error in event listener: " + e.getMessage());
+                    e.printStackTrace();
+                    break;
+                }
             }
         });
-
+        listenerThread.setDaemon(true);
+        listenerThread.start();
     }
 
     @Override
     public void run() {
-        super.run();
+
         System.out.println("!>!<!>!<! On Thread Run !>!<!>!<!");
         eventListener();
+        initializeMoment();
+
+        super.run();
 
     }
 
