@@ -80,12 +80,13 @@ public class ClientHandler implements Runnable, Serializable {
                 System.out.println("Client Handler > Received object: " + this.receivedObject.toString());
 
                 // Added New Client
-                if (this.receivedObject instanceof ClientObj) {
+                if (this.receivedObject instanceof RegisterClient) {
                     server.handleNewConnection(ClientHandler.this);
 
-                }
+                } else {
+                    server.broadcastObject(this.receivedObject, this);
 
-                
+                }
 
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -120,7 +121,7 @@ public class ClientHandler implements Runnable, Serializable {
     }
 
     public Object getClientReceiveObject() {
-        return receivedObject;
+        return this.receivedObject;
 
     }
 }

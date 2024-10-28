@@ -276,7 +276,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
     public void updateWeaponAngle(Point mousePos) {
-        Point componentPos = SwingUtilities.convertPoint(getParent(), mousePos, this);
+        Point componentPos = SwingUtilities.convertPoint(this.getParent(), mousePos, this);
 
         int weaponSpinX = character.getX() + 40;
         int weaponSpinY = character.getY() + 70;

@@ -1,14 +1,18 @@
 package models;
 
+import java.awt.Point;
 import java.io.Serializable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import components.character.CreateCharacter;
 
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
+    private boolean isMoveLeft = false;
+    private boolean isInfected = false;
 
     private State state;
     private CreateCharacter character;
@@ -17,14 +21,15 @@ public class Player implements Serializable {
     private volatile int yDir = 0;
 
     private volatile int zombieHunt = 0;
+    private volatile Point weaponPoint;
 
     private CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private volatile int damage = 10;
     private volatile int health = 100;
+    private int maxHealth = 100;
 
     // ใช้สำหรับอัพแรงค์
     private volatile int storeZombieHunt = 0;
-
     private volatile int rank = 0;
 
     // On Survive
@@ -104,16 +109,40 @@ public class Player implements Serializable {
 
     }
 
+    // -----* Player Health *-----
+
     public void setPlayerHealth(int newHealth) {
         this.health = newHealth;
 
     }
 
-    public void setPlayerDirecter(int x, int y) {
-        System.out.printf("Set Player Position: x=%d | y=%d\n", x, y);
+    public void setMaxPlayerHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+
+    }
+
+    public void setPlayerLocation(int x, int y) {
+        System.out.printf("Set Player Location: x=%d | y=%d\n", x, y);
 
         this.xDir = x;
         this.yDir = y;
+
+    }
+
+    // -----* Player Movement *-----
+
+    public void setWeaponPoint(Point point) {
+        this.weaponPoint = point;
+
+    }
+
+    public void setIsPlayerMoveLeft(boolean isMovedLeft) {
+        this.isMoveLeft = isMovedLeft;
+
+    }
+    
+    public void setInfectedPlayer(boolean isInfected) {
+        this.isInfected = isInfected;
 
     }
 
@@ -131,6 +160,11 @@ public class Player implements Serializable {
 
     public int getPlayerHealth() {
         return this.health;
+
+    }
+
+    public int getMaxPlayerHealth() {
+        return this.maxHealth;
 
     }
 
@@ -176,6 +210,21 @@ public class Player implements Serializable {
 
     public CopyOnWriteArrayList<Bullet> getBullets() {
         return this.bullets;
+
+    }
+
+    public Point getWeaponPoint() {
+        return this.weaponPoint;
+
+    }
+
+    public boolean getPlayerIsMovedLeft() {
+        return this.isMoveLeft;
+
+    }
+
+    public boolean getInfectedStatus() {
+        return this.isInfected;
 
     }
 

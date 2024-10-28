@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.List;
 import java.util.concurrent.*;
 
+import client.helper.RegisterClient;
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import models.ClientObj;
@@ -17,6 +18,7 @@ import utils.UseGlobal;
 
 public class Client implements Serializable, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
+    private RegisterClient register;
 
     private Socket clientSocket;
     private ObjectOutputStream objOutStream;
@@ -75,11 +77,13 @@ public class Client implements Serializable, ManageCharacterElement {
 
             // ! Player
             Player player = new Player(character, null);
-            player.setPlayerDirecter(spawnPositionX, spawnPositionY);
+            player.setPlayerLocation(spawnPositionX, spawnPositionY);
 
             this.clientObj.setPlayer(player);
 
-            clientSideSendObject(this.clientObj);
+            // เริ่มทำงานครั้งแรกจะส่ง IdentityObject เพื่อบอกให้ Server รู้ว่า Client นี้มาใหม่
+            this.register = new RegisterClient(this.clientObj);
+            clientSideSendObject(register);
 
             Thread objectThread = new Thread(this::receiveServerObject);
 

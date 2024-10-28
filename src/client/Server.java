@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import client.helper.ClientHandler;
+import client.helper.RegisterClient;
 import client.helper.ServerHelper;
 import components.character.CreateCharacter;
 import models.ClientObj;
@@ -119,8 +120,10 @@ public class Server extends ServerHelper {
 
         ClientObj clientObj = null;
 
-        if (newClient.getClientReceiveObject() instanceof ClientObj) {
-            clientObj = (ClientObj) newClient.getClientReceiveObject();
+        if (newClient.getClientReceiveObject() instanceof RegisterClient) {
+            RegisterClient login = (RegisterClient) newClient.getClientReceiveObject();
+            clientObj = login.getAuthClient();
+
             System.out.println("Client Object: " + clientObj);
 
             if (clientObj != null) {

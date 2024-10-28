@@ -59,6 +59,8 @@ interface GameContentProps {
 
     void updateGameState();
 
+    void disposeContent();
+
     // boolean getCharacterMovement();
 
 }
@@ -221,7 +223,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         player.setPlayerBulletDamage(bulletDamage);
         player.setPlayerHealth(playerHealth);
 
-        character.setCharacterHp(100);
+        character.setCharacterHp(player.getPlayerHealth());
 
         content.add(character);
 
@@ -285,13 +287,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 new Component[] { backgroundPanel, backgroundCover, content, score, drawMouse },
                 new Component[] { layers });
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-    }
-
-    public void setPlayerToCenter(boolean isCenter) {
-        System.out.println(">`>`>`> Set Player To Center <`<`<`<`<");
-
-        revalidateContent();
 
     }
 
@@ -363,10 +358,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     // ----*----*----*---- Dispose Content ----*----*----*----
 
     public void disposeContent() {
+        backgroundCover.setCoverBackground(0.5f);
+
         bullets.clear();
         zombies.clear();
         character.removeAll();
-        stopAllZombies();
 
         spawner.stop();
         zombieThreads.forEach(ZombieMovementThread::stopMovement);
@@ -396,22 +392,27 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         if (isUpPressed && currentY - MOVEMENT_SPEED >= 0) {
             currentY -= MOVEMENT_SPEED;
             moved = true;
+
         }
         if (isDownPressed && currentY + MOVEMENT_SPEED + character.getHeight() <= getHeight()) {
             currentY += MOVEMENT_SPEED;
             moved = true;
+
         }
         if (isLeftPressed && currentX - MOVEMENT_SPEED >= 0) {
             currentX -= MOVEMENT_SPEED;
             moved = true;
+
         }
         if (isRightPressed && currentX + MOVEMENT_SPEED + character.getWidth() <= getWidth()) {
             currentX += MOVEMENT_SPEED;
             moved = true;
+
         }
 
         if (moved) {
-            character.setLocation(currentX, currentY);
+            this.player.setPlayerLocation(currentX, currentY);
+            this.character.setLocation(player.geDirectionX(), player.geDirectionY());
 
         }
     }
@@ -429,7 +430,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 break;
             case KeyEvent.VK_A:
                 isLeftPressed = true;
-                character.setCharacterMoveLeft(isLeftPressed);
+                player.setIsPlayerMoveLeft(isLeftPressed);
+                character.setCharacterMoveLeft(player.getPlayerIsMovedLeft());
 
                 break;
             case KeyEvent.VK_D:
@@ -452,7 +454,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 break;
             case KeyEvent.VK_A:
                 isLeftPressed = false;
-                character.setCharacterMoveLeft(isLeftPressed);
+                player.setIsPlayerMoveLeft(isLeftPressed);
+                character.setCharacterMoveLeft(player.getPlayerIsMovedLeft());
 
                 break;
             case KeyEvent.VK_D:
@@ -490,16 +493,18 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         private Zombie behavior;
         private CreateCharacter zombie;
 
-        private CreateCharacter player;
+        private Player player;
+        private CreateCharacter character;
 
         private volatile boolean running = true;
         private volatile Timer biteTimer;
         private volatile boolean isBiting = false;
 
-        public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, CreateCharacter player) {
+        public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, Player player) {
             this.zombie = zombie;
             this.behavior = behavior;
             this.player = player;
+            this.character = this.player.getCharacter();
 
             biteTimer = new Timer(1000, e -> biteInArea());
         }
@@ -537,7 +542,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         private boolean isPlayerInRange() {
             Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
-            Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(player);
+            Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(character);
             return zombieHitbox.intersects(playerHitbox);
 
         }
@@ -546,11 +551,13 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             if (isPlayerInRange()) {
                 // System.out.println("Bite!");
 
-                player.setCharacterHp(player.getCharacterHp() - (int) behavior.getZombieDamage());
-                if (player.getCharacterHp() <= 0) {
+                // character.setCharacterHp(character.getCharacterHp() - (int) behavior.getZombieDamage());
+                player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
+                character.setCharacterHp(player.getPlayerHealth());
+
+                if (player.getPlayerHealth() <= 0) {
                     System.out.println("Player is dead!");
 
-                    backgroundCover.setCoverBackground(0.5f);
                     disposeContent();
                     // dispose();
 
@@ -603,16 +610,10 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         content.add(zombie);
         zombies.add(zombie);
 
-        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, character);
+        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, player);
         zombieThread.start();
 
         zombieThreads.add(zombieThread);
-    }
-
-    private void stopAllZombies() {
-        for (ZombieMovementThread thread : zombieThreads) {
-            thread.stopMovement();
-        }
     }
 
     // ----*----*----*---- Mouse ----*----*----*----
@@ -629,22 +630,16 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                character.updateWeaponAngle(e.getPoint());
+                // character.updateWeaponAngle(e.getPoint());
+                player.setWeaponPoint(e.getPoint());
+                updateMousePosition();
 
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                // System.out.println("============================");
-                // System.out.println("Is Moved");
-
-                // System.out.println(e.getX());
-                // System.out.println(e.getY());
-
-                // System.out.println("============================");
-
-                character.updateWeaponAngle(e.getPoint());
-                updateMousePosition(e.getPoint());
+                player.setWeaponPoint(e.getPoint());
+                updateMousePosition();
 
             }
 
@@ -658,50 +653,33 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         mouse.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
-                // System.out.println("+++++++++++++++++++++++++++++");
-                // System.out.println("Is Clicked");
-
-                // System.out.println(e.getX());
-                // System.out.println(e.getY());
-
-                // System.out.println("+++++++++++++++++++++++++++++");
-
             };
 
             public void mousePressed(MouseEvent e) {
-                // System.out.println("+++++++++++++++++++++++++++++");
-                // System.out.println("Is Pressed");
+                // character.updateWeaponAngle(e.getPoint());
+                player.setWeaponPoint(e.getPoint());
+                updateMousePosition();
 
-                // System.out.println(e.getX());
-                // System.out.println(e.getY());
-
-                // System.out.println("+++++++++++++++++++++++++++++");
-
-                // System.out.println("On Shoot");
-                character.updateWeaponAngle(e.getPoint());
                 character.onShootBullet(e.getPoint());
 
             };
 
             public void mouseReleased(MouseEvent e) {
-
             };
 
             public void mouseEntered(MouseEvent e) {
-
             };
 
             public void mouseExited(MouseEvent e) {
-
             };
 
         });
 
     }
 
-    private void updateMousePosition(Point point) {
-        mousePosition = point;
-        character.updateWeaponAngle(point);
+    private void updateMousePosition() {
+        mousePosition = player.getWeaponPoint();
+        character.updateWeaponAngle(player.getWeaponPoint());
 
     }
 
@@ -723,11 +701,16 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
+    public CopyOnWriteArrayList<Bullet> getBullets() {
+        return this.bullets;
+
+    }
+
     @Override
     public void run() {
         System.out.println("*/*/*/*/ ! On Game Thread Start ! /*/*/*/*");
 
-        while (character.getCharacterHp() > 0) {
+        while (this.player.getPlayerHealth() > 0) {
 
             // ใช้ Thread A เพื่อควบคุมกระสุน
             bulletThread = new Thread(new Runnable() {

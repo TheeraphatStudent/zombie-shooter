@@ -7,7 +7,7 @@ public class State {
      * จำนวนของ Zombie = (10 + (players_join * 5)) * (state * 0.5)
     */
 
-    private ArrayList<Object> players  = new ArrayList<>();
+    // private ArrayList<Object> players  = new ArrayList<>();
 
     private int levelState = 0;
     private int maxZombie = 0;
@@ -20,10 +20,10 @@ public class State {
 
     }
 
-    public void setPlayersObject(ArrayList<Object> players) {
-        this.players = players;
+    // public void setPlayersObject(ArrayList<Object> players) {
+    //     this.players = players;
 
-    }
+    // }
 
     public void setStateLevel(int incrementLevel) {
         this.levelState += incrementLevel;
