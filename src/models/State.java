@@ -1,8 +1,7 @@
 package models;
 
-import java.util.ArrayList;
-
 public class State {
+
     /*
      * จำนวนของ Zombie = (10 + (players_join * 5)) * (state * 0.5)
     */

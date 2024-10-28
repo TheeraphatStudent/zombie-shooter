@@ -8,13 +8,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import client.helper.ClientHandler;
 import client.helper.RegisterClient;
 import client.helper.ServerHelper;
-import components.character.CreateCharacter;
 import models.ClientObj;
 import models.Communication;
-import models.Player;
-import utils.UseGlobal;
 
-public class Server extends ServerHelper {
+public class Server extends ServerHelper implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final ServerSocket serverSocket;
     private final int serverPort;

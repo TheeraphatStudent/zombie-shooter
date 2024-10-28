@@ -20,31 +20,25 @@ public class Client implements Serializable, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
     private RegisterClient register;
 
-    private Socket clientSocket;
+    private transient Socket clientSocket;
     private ObjectOutputStream objOutStream;
     private ObjectInputStream objInStream;
 
     private String serverIp;
     private int serverPort;
 
-    // ! Communication Contain
     private Communication communication;
     private String message = "";
 
-    // Queue
-    // private BlockingQueue<String> messageQueue;
-    // private BlockingQueue<Object> objectQueue;
+    private boolean isConnected;
+    private transient ClientObj clientObj;
 
-    private volatile boolean isConnected;
-
-    // Character
-    private ClientObj clientObj;
+    // Flag to track if RegisterClient has been sent
+    private boolean isRegister = false;
 
     public Client(String serverIp, int serverPort, ClientObj clientObj) {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
-        // this.messageQueue = new LinkedBlockingQueue<>();
-        // this.objectQueue = new LinkedBlockingQueue<>();
 
         this.communication = new Communication();
 
@@ -60,14 +54,13 @@ public class Client implements Serializable, ManageCharacterElement {
             isConnected = true;
 
             objOutStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
-            objOutStream.flush(); // Ensure the stream is ready
+            objOutStream.flush();
             objInStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
             CreateCharacter character = new CreateCharacter(false, clientObj);
 
-            // ! Spawn Position
             int spawnPositionX = new UseCharacter().getCharacterRandSpawnX();
             int spawnPositionY = new UseCharacter().getCharacterRandSpawnY();
 
@@ -75,21 +68,20 @@ public class Client implements Serializable, ManageCharacterElement {
 
             character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
-            // ! Player
             Player player = new Player(character, null);
             player.setPlayerLocation(spawnPositionX, spawnPositionY);
 
             this.clientObj.setPlayer(player);
 
-            // เริ่มทำงานครั้งแรกจะส่ง IdentityObject เพื่อบอกให้ Server รู้ว่า Client นี้มาใหม่
-            this.register = new RegisterClient(this.clientObj);
-            clientSideSendObject(register);
+            if (!isRegister) { 
+                this.register = new RegisterClient(this.clientObj);
+                clientSideSendObject(register);
+                isRegister = true;
+            }
 
             Thread objectThread = new Thread(this::receiveServerObject);
-
             objectThread.setPriority(Thread.MAX_PRIORITY);
             objectThread.setDaemon(true);
-
             objectThread.start();
 
         } catch (IOException e) {
@@ -145,6 +137,11 @@ public class Client implements Serializable, ManageCharacterElement {
 
     public Communication getCommunication() {
         return this.communication;
+
+    }
+
+    public boolean isRegister() {
+        return this.isRegister;
 
     }
 

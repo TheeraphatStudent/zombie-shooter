@@ -379,15 +379,13 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                     this.clientObj,
                     this.client,
                     this.server,
-                    this.clientObjs,
-                    this.communication);
+                    this.clientObjs);
         } else {
             gameContent = new MultiplayerGameContent(
                     this.gameCenter,
                     this.clientObj,
                     this.client,
-                    this.clientObjs,
-                    this.communication);
+                    this.clientObjs);
         }
 
         SwingUtilities.invokeLater(() -> {

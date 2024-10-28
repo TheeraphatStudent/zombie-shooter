@@ -13,15 +13,19 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.Serializable;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Insets;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Timer;
+
+import client.Client;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -42,7 +46,7 @@ import models.ClientObj;
 import models.Player;
 import models.Zombie;
 import models.State;
-
+import page.controls.multiplayer.PlayerBehaviorListener;
 import page.home.GameCenter;
 
 import utils.LoadImage;
@@ -66,8 +70,11 @@ interface GameContentProps {
 }
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
+    // Player Listener
+    private List<PlayerBehaviorListener> playerListener = new ArrayList<>();
+
     // Multiplayer
-    // ...
+    // private Client clientConnect;
 
     public ClientObj parentClient;
 
@@ -232,7 +239,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // content.add(anotherPlayer);
 
         // ! Add Zombie
-        initializeZombieSpawner();
+        // initializeZombieSpawner();
 
         // ==================== Layer ====================
 
@@ -311,7 +318,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                     if (zombie.getCharacterHp() <= 0) {
                         for (ZombieMovementThread thread : zombieThreads) {
-                            if (thread.zombie == zombie) {
+                            if (thread.getZombie() == zombie) {
                                 thread.stopMovement();
                                 break;
                             }
@@ -352,6 +359,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     public void addBullet(Bullet bullet) {
         bullets.add(bullet);
+        onPlayerShootBullets(bullets);
 
     }
 
@@ -413,6 +421,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         if (moved) {
             this.player.setPlayerLocation(currentX, currentY);
             this.character.setLocation(player.geDirectionX(), player.geDirectionY());
+            onPlayerActions(this.player);
 
         }
     }
@@ -432,6 +441,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 isLeftPressed = true;
                 player.setIsPlayerMoveLeft(isLeftPressed);
                 character.setCharacterMoveLeft(player.getPlayerIsMovedLeft());
+                onPlayerActions(this.player);
 
                 break;
             case KeyEvent.VK_D:
@@ -456,6 +466,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 isLeftPressed = false;
                 player.setIsPlayerMoveLeft(isLeftPressed);
                 character.setCharacterMoveLeft(player.getPlayerIsMovedLeft());
+                onPlayerActions(this.player);
 
                 break;
             case KeyEvent.VK_D:
@@ -486,88 +497,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             }
         });
         spawner.start();
-    }
-
-    // ! ซอมบี้เดิน
-    private class ZombieMovementThread extends Thread {
-        private Zombie behavior;
-        private CreateCharacter zombie;
-
-        private Player player;
-        private CreateCharacter character;
-
-        private volatile boolean running = true;
-        private volatile Timer biteTimer;
-        private volatile boolean isBiting = false;
-
-        public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, Player player) {
-            this.zombie = zombie;
-            this.behavior = behavior;
-            this.player = player;
-            this.character = this.player.getCharacter();
-
-            biteTimer = new Timer(1000, e -> biteInArea());
-        }
-
-        @Override
-        public void run() {
-            while (running) {
-                try {
-                    Thread.sleep(16);
-
-                    // behavior = new Zombie(character, zombie, GameContent.this,nul);
-                    behavior.updateZombiePosition();
-
-                    if (!isBiting && isPlayerInRange()) {
-                        isBiting = true;
-                        biteInArea();
-
-                        biteTimer.start();
-
-                        if (isBiting && !isPlayerInRange()) {
-                            isBiting = false;
-                            biteTimer.stop();
-
-                        }
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    running = false;
-
-                }
-            }
-            biteTimer.stop();
-        }
-
-        private boolean isPlayerInRange() {
-            Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
-            Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(character);
-            return zombieHitbox.intersects(playerHitbox);
-
-        }
-
-        private void biteInArea() {
-            if (isPlayerInRange()) {
-                // System.out.println("Bite!");
-
-                // character.setCharacterHp(character.getCharacterHp() - (int) behavior.getZombieDamage());
-                player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
-                character.setCharacterHp(player.getPlayerHealth());
-
-                if (player.getPlayerHealth() <= 0) {
-                    System.out.println("Player is dead!");
-
-                    disposeContent();
-                    // dispose();
-
-                }
-            }
-        }
-
-        public void stopMovement() {
-            running = false;
-        }
     }
 
     // ! เพิ่ม ซอมบี้เข้า Frame
@@ -610,7 +539,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         content.add(zombie);
         zombies.add(zombie);
 
-        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, player);
+        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, player, this);
         zombieThread.start();
 
         zombieThreads.add(zombieThread);
@@ -647,7 +576,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         /*
          * ==========================================
-         * Mouse Clicked
+         * ===========   Mouse Clicked    ===========
          * ==========================================
          */
 
@@ -750,6 +679,30 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         drawMouse.add(new Sumstat(this, this.gameCenter, true, player, this.parentClient));
         drawMouse.revalidate();
         drawMouse.repaint();
+
+    }
+
+    // 0-0-0-0- Player Event Listener -0-0-0-0
+    public void addMovementListener(PlayerBehaviorListener listener) {
+        playerListener.add(listener);
+    }
+
+    public void removeMovementListener(PlayerBehaviorListener listener) {
+        playerListener.remove(listener);
+    }
+
+    protected void onPlayerActions(Player actionPlayer) {
+        for (PlayerBehaviorListener listener : playerListener) {
+            listener.onPlayerAction(actionPlayer);
+
+        }
+    }
+
+    protected void onPlayerShootBullets(CopyOnWriteArrayList<Bullet> actionBullets) {
+        for (PlayerBehaviorListener listener : playerListener) {
+            listener.onShootBullet(actionBullets);
+
+        }
 
     }
 }

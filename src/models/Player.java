@@ -121,8 +121,10 @@ public class Player implements Serializable {
 
     }
 
+    // -----* Player Position *-----
+
     public void setPlayerLocation(int x, int y) {
-        System.out.printf("Set Player Location: x=%d | y=%d\n", x, y);
+        // System.out.printf("Set Player Location: x=%d | y=%d\n", x, y);
 
         this.xDir = x;
         this.yDir = y;

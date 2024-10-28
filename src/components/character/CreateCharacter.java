@@ -49,7 +49,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private static final long serialVersionUID = 1L;
 
     ClientObj client;
-    
+
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
@@ -188,7 +188,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         add(compressContent);
 
-
     }
 
     // :::::::::::::::::::: Zombie ::::::::::::::::::::
@@ -284,20 +283,13 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         double deltaX = componentPos.x - weaponSpinX;
         double deltaY = componentPos.y - weaponSpinY;
 
-        weaponAngle = Math.atan2(deltaY, deltaX);
-
-        // if (isMoveLeft) {
-        // weaponAngle = Math.PI - weaponAngle;
-
-        // }
-
-        weapon.repaint();
+        this.weaponAngle = Math.atan2(deltaY, deltaX);
+        this.weapon.repaint();
     }
 
     public void onShootBullet(Point mousePos) {
         if (!isSurvive) {
             return;
-
         }
 
         // ตำแหน่งปืน
@@ -347,15 +339,14 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     public void setCharacterRank(int rank) {
         System.out.println("Set Character Rank Work!");
         System.out.println(rank);
-    
+
         this.currentRank = rank;
-        this.displayText = displayName + " - rank " + this.currentRank;  // Update display text
-    
-        playerName.setText(displayText); 
-    
+        this.displayText = displayName + " - rank " + this.currentRank; // Update display text
+
+        playerName.setText(displayText);
+
         revalidateContent();
     }
-    
 
     // <<<<<<<<<< Getter <<<<<<<<<<
 
@@ -368,6 +359,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         return this.hp;
 
     }
+
     private void revalidateContent() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
