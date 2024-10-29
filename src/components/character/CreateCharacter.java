@@ -62,7 +62,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private boolean isInfected = false;
     private int x, y;
     private int hp = 100;
-    private int useCharacter;
     private boolean isMoveLeft = false;
     private boolean isSurvive = true;
 
@@ -78,11 +77,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private GameContent gameContent;
     private CreateHpBar hpBar;
 
-    // Models
+    private int characterProfile = 1;
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
-    public CreateCharacter(boolean isInfected, ClientObj clientObj) {
+    public CreateCharacter(int characterProfile, boolean isInfected, ClientObj clientObj) {
         // super();
+        this.characterProfile = characterProfile;
 
         this.isSurvive = !isInfected;
 
@@ -91,8 +91,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         setLayout(null);
         setOpaque(false);
         setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
-
-        this.useCharacter = (int) (Math.random() * 10) + 1;
 
         // [document/images/enemy.png]
 
@@ -147,7 +145,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         base.add(playerName);
 
         // >>>>>>>>>> Character 🗣️
-        character = new CreateCharacterImage(useCharacter, !isInfected, this.isMoveLeft);
+        character = new CreateCharacterImage(this.characterProfile, !isInfected, this.isMoveLeft);
 
         // ! Character set content size
         character.setBounds(CHARACTER_CENTER_XY);
@@ -204,7 +202,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         setOpaque(false);
         setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
-        this.useCharacter = (int) (Math.random() * 10) + 1;
+        int useCharacter = (int) (Math.random() * 10) + 1;
 
         // JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
         // "", Color.WHITE, null, Font.PLAIN);

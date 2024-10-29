@@ -1,50 +1,54 @@
-Create new server
+)(+)(+)( Create new server )(+)(+)(
 Create New Communication!
 Server IP: 192.168.1.11
-Server is listening on port 58352
-Game Center > Client: Hello World
+Server is listening on port 58281
+Client Key Id: 555252dd-42ba-4dca-abed-96dd502d6b6c
+Game Center > Client: Hello world
 Image not found
-Join Room > Client: Hello World
+Join Room > Client: Hello world
 Playernum: 1
-Server IP: 192.168.1.11, Server Port: 58352
+Server IP: 192.168.1.11, Server Port: 58281
 Navigating to WaitingRoom...
 Prepare for host!
 Create New Communication!
-Waiting Room > Client : Hello World
+Waiting Room > Client : Hello world
 Create New Communication!
-Server Start
+-#-#-# Server Start #-#-#-
 On Waiting...
 On Client Start!
-New client connected: Socket[addr=/192.168.1.11,port=58354,localport=58352]
+New client connected: Socket[addr=/192.168.1.11,port=58286,localport=58281]
 Client added. Total clients: 1
 !-!-!-!-! On Handler Run !-!-!-!-!
-Connected to 192.168.1.11:58352
+Connected to 192.168.1.11:58281
 Prepare Receive Object From Client!
-Spawn: x=1150 | y=38
-Set Player Position: x=1150 | y=38
-Client Send Object > models.ClientObj@710d8378
+Spawn: x=1387 | y=45
+Client Send Object > client.helper.RegisterClient@52a2029b
 $$$$$ Preparing Start Listening For PLayers! $$$$$
 ---------------------------------------------------
 Thread Start Work!
 
 Waiting Room > On Client Connect!
 []
-requirePlayers list is null or empty.
+Something went wrong! -> null
+java.lang.NullPointerException
+        at page.controls.multiplayer.WaitingRoom.lambda$1(WaitingRoom.java:255)
+        at java.lang.Thread.run(Unknown Source)
 >>>>> Receive Server Object Work! <<<<<
-Client Handler > Received object: models.ClientObj@2840f68f
-!!!!! New Client Connect !!!!!
+Client Handler > Received object: client.helper.RegisterClient@23356879
+!!!>> Register New Client <<!!!
+-!-!-!-!-! New Client Connect !-!-!-!-!-
 
-Client Object: models.ClientObj@2840f68f
-Hello World
+Client Object: models.ClientObj@4bcad957
+Hello world
 ==============================
 
 On Broadcast Object!
-Object (Server): models.Communication@7d2b06a4
+Object (Server): models.Communication@13882f1f
 Client Handler (Sender): null
 
-Sending object to receiver: client.helper.ClientHandler@71cd6111
+Sending object to receiver: client.helper.ClientHandler@1dd548cb
 
-Client Handler > Send Object: models.Communication@7d2b06a4
+Client Handler > Send Object: models.Communication@13882f1f
 
 Check Game Start Work!
 >>>>> Start Countdown!
@@ -53,94 +57,200 @@ On Broadcast Object!
 Object (Server): START_COUNTDOWN
 Client Handler (Sender): null
 
-Sending object to receiver: client.helper.ClientHandler@71cd6111
+Sending object to receiver: client.helper.ClientHandler@1dd548cb
 
 Client Handler > Send Object: START_COUNTDOWN
-Received object from server: models.Communication@1ad7e31c
+
+On Broadcast Object!
+Object (Server): client.helper.RegisterClient@23356879
+Client Handler (Sender): client.helper.ClientHandler@1dd548cb
+
+Received object from server: models.Communication@12e0b856
 class models.Communication
-models.Communication@1ad7e31c
+models.Communication@12e0b856
 Received object from server: START_COUNTDOWN
 class java.lang.String
 START_COUNTDOWN
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 Key: NEW_PLAYER
-Adding New Client Object: models.ClientObj@6afb9f9c
-New Client Name: Hello World
-Added Player: models.ClientObj@6afb9f9c
+Adding New Client Object: models.ClientObj@404e6bd0
+New Client Name: Hello world
+Added Player: models.ClientObj@404e6bd0
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 
 Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+
+Waiting Room > On Client Connect!
+[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
 Client Send Object > READY_TO_START
 Client Handler > Received object: READY_TO_START
-On Create Game Center
 
-Waiting Room > On Client Connect!
-[REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@6afb9f9c]]
-Set Needed Killed: 0
--=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-
-*/*/*/*/ ! On Game Thread Start ! /*/*/*/*
-Client Send Object > READY_TO_START
-Client Handler > Received object: READY_TO_START
+On Broadcast Object!
+Object (Server): READY_TO_START
+Client Handler (Sender): client.helper.ClientHandler@1dd548cb
+
 On Create Game Center
-Set Needed Killed: 0
 -=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-
+
+[SERVER_INFO=[192.168.1.11, 58281], PLAYERS_INFO=[models.ClientObj@404e6bd0], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]]
 */*/*/*/ ! On Game Thread Start ! /*/*/*/*
-Player is dead!
-Create Sum Stat Work!
-!>!<!>!<! On Thread Run !>!<!>!<!
-Multiplayer Initialize Moment Work!
-Exception in thread "Thread-10" java.lang.NullPointerException
-        at page.controls.multiplayer.MultiplayerGameContent.initializeMoment(MultiplayerGameContent.java:93)
-        at page.controls.multiplayer.MultiplayerGameContent.run(MultiplayerGameContent.java:134)
+Multiplayer Game Content > On Event Listening...
+
+[models.ClientObj@404e6bd0]
+Multiplayer Game Content > On Client Connect!
+Contents: [SERVER_INFO=[192.168.1.11, 58281], PLAYERS_INFO=[models.ClientObj@404e6bd0], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]]
+Replace Client Object
+Update Client Objs: [models.ClientObj@404e6bd0]
+Multiplayer Game Content > On Client Connect!
+Contents: [SERVER_INFO=[192.168.1.11, 58281], PLAYERS_INFO=[models.ClientObj@404e6bd0], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]]
+Replace Client Object
+Update Client Objs: [models.ClientObj@404e6bd0]
+Player On: x=1387 | y=45
+Client Send Object > models.Communication@12e0b856
+Player On: x=1377 | y=45
+Client Send Object > models.Communication@12e0b856
+Player On: x=1367 | y=45
+Client Send Object > models.Communication@12e0b856
+
+Error sending object: java.awt.image.BufferedImage     
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeArray(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.access$300(Unknown Source)
+        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeFields(Unknown Source)
+        at java.awt.Container.writeObject(Unknown Source)
+        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.lang.reflect.Method.invoke(Unknown Source)
+        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeArray(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.access$300(Unknown Source)
+        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeFields(Unknown Source)
+        at java.awt.Container.writeObject(Unknown Source)
+        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.lang.reflect.Method.invoke(Unknown Source)
+        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeArray(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.access$300(Unknown Source)
+        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeFields(Unknown Source)
+        at java.awt.Container.writeObject(Unknown Source)
+        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.lang.reflect.Method.invoke(Unknown Source)
+        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeArray(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.access$300(Unknown Source)
+        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeFields(Unknown Source)
+        at java.awt.Container.writeObject(Unknown Source)
+        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.lang.reflect.Method.invoke(Unknown Source)
+        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject(Unknown Source)
+        at java.util.concurrent.CopyOnWriteArrayList.writeObject(Unknown Source)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.lang.reflect.Method.invoke(Unknown Source)
+        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject(Unknown Source)
+        at java.util.HashMap.internalWriteEntries(Unknown Source)
+        at java.util.HashMap.writeObject(Unknown Source)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+        at java.lang.reflect.Method.invoke(Unknown Source)
+        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
+        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
+        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
+        at java.io.ObjectOutputStream.writeObject(Unknown Source)
+        at client.Client.clientSideSendObject(Client.java:100)
+        at page.controls.multiplayer.MultiplayerGameContent.onPlayerAction(MultiplayerGameContent.java:214)
+        at page.controls.GameContent.onPlayerActions(GameContent.java:698)
+        at page.controls.GameContent.updateCharacterPosition(GameContent.java:426)
+        at page.controls.GameContent.access$2(GameContent.java:394)
+        at page.controls.GameContent$6.run(GameContent.java:662)
         at java.lang.Thread.run(Unknown Source)
-Player is dead!
-Create Sum Stat Work!
-!>!<!>!<! On Thread Run !>!<!>!<!
-Multiplayer Initialize Moment Work!
-Exception in thread "Thread-95" java.lang.NullPointerException
-        at page.controls.multiplayer.MultiplayerGameContent.initializeMoment(MultiplayerGameContent.java:93)
-        at page.controls.multiplayer.MultiplayerGameContent.run(MultiplayerGameContent.java:134)
-        at java.lang.Thread.run(Unknown Source)
-Dispose Work!
-Dispose Work!

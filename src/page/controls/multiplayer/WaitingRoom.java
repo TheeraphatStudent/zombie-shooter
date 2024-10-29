@@ -18,6 +18,7 @@ import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
 import models.ClientObj;
 import models.Communication;
+import models.Player;
 import page.controls.GameContent;
 import page.home.GameCenter;
 import utils.*;
@@ -281,8 +282,8 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                                 SwingUtilities.invokeLater(() -> addPlayer(newClient));
                             }
 
-                            if (message.equals("START_COUNTDOWN")) {
-                                startCountdown();
+                            if (message.equals("START_COUNTDOWN") || playerCharacters.size() >= numOfPlayers) {
+                                SwingUtilities.invokeLater(this::startCountdown);
                                 client.resetMessage();
 
                             }
@@ -300,12 +301,6 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
                     break;
                 }
             }
-
-            if (playerCharacters.size() >= numOfPlayers) {
-                SwingUtilities.invokeLater(this::startCountdown);
-
-            }
-
         });
 
         playersListeningThread.setDaemon(true);
@@ -315,15 +310,18 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
     private void addPlayer(ClientObj requireClientObj) {
         System.out.println("Added Player: " + requireClientObj);
 
+        Player player = requireClientObj.getPlayer();
+
         // CreateCharacter playerCharacter = new CreateCharacter(false,
         // requireClientObj);
-        CreateCharacter playerCharacter = requireClientObj.getPlayer().getCharacter();
+        CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, requireClientObj);
+        character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
-        content.add(playerCharacter);
+        content.add(character);
         content.revalidate();
         content.repaint();
 
-        playerCharacters.add(playerCharacter);
+        playerCharacters.add(character);
         updatePlayerCount();
     }
 

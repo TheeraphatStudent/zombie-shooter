@@ -59,16 +59,16 @@ public class Client implements Serializable, ManageCharacterElement {
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
-            CreateCharacter character = new CreateCharacter(false, clientObj);
+            // CreateCharacter character = new CreateCharacter(false, clientObj);
 
             int spawnPositionX = new UseCharacter().getCharacterRandSpawnX();
             int spawnPositionY = new UseCharacter().getCharacterRandSpawnY();
 
             System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
 
-            character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+            // character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
-            Player player = new Player(character, null);
+            Player player = new Player(new UseCharacter().getRandomCharacterNo(), null);
             player.setPlayerLocation(spawnPositionX, spawnPositionY);
 
             this.clientObj.setPlayer(player);

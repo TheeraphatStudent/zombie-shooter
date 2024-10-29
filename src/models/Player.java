@@ -11,11 +11,12 @@ import components.character.CreateCharacter;
 
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private boolean isMoveLeft = false;
     private boolean isInfected = false;
 
     private State state;
-    private CreateCharacter character;
+    private int characterNo = 1;
 
     private volatile int xDir = 0;
     private volatile int yDir = 0;
@@ -38,8 +39,8 @@ public class Player implements Serializable {
     private volatile int min = 0;
     private volatile int hour = 0;
 
-    public Player(CreateCharacter character, State state) {
-        this.character = character;
+    public Player(int characterNo, State state) {
+        this.characterNo = characterNo;
         this.state = state;
 
         this.onSurvive = new Timer(1000, e -> {
@@ -86,11 +87,11 @@ public class Player implements Serializable {
 
         if (storeZombieHunt >= ((5 * (rank + 1)) * 2)) {
             System.out.println("Is Rank Up!");
-            rank++;
-            character.setCharacterRank(rank);
+            this.rank++;
+            // character.setCharacterRank(rank);
             
             this.health = this.health + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
-            character.setCharacterHp(this.health);
+            // character.setCharacterHp(this.health);
             System.out.println("Current Health: " + this.health);
 
             this.damage += (5 * state.getLevelState()) + rank+1;
@@ -150,8 +151,8 @@ public class Player implements Serializable {
 
     // <<<<<<<<<< Getter <<<<<<<<<<
 
-    public CreateCharacter getCharacter() {
-        return this.character;
+    public int getCharacterNo() {
+        return this.characterNo;
 
     }
 

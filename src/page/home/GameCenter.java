@@ -30,6 +30,7 @@ import page.controls.GameContent;
 import utils.LoadImage;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseButton;
+import utils.UseCharacter;
 import utils.UseGlobal;
 import utils.UseText;
 import utils.WindowClosingFrameEvent;
@@ -194,10 +195,13 @@ public class GameCenter extends JFrame implements ManageCharacterElement {
         }
 
         private GameContent startGameSinglePlay() {
-                CreateCharacter character = new CreateCharacter(false, client);
-                character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+                // CreateCharacter character = new CreateCharacter(false, client);
+                // character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
-                client.setPlayer(new Player(character, null));
+                Player player = new Player(new UseCharacter().getRandomCharacterNo(), null);
+                player.setPlayerLocation(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100);
+
+                client.setPlayer(player);
 
                 return new GameContent(this, client);
 

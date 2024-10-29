@@ -1,6 +1,9 @@
 package models;
 
-public class State {
+import java.io.Serializable;
+
+public class State implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /*
      * จำนวนของ Zombie = (10 + (players_join * 5)) * (state * 0.5)

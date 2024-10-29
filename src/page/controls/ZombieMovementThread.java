@@ -22,11 +22,11 @@ public class ZombieMovementThread extends Thread {
     private volatile Timer biteTimer;
     private volatile boolean isBiting = false;
 
-    public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, Player player, GameContent content) {
+    public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, Player player, CreateCharacter character, GameContent content) {
         this.zombie = zombie;
         this.behavior = behavior;
         this.player = player;
-        this.character = this.player.getCharacter();
+        this.character = character;
         this.content = content;
 
         biteTimer = new Timer(1000, e -> biteInArea());

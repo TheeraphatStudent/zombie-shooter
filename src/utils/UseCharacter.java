@@ -28,4 +28,9 @@ public class UseCharacter implements ManageCharacterElement {
         return Math.max(0, Math.min(new Random().nextInt(frameHeight - CHARACTER_HEIGHT), frameHeight - CHARACTER_HEIGHT));
 
     }
+
+    public int getRandomCharacterNo() {
+        return new Random().nextInt(10) + 1;
+
+    }
 }

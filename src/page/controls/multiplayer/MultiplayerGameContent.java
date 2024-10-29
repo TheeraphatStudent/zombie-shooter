@@ -108,7 +108,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
             }
 
-            CreateCharacter character = player.getCharacter();
+            CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, parentClient);
             if (!characters.contains(character)) {
                 characters.add(character);
 
@@ -177,7 +177,11 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     
 
     private void replaceClientObjsFromServer() {
+        System.out.println("Replace Client Object");
+        
         List<ClientObj> updatedClientObjs = contents.get("PLAYERS_INFO");
+        System.out.println("Update Client Objs: " + updatedClientObjs);
+
         for (ClientObj updatedClient : updatedClientObjs) {
             updateClientObjList(updatedClient);
         }
@@ -188,7 +192,6 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         // System.out.println("!>!<!>!<! On Thread Run !>!<!>!<!");
         eventListener();
-
         super.run();
 
     }
@@ -199,8 +202,8 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             if (this.parentClient.getId().equals(clientObj.getId())) {
                 System.out.printf("Player On: x=%d | y=%d\n", player.geDirectionX(), player.geDirectionY());
                 
-                clientObj.setPlayer(player); // Update player in the existing `ClientObj`
-                updateClientObjList(clientObj); // Update `clientObjs` list with the updated object
+                clientObj.setPlayer(player); 
+                updateClientObjList(clientObj);
                 break;
             }
         }

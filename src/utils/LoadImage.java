@@ -15,7 +15,7 @@ import javax.swing.Timer;
 
 public class LoadImage {
     public static class BackgroundPanel extends JPanel {
-        // No changes to the logic inside this class
+        private transient BufferedImage bufferedImage ;
         private Image backgroundImage;
         private int xOffset = 0;
         private int yOffset = 0;
@@ -57,7 +57,7 @@ public class LoadImage {
             int imgWidth = backgroundImage.getWidth(this);
             int imgHeight = backgroundImage.getHeight(this);
 
-            BufferedImage bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
+            bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics bg = bufferedImage.getGraphics();
             bg.drawImage(backgroundImage, 0, 0, null);
             bg.dispose();

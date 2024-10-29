@@ -7,6 +7,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 public class UseAlert {
+    private transient BufferedImage successImage;
+
     public void warringAlert(String message) {
         JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
 
@@ -14,7 +16,7 @@ public class UseAlert {
 
     public void successAlert(String message) {
         try {
-            BufferedImage successImage = (BufferedImage) new LoadImage().getImage("resource/images/icon/success.png");
+            successImage = (BufferedImage) new LoadImage().getImage("resource/images/icon/success.png");
             Image scaledImage = successImage.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
             ImageIcon successIcon = new ImageIcon(scaledImage);
 

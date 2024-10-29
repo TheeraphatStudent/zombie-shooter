@@ -3,6 +3,7 @@ package models;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 import javax.swing.JPanel;
 
@@ -21,7 +22,9 @@ interface BulletProps {
 
 }
 
-public class Bullet extends JPanel implements ManageBulletElement {
+public class Bullet extends JPanel implements ManageBulletElement{
+    private static final long serialVersionUID = 1L;
+
     private double x, y;
     private double dx, dy;
     private boolean isActive = true;

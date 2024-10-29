@@ -216,11 +216,16 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ==================== Create Player Character ====================
 
+        player = this.parentClient.getPlayer();
+
         // character = new CreateCharacter(false, this.parentClient);
-        character = this.parentClient.getPlayer().getCharacter();
+        // character = this.parentClient.getPlayer().getCharacter();
+
+        character = new CreateCharacter(player.getCharacterNo(), false, parentClient);
+        character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
         character.setGameContent(this);
 
-        player = this.parentClient.getPlayer();
         player.setState(state);
 
         // ค่าเริ่มต้นเมื่อผู้เล่นเกิดมาครั้งแรก
@@ -239,7 +244,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // content.add(anotherPlayer);
 
         // ! Add Zombie
-        // initializeZombieSpawner();
+        initializeZombieSpawner();
 
         // ==================== Layer ====================
 
@@ -419,6 +424,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         }
 
         if (moved) {
+            // System.out.println("->->->-> Move <-<-<-<-");
+
             this.player.setPlayerLocation(currentX, currentY);
             this.character.setLocation(player.geDirectionX(), player.geDirectionY());
             onPlayerActions(this.player);
@@ -539,7 +546,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         content.add(zombie);
         zombies.add(zombie);
 
-        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, player, this);
+        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, player, character, this);
         zombieThread.start();
 
         zombieThreads.add(zombieThread);
@@ -694,6 +701,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     protected void onPlayerActions(Player actionPlayer) {
         for (PlayerBehaviorListener listener : playerListener) {
             listener.onPlayerAction(actionPlayer);
+            // System.exit(-1);
 
         }
     }
