@@ -212,16 +212,13 @@ public class Server extends ServerHelper implements Serializable {
         }
     }
 
-    // private void closeServer() {
-    // try {
-    // for (ClientHandler client : clients) {
-    // client.close();
-    // }
-    // serverSocket.close();
-    // } catch (IOException e) {
-    // System.out.println("Error closing server: " + e.getMessage());
-    // }
-    // }
+    public void closeServer() {
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            System.out.println("Error closing server: " + e.getMessage());
+        }
+    }
 
     // Getters
 
