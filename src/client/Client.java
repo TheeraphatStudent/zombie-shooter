@@ -99,7 +99,8 @@ public class Client implements Serializable, ManageCharacterElement {
             synchronized (objOutStream) {
                 objOutStream.writeObject(object);
                 objOutStream.flush();
-                objOutStream.reset();
+                // objOutStream.reset();
+                // objOutStream.close();
             }
         } catch (IOException e) {
             System.out.println("Error sending object: " + e.getMessage());

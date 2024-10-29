@@ -289,7 +289,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         double deltaY = componentPos.y - weaponSpinY;
 
         this.weaponAngle = Math.atan2(deltaY, deltaX);
-        this.weapon.repaint();
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     public void onShootBullet(Point mousePos) {

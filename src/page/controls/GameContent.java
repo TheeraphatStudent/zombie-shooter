@@ -243,7 +243,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // content.add(anotherPlayer);
 
         // ! Add Zombie
-        initializeZombieSpawner();
+        // initializeZombieSpawner();
+        // SwingUtilities.invokeLater(this::initializeZombieSpawner);
 
         // ==================== Layer ====================
 
@@ -404,31 +405,29 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         if (isUpPressed && currentY - MOVEMENT_SPEED >= 0) {
             currentY -= MOVEMENT_SPEED;
             moved = true;
-
         }
-        if (isDownPressed && currentY + MOVEMENT_SPEED + character.getHeight() <= getHeight()) {
+        if (isDownPressed && currentY + MOVEMENT_SPEED + CHARACTER_HEIGHT <= getHeight()) {
             currentY += MOVEMENT_SPEED;
             moved = true;
-
         }
         if (isLeftPressed && currentX - MOVEMENT_SPEED >= 0) {
             currentX -= MOVEMENT_SPEED;
             moved = true;
-
         }
-        if (isRightPressed && currentX + MOVEMENT_SPEED + character.getWidth() <= getWidth()) {
+        if (isRightPressed && currentX + MOVEMENT_SPEED + CHARACTER_WIDTH <= getWidth()) {
             currentX += MOVEMENT_SPEED;
             moved = true;
-
         }
 
+        final int moveX = currentX;
+        final int moveY = currentY;
+
         if (moved) {
-            // System.out.println("->->->-> Move <-<-<-<-");
-
-            this.player.setPlayerLocation(currentX, currentY);
-            this.character.setLocation(player.geDirectionX(), player.geDirectionY());
-            onPlayerActions(this.player);
-
+            SwingUtilities.invokeLater(() -> {
+                player.setPlayerLocation(moveX, moveY);
+                character.setLocation(player.geDirectionX(), player.geDirectionY());
+                onPlayerActions(player);
+            });
         }
     }
 
@@ -582,7 +581,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         /*
          * ==========================================
-         * ===========   Mouse Clicked    ===========
+         * =========== Mouse Clicked ===========
          * ==========================================
          */
 
@@ -619,18 +618,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     }
 
     public void revalidateContent() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                content.revalidate();
-                content.repaint();
-
-                layers.revalidate();
-                layers.repaint();
-
-            }
-        });
+        SwingUtilities.invokeLater(this::repaint);
 
     }
 
@@ -703,7 +691,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     protected void onPlayerActions(Player actionPlayer) {
         for (PlayerBehaviorListener listener : playerListener) {
             listener.onPlayerAction(actionPlayer);
-            // System.exit(-1);
 
         }
     }
