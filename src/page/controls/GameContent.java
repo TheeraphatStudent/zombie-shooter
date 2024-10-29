@@ -236,7 +236,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         player.setPlayerHealth(playerHealth);
 
         character.setCharacterHp(player.getPlayerHealth());
-
         content.add(character);
 
         // CreateCharacter anotherPlayer = new CreateCharacter(false, client);
@@ -626,6 +625,9 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             public void run() {
                 content.revalidate();
                 content.repaint();
+
+                layers.revalidate();
+                layers.repaint();
 
             }
         });

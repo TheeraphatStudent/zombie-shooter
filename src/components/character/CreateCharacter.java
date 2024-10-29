@@ -48,7 +48,7 @@ interface CreateCharacterProps {
 public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
 
-    ClientObj client;
+    private ClientObj client;
 
     // ON Character
     private JLayeredPane base;
@@ -81,6 +81,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(int characterProfile, boolean isInfected, ClientObj clientObj) {
+        System.out.println("Character Name: " + clientObj.getClientName() + "\n");
+
         // super();
         this.characterProfile = characterProfile;
 
@@ -185,6 +187,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         compressContent.add(weapon, JLayeredPane.DRAG_LAYER);
 
         add(compressContent);
+
+    }
+
+    public ClientObj getInitClientObj() {
+        return this.client;
 
     }
 
