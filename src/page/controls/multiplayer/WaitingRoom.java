@@ -315,7 +315,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         // CreateCharacter playerCharacter = new CreateCharacter(false,
         // requireClientObj);
         CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, requireClientObj);
-        character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        character.setBounds(player.getDirectionX(), player.getDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
         content.add(character);
         content.revalidate();

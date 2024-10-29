@@ -79,14 +79,13 @@ public class ClientHandler implements Runnable, Serializable {
                 this.receivedObject = objectIn.readObject();
                 System.out.println("Client Handler > Received object: " + this.receivedObject.toString());
 
-
                 // Added New Client
                 if (this.receivedObject instanceof RegisterClient) {
                     System.out.println("!!!>> Register New Client <<!!!");
                     server.handleNewConnection(this);
 
                 }
-                
+
                 server.broadcastObject(this.receivedObject, null);
 
             }
@@ -98,7 +97,6 @@ public class ClientHandler implements Runnable, Serializable {
     public void sendObject(Object object) {
         try {
             synchronized (objectOut) {
-                System.out.println();
                 System.out.println("Client Handler > Send Object: " + object);
 
                 objectOut.writeObject(object);
@@ -108,7 +106,19 @@ public class ClientHandler implements Runnable, Serializable {
         } catch (IOException e) {
             System.out.println("Error sending object: " + e.getMessage());
             e.printStackTrace();
+            handleDisconnection();
         }
+    }
+
+    private void handleDisconnection() {
+        try {
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                clientSocket.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error closing socket: " + e.getMessage());
+        }
+        server.removeClient(this); 
     }
 
     public void setReady(boolean isReady) {

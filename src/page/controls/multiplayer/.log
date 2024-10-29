@@ -1,256 +1,217 @@
-)(+)(+)( Create new server )(+)(+)(
-Create New Communication!
-Server IP: 192.168.1.11
-Server is listening on port 58281
-Client Key Id: 555252dd-42ba-4dca-abed-96dd502d6b6c
-Game Center > Client: Hello world
-Image not found
-Join Room > Client: Hello world
-Playernum: 1
-Server IP: 192.168.1.11, Server Port: 58281
-Navigating to WaitingRoom...
-Prepare for host!
-Create New Communication!
-Waiting Room > Client : Hello world
-Create New Communication!
--#-#-# Server Start #-#-#-
-On Waiting...
-On Client Start!
-New client connected: Socket[addr=/192.168.1.11,port=58286,localport=58281]
-Client added. Total clients: 1
-!-!-!-!-! On Handler Run !-!-!-!-!
-Connected to 192.168.1.11:58281
-Prepare Receive Object From Client!
-Spawn: x=1387 | y=45
-Client Send Object > client.helper.RegisterClient@52a2029b
-$$$$$ Preparing Start Listening For PLayers! $$$$$
----------------------------------------------------
-Thread Start Work!
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@6f956e9a
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@2d063d3b, models.ClientObj@76aa3ed0], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@2d063d3b, models.ClientObj@76aa3ed0]}
+????? Player: x=687 | y=340
 
-Waiting Room > On Client Connect!
-[]
-Something went wrong! -> null
-java.lang.NullPointerException
-        at page.controls.multiplayer.WaitingRoom.lambda$1(WaitingRoom.java:255)
-        at java.lang.Thread.run(Unknown Source)
->>>>> Receive Server Object Work! <<<<<
-Client Handler > Received object: client.helper.RegisterClient@23356879
-!!!>> Register New Client <<!!!
--!-!-!-!-! New Client Connect !-!-!-!-!-
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=687 | y=340
+Received object from server: models.Communication@9d488d
+????? Player: x=687 | y=340
 
-Client Object: models.ClientObj@4bcad957
-Hello world
-==============================
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@443817ba, models.ClientObj@584b15e3], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@443817ba, models.ClientObj@584b15e3]}
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=687 | y=340
+????? Player: x=687 | y=340
 
-On Broadcast Object!
-Object (Server): models.Communication@13882f1f
-Client Handler (Sender): null
+Received object from server: models.Communication@7f30ec84
+Updated player for client: Client
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@15030acf, models.ClientObj@11024a12], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@15030acf, models.ClientObj@11024a12]}
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@1166b1dc
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@694a2bb8, models.ClientObj@6412012c], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@694a2bb8, models.ClientObj@6412012c]}
+Received object from server: models.Communication@67c38566
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@430f2013, models.ClientObj@7b20c421], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@430f2013, models.ClientObj@7b20c421]}
+Set Player Location: x=677 | y=350
+????? Player: x=677 | y=350
 
-Sending object to receiver: client.helper.ClientHandler@1dd548cb
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+????? Player: x=677 | y=350
 
-Client Handler > Send Object: models.Communication@13882f1f
+Received object from server: models.Communication@fcfa108
+Updated player for client: Client
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@74dcfd22, models.ClientObj@4e695412], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@74dcfd22, models.ClientObj@4e695412]}
+Client Send Object > models.Communication@c744215
+Set Player Location: x=677 | y=350
+????? Player: x=677 | y=350
 
-Check Game Start Work!
->>>>> Start Countdown!
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+????? Player: x=677 | y=350
 
-On Broadcast Object!
-Object (Server): START_COUNTDOWN
-Client Handler (Sender): null
+Updated player for client: Client
+Received object from server: models.Communication@33959032
+Client Send Object > models.Communication@c744215
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@4120a0a9, models.ClientObj@52066042], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@4120a0a9, models.ClientObj@52066042]}
+Set Player Location: x=677 | y=350
+????? Player: x=677 | y=350
 
-Sending object to receiver: client.helper.ClientHandler@1dd548cb
+Updated player for client: Client
+Received object from server: models.Communication@56cb77d4
+Client Send Object > models.Communication@c744215
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@49c0793f, models.ClientObj@d21ad46], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@49c0793f, models.ClientObj@d21ad46]}
+Set Player Location: x=677 | y=350
+????? Player: x=677 | y=350
 
-Client Handler > Send Object: START_COUNTDOWN
+Received object from server: models.Communication@6cc4d8d0
+Updated player for client: Client
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@613c674b, models.ClientObj@2bffe3d2], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@613c674b, models.ClientObj@2bffe3d2]}
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@2bb42076
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@617c6f88, models.ClientObj@63f85ad3], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@617c6f88, models.ClientObj@63f85ad3]}
+Received object from server: models.Communication@374dd40d
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@3df0e502, models.ClientObj@3f72dd1b], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@3df0e502, models.ClientObj@3f72dd1b]}
+Received object from server: models.Communication@1e7d36e4
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@4749649a, models.ClientObj@7dab5184], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@5498d12f, models.ClientObj@23a5074e]}
+????? Player: x=677 | y=350
 
-On Broadcast Object!
-Object (Server): client.helper.RegisterClient@23356879
-Client Handler (Sender): client.helper.ClientHandler@1dd548cb
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=667 | y=360
+????? Player: x=667 | y=360
 
-Received object from server: models.Communication@12e0b856
-class models.Communication
-models.Communication@12e0b856
-Received object from server: START_COUNTDOWN
-class java.lang.String
-START_COUNTDOWN
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=667 | y=360
+????? Player: x=667 | y=360
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
-Key: NEW_PLAYER
-Adding New Client Object: models.ClientObj@404e6bd0
-New Client Name: Hello world
-Added Player: models.ClientObj@404e6bd0
+Updated player for client: Client
+Received object from server: models.Communication@2f44ca14
+Client Send Object > models.Communication@c744215
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@8c49909, models.ClientObj@1a473097], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@8c49909, models.ClientObj@1a473097]}
+????? Player: x=667 | y=360
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@1153dbe6
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@184eb7b2, models.ClientObj@34ee7963], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@184eb7b2, models.ClientObj@34ee7963]}
+Set Player Location: x=667 | y=360
+????? Player: x=667 | y=360
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@170e34e1
+Set Player Location: x=667 | y=360
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@188d510d, models.ClientObj@75938689], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@188d510d, models.ClientObj@75938689]}
+????? Player: x=667 | y=360
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@32f1dc39
+????? Player: x=667 | y=360
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@543e5fba, models.ClientObj@26497909], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@543e5fba, models.ClientObj@26497909]}
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@4f870487
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@73ab195a, models.ClientObj@554e4b1a], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@73ab195a, models.ClientObj@554e4b1a]}
+Received object from server: models.Communication@3822e18b
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@4f767934, models.ClientObj@64bcc849], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@4f767934, models.ClientObj@64bcc849]}
+Received object from server: models.Communication@430d495f
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@6c0cc60c, models.ClientObj@10cfbd60], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@6c0cc60c, models.ClientObj@10cfbd60]}
+Set Player Location: x=657 | y=370
+????? Player: x=657 | y=370
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=657 | y=370
+????? Player: x=657 | y=370
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+????? Player: x=657 | y=370
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Received object from server: models.Communication@12b3d1b0
+Client Send Object > models.Communication@c744215
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@3b5d2508, models.ClientObj@31eba8c9], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@3b5d2508, models.ClientObj@31eba8c9]}
+Set Player Location: x=657 | y=370
+????? Player: x=657 | y=370
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Received object from server: models.Communication@5c223729
+Client Send Object > models.Communication@c744215
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@5090434c, models.ClientObj@2b75933], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@5090434c, models.ClientObj@2b75933]}
+Set Player Location: x=657 | y=370
+????? Player: x=657 | y=370
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@6e76144c
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@2320fdd4, models.ClientObj@717840df], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@2320fdd4, models.ClientObj@717840df]}
+????? Player: x=657 | y=370
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@49bef102
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@17b4480d, models.ClientObj@33ded972], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@17b4480d, models.ClientObj@33ded972]}
+Received object from server: models.Communication@13096e
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@3e1bde8f, models.ClientObj@b5a0d61], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@3e1bde8f, models.ClientObj@b5a0d61]}
+Received object from server: models.Communication@4e0a4031
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@56ca78e7, models.ClientObj@36c53b17], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@56ca78e7, models.ClientObj@36c53b17]}
+Set Player Location: x=647 | y=380
+????? Player: x=647 | y=380
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=647 | y=380
+????? Player: x=647 | y=380
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+????? Player: x=647 | y=380
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@6daf19ab
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@7138c7e7, models.ClientObj@74308467], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@7138c7e7, models.ClientObj@74308467]}
+Set Player Location: x=647 | y=380
+????? Player: x=647 | y=380
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@6bb21475
+????? Player: x=647 | y=380
 
-Waiting Room > On Client Connect!
-[SERVER_INFO=[192.168.1.11, 58281], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]] 
-Client Send Object > READY_TO_START
-Client Handler > Received object: READY_TO_START
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@7e452ae9, models.ClientObj@49f5dd39], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@7e452ae9, models.ClientObj@49f5dd39]}
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=647 | y=380
+Received object from server: models.Communication@39166bdc
+????? Player: x=647 | y=380
 
-On Broadcast Object!
-Object (Server): READY_TO_START
-Client Handler (Sender): client.helper.ClientHandler@1dd548cb
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@427cc137, models.ClientObj@1539b9f3], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@427cc137, models.ClientObj@1539b9f3]}
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@7242b278
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@78807f67, models.ClientObj@5c516c39], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@78807f67, models.ClientObj@5c516c39]}
+Received object from server: models.Communication@47fb061
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@63c903e4, models.ClientObj@184923bd], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@63c903e4, models.ClientObj@184923bd]}
+Received object from server: models.Communication@4faeb429
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@362be905, models.ClientObj@1d560a07], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@362be905, models.ClientObj@1d560a07]}
+Set Player Location: x=637 | y=390
+????? Player: x=637 | y=390
 
-On Create Game Center
--=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Received object from server: models.Communication@4c5396db
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@76e66c84, models.ClientObj@1f6cd09c], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@76e66c84, models.ClientObj@1f6cd09c]}
+????? Player: x=637 | y=390
 
-[SERVER_INFO=[192.168.1.11, 58281], PLAYERS_INFO=[models.ClientObj@404e6bd0], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]]
-*/*/*/*/ ! On Game Thread Start ! /*/*/*/*
-Multiplayer Game Content > On Event Listening...
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=637 | y=390
+????? Player: x=637 | y=390
 
-[models.ClientObj@404e6bd0]
-Multiplayer Game Content > On Client Connect!
-Contents: [SERVER_INFO=[192.168.1.11, 58281], PLAYERS_INFO=[models.ClientObj@404e6bd0], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]]
-Replace Client Object
-Update Client Objs: [models.ClientObj@404e6bd0]
-Multiplayer Game Content > On Client Connect!
-Contents: [SERVER_INFO=[192.168.1.11, 58281], PLAYERS_INFO=[models.ClientObj@404e6bd0], REQUIRE_PLAYERS=[1], NEW_PLAYER=[models.ClientObj@404e6bd0]]
-Replace Client Object
-Update Client Objs: [models.ClientObj@404e6bd0]
-Player On: x=1387 | y=45
-Client Send Object > models.Communication@12e0b856
-Player On: x=1377 | y=45
-Client Send Object > models.Communication@12e0b856
-Player On: x=1367 | y=45
-Client Send Object > models.Communication@12e0b856
+Updated player for client: Client
+Client Send Object > models.Communication@c744215
+Set Player Location: x=637 | y=390
+????? Player: x=637 | y=390
 
-Error sending object: java.awt.image.BufferedImage     
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeArray(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.access$300(Unknown Source)
-        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeFields(Unknown Source)
-        at java.awt.Container.writeObject(Unknown Source)
-        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-        at java.lang.reflect.Method.invoke(Unknown Source)
-        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeArray(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.access$300(Unknown Source)
-        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeFields(Unknown Source)
-        at java.awt.Container.writeObject(Unknown Source)
-        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-        at java.lang.reflect.Method.invoke(Unknown Source)
-        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeArray(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.access$300(Unknown Source)
-        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeFields(Unknown Source)
-        at java.awt.Container.writeObject(Unknown Source)
-        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-        at java.lang.reflect.Method.invoke(Unknown Source)
-        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeArray(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.access$300(Unknown Source)
-        at java.io.ObjectOutputStream$PutFieldImpl.writeFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeFields(Unknown Source)
-        at java.awt.Container.writeObject(Unknown Source)
-        at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-        at java.lang.reflect.Method.invoke(Unknown Source)
-        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject(Unknown Source)
-        at java.util.concurrent.CopyOnWriteArrayList.writeObject(Unknown Source)
-        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-        at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-        at java.lang.reflect.Method.invoke(Unknown Source)
-        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject(Unknown Source)
-        at java.util.HashMap.internalWriteEntries(Unknown Source)
-        at java.util.HashMap.writeObject(Unknown Source)
-        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-        at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-        at java.lang.reflect.Method.invoke(Unknown Source)
-        at java.io.ObjectStreamClass.invokeWriteObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.defaultWriteFields(Unknown Source)
-        at java.io.ObjectOutputStream.writeSerialData(Unknown Source)
-        at java.io.ObjectOutputStream.writeOrdinaryObject(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject0(Unknown Source)
-        at java.io.ObjectOutputStream.writeObject(Unknown Source)
-        at client.Client.clientSideSendObject(Client.java:100)
-        at page.controls.multiplayer.MultiplayerGameContent.onPlayerAction(MultiplayerGameContent.java:214)
-        at page.controls.GameContent.onPlayerActions(GameContent.java:698)
-        at page.controls.GameContent.updateCharacterPosition(GameContent.java:426)
-        at page.controls.GameContent.access$2(GameContent.java:394)
-        at page.controls.GameContent$6.run(GameContent.java:662)
-        at java.lang.Thread.run(Unknown Source)
+Received object from server: models.Communication@32c7e744
+Updated player for client: Client
+{SERVER_INFO=[192.168.1.11, 53940], PLAYERS_INFO=[models.ClientObj@62f25a89, models.ClientObj@27b5981f], REQUIRE_PLAYERS=[2], NEW_PLAYER=[models.ClientObj@62f25a89, models.ClientObj@27b5981f]}
+Client Send Object > models.Communication@c744215
+????? Player: x=637 | y=390

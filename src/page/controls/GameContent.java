@@ -222,7 +222,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // character = this.parentClient.getPlayer().getCharacter();
 
         character = new CreateCharacter(player.getCharacterNo(), false, parentClient);
-        character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        character.setBounds(player.getDirectionX(), player.getDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
         character.setGameContent(this);
 
@@ -425,7 +425,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         if (moved) {
             SwingUtilities.invokeLater(() -> {
                 player.setPlayerLocation(moveX, moveY);
-                character.setLocation(player.geDirectionX(), player.geDirectionY());
+                character.setLocation(player.getDirectionX(), player.getDirectionY());
+
                 onPlayerActions(player);
             });
         }

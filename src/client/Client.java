@@ -147,14 +147,12 @@ public class Client implements Serializable, ManageCharacterElement {
     }
 
     private void receiveServerObject() {
-        System.out.println(">>>>> Receive Server Object Work! <<<<<");
+        // System.out.println(">>>>> Receive Server Object Work! <<<<<");
         try {
             while (isConnected && !clientSocket.isClosed()) {
                 Object object = (Object) objInStream.readObject();
                 if (object != null) {
                     System.out.println("Received object from server: " + object);
-                    System.out.println(object.getClass());
-                    System.out.println(object.toString());
 
                     if (object instanceof Communication) {
                         this.communication = (Communication) object;
