@@ -48,8 +48,8 @@ interface CreateCharacterProps {
 public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
 
-    ClientObj client;
-    
+    private ClientObj client;
+
     // ON Character
     private JLayeredPane base;
     private JLayeredPane compressContent;
@@ -62,7 +62,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private boolean isInfected = false;
     private int x, y;
     private int hp = 100;
-    private int useCharacter;
     private boolean isMoveLeft = false;
     private boolean isSurvive = true;
 
@@ -78,11 +77,14 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     private GameContent gameContent;
     private CreateHpBar hpBar;
 
-    // Models
+    private int characterProfile = 1;
 
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
-    public CreateCharacter(boolean isInfected, ClientObj clientObj) {
+    public CreateCharacter(int characterProfile, boolean isInfected, ClientObj clientObj) {
+        System.out.println("Character Name: " + clientObj.getClientName() + "\n");
+
         // super();
+        this.characterProfile = characterProfile;
 
         this.isSurvive = !isInfected;
 
@@ -91,8 +93,6 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         setLayout(null);
         setOpaque(false);
         setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
-
-        this.useCharacter = (int) (Math.random() * 10) + 1;
 
         // [document/images/enemy.png]
 
@@ -147,7 +147,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         base.add(playerName);
 
         // >>>>>>>>>> Character 🗣️
-        character = new CreateCharacterImage(useCharacter, !isInfected, this.isMoveLeft);
+        character = new CreateCharacterImage(this.characterProfile, !isInfected, this.isMoveLeft);
 
         // ! Character set content size
         character.setBounds(CHARACTER_CENTER_XY);
@@ -188,6 +188,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         add(compressContent);
 
+    }
+
+    public ClientObj getInitClientObj() {
+        return this.client;
 
     }
 
@@ -205,7 +209,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         setOpaque(false);
         setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
-        this.useCharacter = (int) (Math.random() * 10) + 1;
+        int useCharacter = (int) (Math.random() * 10) + 1;
 
         // JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
         // "", Color.WHITE, null, Font.PLAIN);
@@ -276,7 +280,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
     public void updateWeaponAngle(Point mousePos) {
-        Point componentPos = SwingUtilities.convertPoint(getParent(), mousePos, this);
+        Point componentPos = SwingUtilities.convertPoint(this.getParent(), mousePos, this);
 
         int weaponSpinX = character.getX() + 40;
         int weaponSpinY = character.getY() + 70;
@@ -284,20 +288,13 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         double deltaX = componentPos.x - weaponSpinX;
         double deltaY = componentPos.y - weaponSpinY;
 
-        weaponAngle = Math.atan2(deltaY, deltaX);
-
-        // if (isMoveLeft) {
-        // weaponAngle = Math.PI - weaponAngle;
-
-        // }
-
-        weapon.repaint();
+        this.weaponAngle = Math.atan2(deltaY, deltaX);
+        this.weapon.repaint();
     }
 
     public void onShootBullet(Point mousePos) {
         if (!isSurvive) {
             return;
-
         }
 
         // ตำแหน่งปืน
@@ -347,15 +344,14 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     public void setCharacterRank(int rank) {
         System.out.println("Set Character Rank Work!");
         System.out.println(rank);
-    
+
         this.currentRank = rank;
-        this.displayText = displayName + " - rank " + this.currentRank;  // Update display text
-    
-        playerName.setText(displayText); 
-    
+        this.displayText = displayName + " - rank " + this.currentRank; // Update display text
+
+        playerName.setText(displayText);
+
         revalidateContent();
     }
-    
 
     // <<<<<<<<<< Getter <<<<<<<<<<
 
@@ -368,6 +364,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         return this.hp;
 
     }
+
     private void revalidateContent() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

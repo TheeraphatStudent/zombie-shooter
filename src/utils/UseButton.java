@@ -30,6 +30,7 @@ import javax.imageio.ImageIO;
 
 public class UseButton {
     private int fontSize = 16;
+    private transient BufferedImage iconImage;
 
     public UseButton() {
     }
@@ -65,7 +66,7 @@ public class UseButton {
             if (is == null) {
                 System.out.println("Image not found");
             } else {
-                BufferedImage iconImage = ImageIO.read(is);
+                iconImage = ImageIO.read(is);
                 int buttonWidth = btn.getPreferredSize().width;
                 int buttonHeight = btn.getPreferredSize().height;
                 Image resizedImage = iconImage.getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
@@ -116,7 +117,7 @@ public class UseButton {
                     System.out.println("Image not found");
 
                 } else {
-                    BufferedImage iconImage = ImageIO.read(is);
+                    iconImage = ImageIO.read(is);
                     int buttonWidth = btn.getPreferredSize().width;
                     int buttonHeight = btn.getPreferredSize().height;
                     Image resizedImage = iconImage.getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);

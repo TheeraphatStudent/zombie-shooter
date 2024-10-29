@@ -12,8 +12,7 @@ import java.awt.Graphics2D;
 
 import utils.LoadImage;
 
-public class CreateCharacterImage extends JPanel implements ManageCharacterElement, Serializable {
-    private static final long serialVersionUID = 1L;
+public class CreateCharacterImage extends JPanel implements ManageCharacterElement {
 
     private boolean isSurvive;
     private boolean isMoveLeft;

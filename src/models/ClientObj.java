@@ -1,11 +1,13 @@
 package models;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import client.Server;
 
 public class ClientObj implements Serializable {
     private static final long serialVersionUID = 1L;
+    private String keyId = "";
 
     private String clientName = "";
     private transient Server serverOnClientSide = null;
@@ -14,7 +16,10 @@ public class ClientObj implements Serializable {
 
     public ClientObj(String clientName, Server serverOnClientSide) {
         this.clientName = clientName;
-        this.serverOnClientSide = serverOnClientSide;
+        this.serverOnClientSide = serverOnClientSide; 
+        this.keyId = UUID.randomUUID().toString();
+
+        System.out.println("Client Key Id: " + this.keyId);
 
     }
 
@@ -44,6 +49,11 @@ public class ClientObj implements Serializable {
 
     public Player getPlayer() {
         return this.player;
+
+    }
+
+    public String getId() {
+        return this.keyId;
 
     }
 }

@@ -6,13 +6,13 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import client.helper.ClientHandler;
-import client.helper.Communication;
+import client.helper.RegisterClient;
 import client.helper.ServerHelper;
-import components.character.CreateCharacter;
 import models.ClientObj;
-import models.Player;
+import models.Communication;
 
-public class Server extends ServerHelper {
+public class Server extends ServerHelper implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final ServerSocket serverSocket;
     private final int serverPort;
@@ -33,7 +33,7 @@ public class Server extends ServerHelper {
 
     public Server() {
         // super();
-        System.out.println("Create new server");
+        System.out.println(")(+)(+)( Create new server )(+)(+)(");
         this.serverPort = getAlreadyPort();
         this.serverIp = getServerIp();
 
@@ -44,6 +44,12 @@ public class Server extends ServerHelper {
             System.out.println("Server IP: " + serverIp);
             System.out.println("Server is listening on port " + serverPort);
 
+            List<String> serverInfo = new ArrayList<String>();
+            serverInfo.add(serverIp);
+            serverInfo.add(String.valueOf(serverPort));
+
+            this.communication.setContent("SERVER_INFO", serverInfo);
+
         } catch (IOException e) {
             throw new RuntimeException("Error creating server socket: " + e.getMessage(), e);
 
@@ -51,7 +57,7 @@ public class Server extends ServerHelper {
     }
 
     public void start() {
-        System.out.println("Server Start");
+        System.out.println("-#-#-# Server Start #-#-#-");
 
         // Start server input handler in daemon thread
         Thread inputHandler = new Thread(this::handleServerInput);
@@ -108,15 +114,15 @@ public class Server extends ServerHelper {
     }
 
     public synchronized void handleNewConnection(ClientHandler newClient) {
-        System.out.println("!!!!! New Client Connect !!!!!\n");
+        System.out.println("-!-!-!-!-! New Client Connect !-!-!-!-!-\n");
 
         ClientObj clientObj = null;
 
-        if (newClient.getClientReceiveObject() instanceof ClientObj) {
-            clientObj = (ClientObj) newClient.getClientReceiveObject();
-            System.out.println("Client Object: " + clientObj);
+        if (newClient.getClientReceiveObject() instanceof RegisterClient) {
+            RegisterClient login = (RegisterClient) newClient.getClientReceiveObject();
+            clientObj = login.getAuthClient();
 
-            clientObj.setPlayer(new Player(null, null));
+            System.out.println("Client Object: " + clientObj);
 
             if (clientObj != null) {
                 clientObjs.add(clientObj);

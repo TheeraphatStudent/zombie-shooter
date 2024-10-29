@@ -13,7 +13,7 @@ import utils.LoadImage;
 
 public class DrawMouse extends JPanel {
 
-    private BufferedImage cursorImage;
+    private transient BufferedImage cursorImage;
 
     public DrawMouse() {
         setOpaque(false);

@@ -1,7 +1,10 @@
 package models;
 
+import java.awt.Point;
 import java.io.Serializable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import components.character.CreateCharacter;
@@ -9,20 +12,25 @@ import components.character.CreateCharacter;
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private boolean isMoveLeft = false;
+    private boolean isInfected = false;
+
     private State state;
-    private CreateCharacter character;
+    private int characterNo = 1;
 
     private volatile int xDir = 0;
     private volatile int yDir = 0;
 
     private volatile int zombieHunt = 0;
+    private volatile Point weaponPoint;
 
+    private CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private volatile int damage = 10;
     private volatile int health = 100;
+    private int maxHealth = 100;
 
     // ใช้สำหรับอัพแรงค์
     private volatile int storeZombieHunt = 0;
-
     private volatile int rank = 0;
 
     // On Survive
@@ -31,8 +39,8 @@ public class Player implements Serializable {
     private volatile int min = 0;
     private volatile int hour = 0;
 
-    public Player(CreateCharacter character, State state) {
-        this.character = character;
+    public Player(int characterNo, State state) {
+        this.characterNo = characterNo;
         this.state = state;
 
         this.onSurvive = new Timer(1000, e -> {
@@ -63,17 +71,27 @@ public class Player implements Serializable {
 
     // >>>>>>>>>> Setter >>>>>>>>>>
 
+    public void setState(State state) {
+        this.state = state;
+
+    }
+
+    public void setBullets(CopyOnWriteArrayList<Bullet> bullets) {
+        this.bullets = bullets;
+
+    }
+
     public void addZombieWasKilled(int number) {
         this.zombieHunt += number;
         this.storeZombieHunt += number;
 
         if (storeZombieHunt >= ((5 * (rank + 1)) * 2)) {
             System.out.println("Is Rank Up!");
-            rank++;
-            character.setCharacterRank(rank);
+            this.rank++;
+            // character.setCharacterRank(rank);
             
             this.health = this.health + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
-            character.setCharacterHp(this.health);
+            // character.setCharacterHp(this.health);
             System.out.println("Current Health: " + this.health);
 
             this.damage += (5 * state.getLevelState()) + rank+1;
@@ -92,18 +110,51 @@ public class Player implements Serializable {
 
     }
 
+    // -----* Player Health *-----
+
     public void setPlayerHealth(int newHealth) {
         this.health = newHealth;
 
     }
 
-    public void setPlayerDirecter(int x, int y) {
+    public void setMaxPlayerHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+
+    }
+
+    // -----* Player Position *-----
+
+    public void setPlayerLocation(int x, int y) {
+        // System.out.printf("Set Player Location: x=%d | y=%d\n", x, y);
+
         this.xDir = x;
         this.yDir = y;
 
     }
 
+    // -----* Player Movement *-----
+
+    public void setWeaponPoint(Point point) {
+        this.weaponPoint = point;
+
+    }
+
+    public void setIsPlayerMoveLeft(boolean isMovedLeft) {
+        this.isMoveLeft = isMovedLeft;
+
+    }
+    
+    public void setInfectedPlayer(boolean isInfected) {
+        this.isInfected = isInfected;
+
+    }
+
     // <<<<<<<<<< Getter <<<<<<<<<<
+
+    public int getCharacterNo() {
+        return this.characterNo;
+
+    }
 
     public int getPlayerBulletDamage() {
         return this.damage;
@@ -112,6 +163,11 @@ public class Player implements Serializable {
 
     public int getPlayerHealth() {
         return this.health;
+
+    }
+
+    public int getMaxPlayerHealth() {
+        return this.maxHealth;
 
     }
 
@@ -147,6 +203,31 @@ public class Player implements Serializable {
 
     public int geDirectionY() {
         return this.yDir;
+
+    }
+
+    public State getState() {
+        return this.state;
+
+    }
+
+    public CopyOnWriteArrayList<Bullet> getBullets() {
+        return this.bullets;
+
+    }
+
+    public Point getWeaponPoint() {
+        return this.weaponPoint;
+
+    }
+
+    public boolean getPlayerIsMovedLeft() {
+        return this.isMoveLeft;
+
+    }
+
+    public boolean getInfectedStatus() {
+        return this.isInfected;
 
     }
 

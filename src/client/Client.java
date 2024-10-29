@@ -3,40 +3,42 @@ package client;
 import java.io.*;
 import java.net.*;
 import java.util.Map;
+import java.util.Random;
 import java.util.List;
 import java.util.concurrent.*;
 
-import client.helper.Communication;
+import client.helper.RegisterClient;
+import components.character.CreateCharacter;
+import components.character.ManageCharacterElement;
 import models.ClientObj;
+import models.Communication;
+import models.Player;
+import utils.UseCharacter;
+import utils.UseGlobal;
 
-public class Client implements Serializable {
+public class Client implements Serializable, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
+    private RegisterClient register;
 
-    private Socket clientSocket;
+    private transient Socket clientSocket;
     private ObjectOutputStream objOutStream;
     private ObjectInputStream objInStream;
 
     private String serverIp;
     private int serverPort;
 
-    // ! Communication Contain
     private Communication communication;
     private String message = "";
 
-    // Queue
-    // private BlockingQueue<String> messageQueue;
-    // private BlockingQueue<Object> objectQueue;
+    private boolean isConnected;
+    private transient ClientObj clientObj;
 
-    private volatile boolean isConnected;
-
-    // Character
-    private ClientObj clientObj;
+    // Flag to track if RegisterClient has been sent
+    private boolean isRegister = false;
 
     public Client(String serverIp, int serverPort, ClientObj clientObj) {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
-        // this.messageQueue = new LinkedBlockingQueue<>();
-        // this.objectQueue = new LinkedBlockingQueue<>();
 
         this.communication = new Communication();
 
@@ -52,18 +54,34 @@ public class Client implements Serializable {
             isConnected = true;
 
             objOutStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
-            objOutStream.flush(); // Ensure the stream is ready
+            objOutStream.flush();
             objInStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 
             System.out.println("Connected to " + this.serverIp + ":" + this.serverPort);
 
-            clientSideSendObject(this.clientObj);
+            // CreateCharacter character = new CreateCharacter(false, clientObj);
+
+            int spawnPositionX = new UseCharacter().getCharacterRandSpawnX();
+            int spawnPositionY = new UseCharacter().getCharacterRandSpawnY();
+
+            System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
+
+            // character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+            Player player = new Player(new UseCharacter().getRandomCharacterNo(), null);
+            player.setPlayerLocation(spawnPositionX, spawnPositionY);
+
+            this.clientObj.setPlayer(player);
+
+            if (!isRegister) { 
+                this.register = new RegisterClient(this.clientObj);
+                clientSideSendObject(register);
+                isRegister = true;
+            }
 
             Thread objectThread = new Thread(this::receiveServerObject);
-
             objectThread.setPriority(Thread.MAX_PRIORITY);
             objectThread.setDaemon(true);
-
             objectThread.start();
 
         } catch (IOException e) {
@@ -74,7 +92,8 @@ public class Client implements Serializable {
 
     public void clientSideSendObject(Object object) {
         System.out.println("Client Send Object > " + object.toString());
-        System.out.println("Before Send Object > Client Name: " + ((ClientObj) object).getClientName());
+        // System.out.println("Before Send Object > Client Name: " + ((ClientObj)
+        // object).getClientName());
 
         try {
             synchronized (objOutStream) {
@@ -118,6 +137,11 @@ public class Client implements Serializable {
 
     public Communication getCommunication() {
         return this.communication;
+
+    }
+
+    public boolean isRegister() {
+        return this.isRegister;
 
     }
 

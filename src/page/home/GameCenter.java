@@ -20,19 +20,23 @@ import client.Client;
 import client.Server;
 import components.CoverTitle;
 import components.DrawMouse;
+import components.character.CreateCharacter;
+import components.character.ManageCharacterElement;
 import models.ClientObj;
+import models.Player;
 
 import java.awt.Image;
 import page.controls.GameContent;
 import utils.LoadImage;
 import utils.LoadImage.BackgroundPanel;
 import utils.UseButton;
+import utils.UseCharacter;
 import utils.UseGlobal;
 import utils.UseText;
 import utils.WindowClosingFrameEvent;
 import utils.WindowResize;
 
-public class GameCenter extends JFrame {
+public class GameCenter extends JFrame implements ManageCharacterElement {
 
         // Server server;
         private ClientObj client;
@@ -112,7 +116,7 @@ public class GameCenter extends JFrame {
                                 100,
                                 "hand",
                                 this,
-                                () -> new GameContent(this, client));
+                                () -> startGameSinglePlay());
 
                 gridConst.gridy = 2;
                 gridConst.insets = new Insets(0, 0, 15, 0);
@@ -184,8 +188,22 @@ public class GameCenter extends JFrame {
                 layers.revalidate();
                 layers.repaint();
 
-                new WindowResize().addWindowResize(this, new Component[]{backgroundPanel, drawMouse}, new Component[]{layers});
+                new WindowResize().addWindowResize(this, new Component[] { backgroundPanel, drawMouse },
+                                new Component[] { layers });
                 new WindowClosingFrameEvent(this);
+
+        }
+
+        private GameContent startGameSinglePlay() {
+                // CreateCharacter character = new CreateCharacter(false, client);
+                // character.setBounds(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+                Player player = new Player(new UseCharacter().getRandomCharacterNo(), null);
+                player.setPlayerLocation(this.getWidth() / 2 - 100, this.getHeight() / 2 - 100);
+
+                client.setPlayer(player);
+
+                return new GameContent(this, client);
 
         }
 

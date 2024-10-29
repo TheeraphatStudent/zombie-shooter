@@ -3,10 +3,14 @@ package components;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import models.ClientObj;
+
 import javax.swing.JTextPane;
 
 import utils.UseText;
@@ -89,7 +93,7 @@ public class Scoreboard extends JPanel {
     }
 
     public void setNeededKilled(int needed) {
-        System.out.println("Set Needed Killed: " + needed);
+        // System.out.println("Set Needed Killed: " + needed);
         this.neededZombie = needed;
 
         rankUp.setText(String.format("Require: %d / %d", neededZombie, maxZombie));
@@ -111,5 +115,9 @@ public class Scoreboard extends JPanel {
                 repaint();
             }
         });
+    }
+
+    public void initializePlayerList(List<ClientObj> clientObjs) {
+
     }
 }
