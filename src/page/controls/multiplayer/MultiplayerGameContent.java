@@ -83,63 +83,69 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     }
 
     private void initializeEvent() {
+        this.clientConnect.clientSideSendObject(this.communication);
         addMovementListener(this);
     }
 
     private void startUpdateLoop() {
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(this::update, 0, 16, TimeUnit.MILLISECONDS); // 60 FPS
+        executorService.scheduleAtFixedRate(this::update, 100, 16, TimeUnit.MILLISECONDS);
     }
 
     private void update() {
         if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
+            System.out.println("Updating game state...");
             replaceClientObjsFromServer();
-            SwingUtilities.invokeLater(this::updateGameState);
+            initializeMoment();
+            SwingUtilities.invokeLater(this::revalidateContent);
             sendUpdateToServer();
         }
-    }
-
-    @Override
-    public void updateGameState() {
-        initializeMoment();
-        revalidateContent();
     }
 
     private void sendUpdateToServer() {
         try {
             clientConnect.clientSideSendObject(this.communication);
+
         } catch (Exception e) {
             System.err.println("Error sending update to server: " + e.getMessage());
         }
     }
 
     private void initializeMoment() {
-        if (this.clientObjs == null) {
+        if (this.clientObjs == null || this.clientObjs.isEmpty()) {
+            System.out.println("No client objects to initialize");
             return;
         }
 
         for (ClientObj clientObj : this.clientObjs) {
-            Player player = clientObj.getPlayer();
-            boolean alreadyExists = characters.stream()
-                    .anyMatch(character -> character.getInitClientObj().getId()
-                            .equals(clientObj.getId()));
+            System.out.println("Processing Client: " + clientObj.getClientName());
 
-            if (!alreadyExists) {
+            Player player = clientObj.getPlayer();
+            if (player == null) {
+                System.out.println("Warning: Player is null for client " + clientObj.getClientName());
+                continue;
+            }
+            CreateCharacter existingCharacter = characters.stream()
+                    .filter(character -> character.getInitClientObj().getId().equals(clientObj.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingCharacter == null) {
                 CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, clientObj);
                 players.add(player);
                 characters.add(character);
                 character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
                 content.add(character);
+                System.out.println("Created new character for client: " + clientObj.getClientName());
             } else {
-                characters.stream()
-                        .filter(character -> character.getInitClientObj().getId().equals(clientObj.getId()))
-                        .findFirst()
-                        .ifPresent(character -> {
-                            character.setLocation(player.geDirectionX(), player.geDirectionY());
-                        });
+                existingCharacter.setLocation(player.geDirectionX(), player.geDirectionY());
+                System.out.println("Updated existing character position for client: " + clientObj.getClientName());
             }
         }
+
+        revalidateContent();
     }
+
 
     @Override
     public void disposeContent() {
@@ -153,31 +159,74 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         super.disposeContent();
     }
 
-    private void updateClientObjList(ClientObj newClientObj) {
-        clientObjs.removeIf(existingClient -> existingClient.getId().equals(newClientObj.getId()));
-        clientObjs.add(newClientObj);
-    }
+    // private void updateClientObjList(ClientObj newClientObj) {
+    //     clientObjs.removeIf(existingClient -> existingClient.getId().equals(newClientObj.getId()));
+    //     clientObjs.add(newClientObj);
+    // }
 
     private void replaceClientObjsFromServer() {
         List<ClientObj> updatedClientObjs = contents.get("PLAYERS_INFO");
-        if (updatedClientObjs != null) {
+        System.out.println("Before Update ClientObj: " + updatedClientObjs);
+    
+        if (updatedClientObjs != null && !updatedClientObjs.isEmpty()) {
+            // Create a new list to store updated clients
+            List<ClientObj> newClientObjs = new ArrayList<>();
+    
+            // Update existing clients and add new ones
             for (ClientObj updatedClient : updatedClientObjs) {
-                updateClientObjList(updatedClient);
+                ClientObj existingClient = findClientById(updatedClient.getId());
+                if (existingClient != null) {
+                    // Update existing client
+                    existingClient.setPlayer(updatedClient.getPlayer());
+                    newClientObjs.add(existingClient);
+                } else {
+                    // Add new client
+                    newClientObjs.add(updatedClient);
+                }
+            }
+    
+            // Replace the clientObjs list with the new list
+            this.clientObjs.clear();
+            this.clientObjs.addAll(newClientObjs);
+        } else {
+            System.out.println("Warning: Received empty or null PLAYERS_INFO");
+        }
+    
+        System.out.println("After Update >> clientObjs: " + this.clientObjs);
+    
+        // Update the communication object with the latest clientObjs
+        this.communication.setContent("PLAYERS_INFO", this.clientObjs);
+    }
+
+    private ClientObj findClientById(String id) {
+        for (ClientObj client : this.clientObjs) {
+            if (client.getId().equals(id)) {
+                return client;
             }
         }
+        return null;
     }
 
     @Override
     public void onPlayerAction(Player player) {
+        boolean updated = false;
         for (ClientObj clientObj : this.clientObjs) {
             if (this.parentClient.getId().equals(clientObj.getId())) {
                 clientObj.setPlayer(player);
-                updateClientObjList(clientObj);
+                updated = true;
+                System.out.println("Updated player for client: " + clientObj.getClientName());
                 break;
             }
         }
+
+        if (!updated) {
+            System.out.println("Warning: Could not find matching client for player update");
+        }
+
         this.communication.setContent("PLAYERS_INFO", this.clientObjs);
+        sendUpdateToServer();
     }
+
 
     @Override
     public void onShootBullet(CopyOnWriteArrayList<Bullet> bullets) {

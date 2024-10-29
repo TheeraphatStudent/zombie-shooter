@@ -182,8 +182,9 @@ public class Server extends ServerHelper implements Serializable {
             if (receiver != sender && receiver.isReady() && object != null) {
                 synchronized (receiver) {
                     try {
-                        System.out.println("Sending object to receiver: " + receiver);
+                        // System.out.println("Sending object to receiver: " + receiver);
                         receiver.sendObject(object);
+
                     } catch (Exception e) {
                         System.out.println("Error broadcasting object to client: " + e.getMessage());
                         e.printStackTrace();

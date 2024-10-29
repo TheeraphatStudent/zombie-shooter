@@ -87,7 +87,7 @@ public class ClientHandler implements Runnable, Serializable {
 
                 }
                 
-                server.broadcastObject(this.receivedObject, this);
+                server.broadcastObject(this.receivedObject, null);
 
             }
         } catch (IOException | ClassNotFoundException e) {
