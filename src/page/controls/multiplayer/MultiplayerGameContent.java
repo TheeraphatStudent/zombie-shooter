@@ -111,11 +111,12 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
                 CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, clientObj);
                 players.add(player);
                 characters.add(character);
+                character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
                 content.add(character);
             }
         }
 
-        revalidateContent();
     }
 
     private void eventListener() {
@@ -124,10 +125,6 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             while (true) {
                 try {
                     if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
-                        System.out.println("Multiplayer Game Content > On Client Connect!");
-                        // clientConnect.clientSideSendObject(this.communication);
-                        // this.communication.setContent("CHARACTERS_INFO", players);
-
                         System.out.println("Contents: " + contents.entrySet());
 
                         replaceClientObjsFromServer();
@@ -137,8 +134,10 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
                             revalidateContent();
                         });
 
+                        clientConnect.clientSideSendObject(this.communication);
+
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(16);
                 } catch (InterruptedException e) {
                     System.err.println("Event listener interrupted: " + e.getMessage());
                     e.printStackTrace();
@@ -153,6 +152,13 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         listenerThread.setDaemon(true);
         listenerThread.start();
+    }
+
+    @Override
+    public void disposeContent() {
+        listenerThread.interrupt();
+
+        super.disposeContent();
     }
 
     private void updateClientObjList(ClientObj newClientObj) {
@@ -205,7 +211,6 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         if (isUpdated) {
             try {
                 this.communication.setContent("PLAYERS_INFO", clientObjs);
-                clientConnect.clientSideSendObject(this.communication);
             } catch (Exception e) {
                 System.err.println("Error sending player update to server: " + e.getMessage());
                 e.printStackTrace();
