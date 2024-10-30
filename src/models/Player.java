@@ -94,6 +94,7 @@ public class Player implements Serializable {
             // character.setCharacterHp(this.health);
             System.out.println("Current Health: " + this.health);
 
+            // ! อัพเดท Damage
             this.damage += (5 * state.getLevelState()) + rank+1;
             System.out.println("Current Damage: " + this.damage);
 

@@ -93,7 +93,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
     private void startUpdateLoop() {
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(this::update, 0, 16, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(this::update, 4, 16, TimeUnit.MILLISECONDS);
     }
 
     private void update() {
@@ -114,6 +114,21 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         }
     }
 
+    private void updateCharacterPosition(CreateCharacter character, int targetX, int targetY) {
+        int currentX = character.getX();
+        int currentY = character.getY();
+
+        int deltaX = targetX - currentX;
+        int deltaY = targetY - currentY;
+
+        double smoothingFactor = 0.08;
+        int smoothX = (int) (currentX + deltaX * smoothingFactor);
+        int smoothY = (int) (currentY + deltaY * smoothingFactor);
+
+        System.out.printf("SmoothX: %d, SmoothY: %d\n", smoothX, smoothY);
+
+        character.setLocation(smoothX, smoothY);
+    }
     private void initializeMoment() {
         if (this.clientObjs == null || this.clientObjs.isEmpty()) {
             return;
@@ -143,7 +158,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             } else {
                 System.out.printf("Updating character position for client: %s, x: %d, y: %d\n",
                         clientObj.getClientName(), player.getDirectionX(), player.getDirectionY());
-                existingCharacter.setLocation(player.getDirectionX(), player.getDirectionY());
+                updateCharacterPosition(existingCharacter, player.getDirectionX(), player.getDirectionY());
 
                 System.out.println("Updated another character position: " + clientObj.getClientName());
                 System.out.printf("Player position x: %d, y: %d\n", player.getDirectionX(), player.getDirectionY());
@@ -201,7 +216,15 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             System.out.println("Warning: Could not find matching client for player update");
         }
 
-        // update();
+        final boolean isUpdated = updated;
+
+        new Thread(() -> {
+            while (isUpdated) {
+                update();
+
+            }
+
+        });
         SwingUtilities.invokeLater(this::revalidateContent);
     }
 

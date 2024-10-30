@@ -250,34 +250,28 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         if (!isSurvive)
             return;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String getGun = "resource/images/character/weapon/Gun.png";
-                Image weapon = new LoadImage().getImage(getGun);
+        String getGun = "resource/images/character/weapon/Gun.png";
+        Image weapon = new LoadImage().getImage(getGun);
 
-                int weaponSpinX = character.getX() + 40;
-                int weaponSpinY = character.getY() + 70;
+        int weaponSpinX = character.getX() + 40;
+        int weaponSpinY = character.getY() + 70;
 
-                g2d.translate(weaponSpinX, weaponSpinY);
-                g2d.rotate(weaponAngle);
+        g2d.translate(weaponSpinX, weaponSpinY);
+        g2d.rotate(weaponAngle);
 
-                g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
+        g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
 
-                int scaledHeight = (int) (WEAPON_HEIGHT * WEAPON_SCALE);
+        int scaledHeight = (int) (WEAPON_HEIGHT * WEAPON_SCALE);
 
-                g2d.drawImage(weapon,
-                        -20,
-                        -scaledHeight / 2,
-                        WEAPON_WIDTH,
-                        WEAPON_HEIGHT,
-                        null);
+        g2d.drawImage(weapon,
+                -20,
+                -scaledHeight / 2,
+                WEAPON_WIDTH,
+                WEAPON_HEIGHT,
+                null);
 
-                g2d.setTransform(originTransform);
-            }
-        }).start();
+        g2d.setTransform(originTransform);
     }
-
 
     // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
