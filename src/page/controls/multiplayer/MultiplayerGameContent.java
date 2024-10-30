@@ -70,7 +70,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         this.clientConnect = clientConnect;
         this.isHost = false;
-        
+
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
         this.players = new CopyOnWriteArrayList<>();
         this.characters = new CopyOnWriteArrayList<>();
@@ -121,13 +121,9 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         for (ClientObj clientObj : this.clientObjs) {
             if (this.parentClient.getId().equals(clientObj.getId())) {
-                // System.out.println("is Client > Don't Update!!!");
-                // System.out.println("Name: " + clientObj.getClientName());
-                // System.out.println();
-
                 continue;
             }
-    
+
             System.out.println("Processing Client: " + clientObj.getClientName());
             Player player = clientObj.getPlayer();
 
@@ -145,8 +141,9 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
                 System.out.println("Created new character for client: " + clientObj.getClientName());
             } else {
+                System.out.printf("Updating character position for client: %s, x: %d, y: %d\n",
+                        clientObj.getClientName(), player.getDirectionX(), player.getDirectionY());
                 existingCharacter.setLocation(player.getDirectionX(), player.getDirectionY());
-                content.add(existingCharacter);
 
                 System.out.println("Updated another character position: " + clientObj.getClientName());
                 System.out.printf("Player position x: %d, y: %d\n", player.getDirectionX(), player.getDirectionY());
@@ -169,16 +166,18 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     }
 
     private void onUpdateClientObjFromServer() {
-        System.out.println("OnUpdateClientObjFromServer...");   
+        System.out.println("OnUpdateClientObjFromServer...");
 
         this.communication = clientConnect.getCommunication();
         this.contents = this.communication.getContent();
         List<ClientObj> updatedClientObjs = contents.get("PLAYERS_INFO");
+
+        this.clientObjs.clear();
         this.clientObjs.addAll(updatedClientObjs);
 
         System.out.println(updatedClientObjs);
         System.out.println("==============================\n");
-    
+
         initializeMoment();
     }
 
@@ -195,8 +194,6 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
                 System.out.println("On Player Action > Updated player for client: " + clientObj.getClientName());
 
                 this.clientObjs.set(i, clientObj);
-                // sendUpdateToServer();
-                // update();
             }
         }
 

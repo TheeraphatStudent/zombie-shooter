@@ -244,7 +244,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         // ! Add Zombie
         // initializeZombieSpawner();
-        SwingUtilities.invokeLater(this::initializeZombieSpawner);
+        // SwingUtilities.invokeLater(this::initializeZombieSpawner);
 
         // ==================== Layer ====================
 
