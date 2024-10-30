@@ -68,6 +68,8 @@ public class Bullet extends JPanel implements ManageBulletElement{
     // Check out of frame
     public boolean isOutOfBounds(int width, int height) {
         return x < 0 || x > width || y < 0 || y > height;
+        // return false;
+
     }
 
     // เมื่อผู้เล่นติดเชื้อ หรือ ตาย จะยิงไม่ได้

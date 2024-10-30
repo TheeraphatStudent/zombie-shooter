@@ -106,7 +106,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     public Point mousePosition;
 
     // Bullet
-    private CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
+    protected CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
 
     // Thread
     private Thread bulletThread;
@@ -304,7 +304,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ----*----*----*---- Bullet Management ----*----*----*----
 
-    private void updateBullets() {
+    protected void updateBullets() {
         for (Bullet bullet : bullets) {
             bullet.move();
 

@@ -27,9 +27,12 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     private Server serverConnect;
     private Communication communication;
     private Map<String, List> contents;
+
     private List<ClientObj> clientObjs;
     private List<Player> players;
     private List<CreateCharacter> characters;
+    private CopyOnWriteArrayList<Bullet> updatedBullets;
+
     private ScheduledExecutorService executorService;
 
     // ! ----- Host ----- !
@@ -41,20 +44,13 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             List<ClientObj> clientObjs) {
         super(gameCenter, clientObjSide);
 
+        this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
+
         this.clientConnect = clientConnect;
         this.serverConnect = serverConnect;
         this.isHost = true;
 
-        this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
-        this.players = new CopyOnWriteArrayList<>();
-        this.characters = new CopyOnWriteArrayList<>();
-        this.communication = this.clientConnect.getCommunication();
-        this.communication.setContent("PLAYERS_INFO", this.clientObjs);
-        this.contents = this.communication.getContent();
-
         System.out.println("-=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-\n");
-        System.out.println(contents.entrySet());
-        System.out.println(this.clientObjs);
 
         initializeEvent();
         startUpdateLoop();
@@ -68,27 +64,32 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             List<ClientObj> clientObjs) {
         super(gameCenter, clientObjSide);
 
+        this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
+
         this.clientConnect = clientConnect;
         this.isHost = false;
 
-        this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
-        this.players = new CopyOnWriteArrayList<>();
-        this.characters = new CopyOnWriteArrayList<>();
-        this.communication = this.clientConnect.getCommunication();
-        this.communication.setContent("PLAYERS_INFO", this.clientObjs);
-        this.contents = this.communication.getContent();
-
         System.out.println("-=-=-=-=-=| On Game Start - Client |=-=-=-=-=-\n");
-        System.out.println(contents.entrySet());
-        System.out.println(this.clientObjs);
 
         initializeEvent();
         startUpdateLoop();
     }
 
     private void initializeEvent() {
+        this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
+        this.players = new CopyOnWriteArrayList<>();
+        this.characters = new CopyOnWriteArrayList<>();
+
+        this.communication = this.clientConnect.getCommunication();
+        this.contents = this.communication.getContent();
+        this.communication.setContent("PLAYERS_INFO", this.clientObjs);
+        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+
         this.clientConnect.clientSideSendObject(this.communication);
         addMovementListener(this);
+
+        System.out.println(contents.entrySet());
+        System.out.println(this.clientObjs);
     }
 
     private void startUpdateLoop() {
@@ -99,10 +100,17 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     private void update() {
         if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
             System.out.println("Updating game state...");
+
+            this.communication = clientConnect.getCommunication();
+            this.contents = this.communication.getContent();
+            System.out.println(contents);
+
             onUpdateClientObjFromServer();
+            onUpdateBulletsFromServer();
+
             initializeMoment();
-            SwingUtilities.invokeLater(this::revalidateContent);
             sendUpdateToServer();
+            SwingUtilities.invokeLater(this::revalidateContent);
         }
     }
 
@@ -129,6 +137,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         character.setLocation(smoothX, smoothY);
     }
+
     private void initializeMoment() {
         if (this.clientObjs == null || this.clientObjs.isEmpty()) {
             return;
@@ -181,19 +190,32 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     }
 
     private void onUpdateClientObjFromServer() {
-        System.out.println("OnUpdateClientObjFromServer...");
+        // System.out.println("OnUpdateClientObjFromServer...");
 
-        this.communication = clientConnect.getCommunication();
-        this.contents = this.communication.getContent();
-        List<ClientObj> updatedClientObjs = contents.get("PLAYERS_INFO");
+        // ! Update Players
+        List<ClientObj> updatedClientObjs = (List<ClientObj>) this.contents.get("PLAYERS_INFO");
 
         this.clientObjs.clear();
         this.clientObjs.addAll(updatedClientObjs);
 
-        System.out.println(updatedClientObjs);
-        System.out.println("==============================\n");
+        // System.out.println("=============== Update Client Obj ===============\n");
+        // System.out.println(updatedClientObjs);
 
-        initializeMoment();
+    }
+
+    private void onUpdateBulletsFromServer() {
+        this.updatedBullets = (CopyOnWriteArrayList<Bullet>) contents.get("BULLETS_INFO");
+        System.out.println("Update bullets...");
+    
+        if (updatedBullets != null) {
+            for (Bullet shootBullet : updatedBullets) {
+                super.addBullet(shootBullet);
+            }
+            this.updatedBullets.clear();
+        }
+
+        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+
     }
 
     @Override
@@ -216,20 +238,16 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             System.out.println("Warning: Could not find matching client for player update");
         }
 
-        final boolean isUpdated = updated;
-
-        new Thread(() -> {
-            while (isUpdated) {
-                update();
-
-            }
-
-        });
+        // update();
         SwingUtilities.invokeLater(this::revalidateContent);
     }
 
     @Override
     public void onShootBullet(CopyOnWriteArrayList<Bullet> bullets) {
-        // Implement bullet synchronization if needed
+        this.communication.setContent("BULLETS_INFO", bullets);
+
+        // update();
+        SwingUtilities.invokeLater(this::revalidateContent);
+
     }
 }
