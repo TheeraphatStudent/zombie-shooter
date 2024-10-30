@@ -1,6 +1,5 @@
 package page.controls.multiplayer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,6 +22,7 @@ import page.home.GameCenter;
 public class MultiplayerGameContent extends GameContent implements PlayerBehaviorListener {
 
     private boolean isHost;
+
     private Client clientConnect;
     private Server serverConnect;
     private Communication communication;
@@ -44,6 +44,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         this.clientConnect = clientConnect;
         this.serverConnect = serverConnect;
         this.isHost = true;
+
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
         this.players = new CopyOnWriteArrayList<>();
         this.characters = new CopyOnWriteArrayList<>();
@@ -69,6 +70,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         this.clientConnect = clientConnect;
         this.isHost = false;
+        
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
         this.players = new CopyOnWriteArrayList<>();
         this.characters = new CopyOnWriteArrayList<>();
@@ -97,7 +99,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     private void update() {
         if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
             System.out.println("Updating game state...");
-            replaceClientObjsFromServer();
+            onUpdateClientObjFromServer();
             initializeMoment();
             SwingUtilities.invokeLater(this::revalidateContent);
             sendUpdateToServer();
@@ -119,9 +121,9 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
         for (ClientObj clientObj : this.clientObjs) {
             if (this.parentClient.getId().equals(clientObj.getId())) {
-                System.out.println("is Client > Don't Update!!!");
-                System.out.println("Name: " + clientObj.getClientName());
-                System.out.println();
+                // System.out.println("is Client > Don't Update!!!");
+                // System.out.println("Name: " + clientObj.getClientName());
+                // System.out.println();
 
                 continue;
             }
@@ -154,7 +156,6 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         }
     }
 
-
     @Override
     public void disposeContent() {
         if (executorService != null) {
@@ -167,30 +168,18 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         super.disposeContent();
     }
 
-    private void replaceClientObjsFromServer() {
+    private void onUpdateClientObjFromServer() {
+        System.out.println("OnUpdateClientObjFromServer...");   
+
+        this.communication = clientConnect.getCommunication();
+        this.contents = this.communication.getContent();
         List<ClientObj> updatedClientObjs = contents.get("PLAYERS_INFO");
-        if (updatedClientObjs != null && !updatedClientObjs.isEmpty()) {
-            for (ClientObj updatedClient : updatedClientObjs) {
-                ClientObj existingClient = findClientById(updatedClient.getId());
-                if (existingClient != null) {
-                    existingClient.setPlayer(updatedClient.getPlayer());
-                } else {
-                    this.clientObjs.add(updatedClient);
-                }
-            }
-        }
+        this.clientObjs.addAll(updatedClientObjs);
 
-        this.communication.setContent("PLAYERS_INFO", this.clientObjs);
+        System.out.println(updatedClientObjs);
+        System.out.println("==============================\n");
+    
         initializeMoment();
-    }
-
-    private ClientObj findClientById(String id) {
-        for (ClientObj client : this.clientObjs) {
-            if (client.getId().equals(id)) {
-                return client;
-            }
-        }
-        return null;
     }
 
     @Override
@@ -206,6 +195,8 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
                 System.out.println("On Player Action > Updated player for client: " + clientObj.getClientName());
 
                 this.clientObjs.set(i, clientObj);
+                // sendUpdateToServer();
+                // update();
             }
         }
 
@@ -213,10 +204,8 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             System.out.println("Warning: Could not find matching client for player update");
         }
 
-        // this.communication.setContent("PLAYERS_INFO", this.clientObjs);
-        // sendUpdateToServer(); // Ensure this method sends the update to the server
-        update();
-        SwingUtilities.invokeLater(this::repaint);
+        // update();
+        SwingUtilities.invokeLater(this::revalidateContent);
     }
 
     @Override

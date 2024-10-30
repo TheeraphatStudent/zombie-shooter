@@ -247,35 +247,37 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     private void drawWeapon(Graphics2D g2d, AffineTransform originTransform) {
 
-        // g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        // RenderingHints.VALUE_ANTIALIAS_ON);
-
         if (!isSurvive)
             return;
 
-        String getGun = "resource/images/character/weapon/Gun.png";
-        Image weapon = new LoadImage().getImage(getGun);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String getGun = "resource/images/character/weapon/Gun.png";
+                Image weapon = new LoadImage().getImage(getGun);
 
-        // ตำแหน่งในการหมุนปืน
-        int weaponSpinX = character.getX() + 40;
-        int weaponSpinY = character.getY() + 70;
+                int weaponSpinX = character.getX() + 40;
+                int weaponSpinY = character.getY() + 70;
 
-        g2d.translate(weaponSpinX, weaponSpinY);
-        g2d.rotate(weaponAngle);
+                g2d.translate(weaponSpinX, weaponSpinY);
+                g2d.rotate(weaponAngle);
 
-        g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
+                g2d.scale(WEAPON_SCALE, WEAPON_SCALE);
 
-        int scaledHeight = (int) (WEAPON_HEIGHT * WEAPON_SCALE);
+                int scaledHeight = (int) (WEAPON_HEIGHT * WEAPON_SCALE);
 
-        g2d.drawImage(weapon,
-                -20,
-                -scaledHeight / 2,
-                WEAPON_WIDTH,
-                WEAPON_HEIGHT,
-                this);
+                g2d.drawImage(weapon,
+                        -20,
+                        -scaledHeight / 2,
+                        WEAPON_WIDTH,
+                        WEAPON_HEIGHT,
+                        null);
 
-        g2d.setTransform(originTransform);
+                g2d.setTransform(originTransform);
+            }
+        }).start();
     }
+
 
     // ::::::::::::::::: Weapon Control :::::::::::::::::::
 
