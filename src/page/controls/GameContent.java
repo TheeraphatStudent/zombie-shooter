@@ -364,6 +364,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     public void addBullet(Bullet bullet) {
         bullets.add(bullet);
+    
         onPlayerShootBullets(bullets);
 
     }
@@ -596,6 +597,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 updateMousePosition();
 
                 character.onShootBullet(e.getPoint());
+                // onPlayerShootBullets(GameContent.this.bullets);
 
             };
 

@@ -207,14 +207,16 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         this.updatedBullets = (CopyOnWriteArrayList<Bullet>) contents.get("BULLETS_INFO");
         System.out.println("Update bullets...");
     
-        if (updatedBullets != null) {
-            for (Bullet shootBullet : updatedBullets) {
+        if (this.updatedBullets != null) {
+            for (Bullet shootBullet : this.updatedBullets) {
                 super.addBullet(shootBullet);
+                this.updatedBullets.remove(shootBullet);
+
             }
-            this.updatedBullets.clear();
+            // this.updatedBullets.clear();
         }
 
-        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+        // this.communication.setContent("BULLETS_INFO", this.updatedBullets);
 
     }
 

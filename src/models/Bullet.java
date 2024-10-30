@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.swing.JPanel;
 
@@ -24,17 +25,24 @@ interface BulletProps {
 
 public class Bullet extends JPanel implements ManageBulletElement{
     private static final long serialVersionUID = 1L;
+    private String bulletId;
 
     private double x, y;
     private double dx, dy;
     private boolean isActive = true;
 
     public Bullet(double startX, double startY, double angle) {
+        this.bulletId = UUID.randomUUID().toString();
+
         this.x = startX;
         this.y = startY;
 
         this.dx = Math.cos(angle) * BULLET_SPEED;
         this.dy = Math.sin(angle) * BULLET_SPEED;
+    }
+
+    public String getBulletId() {
+        return this.bulletId;
     }
 
     public void move() {
