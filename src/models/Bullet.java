@@ -27,12 +27,15 @@ public class Bullet extends JPanel implements ManageBulletElement{
     private static final long serialVersionUID = 1L;
     private String bulletId;
 
+    private Player player;
+
     private double x, y;
     private double dx, dy;
     private boolean isActive = true;
 
-    public Bullet(double startX, double startY, double angle) {
+    public Bullet(Player player, double startX, double startY, double angle) {
         this.bulletId = UUID.randomUUID().toString();
+        this.player = player;
 
         this.x = startX;
         this.y = startY;
@@ -43,6 +46,11 @@ public class Bullet extends JPanel implements ManageBulletElement{
 
     public String getBulletId() {
         return this.bulletId;
+    }
+
+    public Player getPlayer() {
+        return this.player;
+
     }
 
     public void move() {

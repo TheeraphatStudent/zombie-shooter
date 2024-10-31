@@ -65,6 +65,7 @@ public class ZombieMovementThread extends Thread {
             try {
                 Thread.sleep(16);
 
+                // อัพเดทตำแหน่งการเดินของ Zombie
                 behavior.updateZombiePosition();
 
                 if (!isBiting && checkIsPlayerInRange()) {
@@ -160,6 +161,11 @@ public class ZombieMovementThread extends Thread {
 
     public CreateCharacter getZombie() {
         return this.zombie;
+    }
+
+    public void updateTargetCharacter(CreateCharacter newTarget) {
+        this.character = newTarget;
+        this.behavior = new Zombie(newTarget, this.zombie, this.content, null, this.behavior.getType());
     }
 
     public void stopMovement() {

@@ -298,7 +298,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         int weaponSpinY = (getY() + CHARACTER_CENTER_Y) + 70;
 
         // เพิ่มจำนวนกระสุนที่ยิงออกไป
-        gameContent.addBullet(new Bullet(weaponSpinX, weaponSpinY, weaponAngle));
+        gameContent.addBullet(new Bullet(client.getPlayer(), weaponSpinX, weaponSpinY, weaponAngle));
     }
 
     // ::::::::::::::::: Control :::::::::::::::::

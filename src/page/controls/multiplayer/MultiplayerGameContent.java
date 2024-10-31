@@ -223,6 +223,8 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
 
     }
 
+    
+
     @Override
     public void onPlayerAction(Player player) {
         System.out.printf("????? Player: x=%d | y=%d\n\n", player.getDirectionX(), player.getDirectionY());
