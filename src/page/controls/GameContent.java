@@ -375,55 +375,58 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         new Thread(() -> {
             for (Bullet bullet : bullets) {
                 bullet.move();
-
+    
                 boolean bulletRemoved = false;
-
-                Iterator<CreateCharacter> zombieContain = zombiesCharacters.iterator();
-
-                while (zombieContain.hasNext() && !bulletRemoved) {
-                    CreateCharacter zombie = zombieContain.next();
-                    Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
-
+    
+                Iterator<CreateCharacter> zombieContain = this.zombiesCharacters.iterator();
+                Iterator<Info> zombiesInfo = this.zombieInfos.iterator();
+    
+                while (zombieContain.hasNext() && zombiesInfo.hasNext() && !bulletRemoved) {
+                    CreateCharacter zombieCharacter = zombieContain.next();
+                    Info zombieInfo = zombiesInfo.next();
+                    
+                    Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombieCharacter);
+    
                     if (bullet.getBounds().intersects(zombieHitbox)) {
-
                         Player shottedPlayer = bullet.getPlayer();
-
-                        // Remove bullet
+    
                         bullets.remove(bullet);
-
-                        zombie.setCharacterHp(zombie.getCharacterHp() - shottedPlayer.getPlayerBulletDamage());
-
-                        if (zombie.getCharacterHp() <= 0) {
+    
+                        zombieInfo.setHealth(zombieInfo.getHealth() - shottedPlayer.getPlayerBulletDamage());
+    
+                        if (zombieInfo.getHealth() <= 0) {
                             for (ZombieThreadControl thread : zombieMoveThreads) {
-                                if (thread.getZombie() == zombie) {
+                                if (thread.getZombie() == zombieCharacter) {
                                     thread.stopMovement();
                                     break;
                                 }
                             }
-
+    
                             shottedPlayer.addZombieWasKilled(1);
-                            this.character.setCharacterHp(shottedPlayer.getPlayerHealth());;
+                            this.character.setCharacterHp(shottedPlayer.getPlayerHealth());
                             this.character.repaint();
-
+    
                             scoreboard.setKilled(shottedPlayer.getZombieHunt());
-
+    
                             zombieContain.remove();
-                            content.remove(zombie);
-
+                            content.remove(zombieCharacter);
+    
                             this.ZOMBIE_REMAIN = ZOMBIE_REMAIN - 1;
-
+    
                             updateLevelScoreboard();
                             updatePlayerStat(shottedPlayer);
-
+    
                             onPlayerActions(shottedPlayer);
-
+    
                             revalidateContent();
                         }
-
+    
+                        onZombieUpdate(zombieInfo);
+    
                         bulletRemoved = true;
                     }
                 }
-
+    
                 if (!bulletRemoved && bullet.isOutOfBounds(getWidth(), getHeight())) {
                     bullets.remove(bullet);
                 }
@@ -595,7 +598,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
         Info zombieInfo = new Info();
 
-        CreateCharacter zombieCharacter = new CreateCharacter(this, zombieInfo.getId());
+        CreateCharacter zombieCharacter = new CreateCharacter(this, zombieInfo.getId(), (int) (Math.random() * 10) + 1);
         zombieInfo.setProfile(zombieCharacter.getCharacterProfile());
 
         Behavior zombieBehavior = new Behavior(character, zombieCharacter, this, state, type, zombieInfo);
@@ -635,6 +638,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         zombieInfo.setLocation(x, y);
         this.zombieInfos.add(zombieInfo);
         this.zombieBehaviors.add(zombieBehavior);
+        this.zombiesCharacters.add(zombieCharacter);
 
         if (!this.onMultiplayerMode) {
             ZombieThreadControl zombieThread = new ZombieThreadControl(
@@ -649,7 +653,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             this.zombieMoveThreads.add(zombieThread);
 
             this.content.add(zombieCharacter);
-            this.zombiesCharacters.add(zombieCharacter);
 
         } else {
             if (this.isHost) {
@@ -667,6 +670,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                     if (usePlayer == targetPlayer) {
                         targetCharacter = character;
+
                     }
                 }
 
@@ -686,6 +690,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             }
 
         }
+
     }
 
     public List<Info> getZombiesInfo() {

@@ -86,14 +86,14 @@ public class ZombieThreadControl extends Thread {
                 biteTimer.start();
 
                 if (!isBiting && checkIsPlayerInRange()) {
-                    isBiting = true;
                     biteTimer.setDelay(1000);
+                    isBiting = true;
 
                 } else if (isBiting && !checkIsPlayerInRange()) {
                     isBiting = false;
 
                     biteTimer.stop();
-                    biteTimer.setDelay(0);
+                    // biteTimer.setDelay(0);
 
                 }
 

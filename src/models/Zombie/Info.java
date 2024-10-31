@@ -29,6 +29,7 @@ public class Info implements Serializable {
 
     public void setHealth(int health) {
         this.health = health;
+        System.out.println("Zombie Health: " + this.health);
     }
 
     public void setProfile(int profile) {
@@ -50,6 +51,12 @@ public class Info implements Serializable {
     public int getHealth() {
         return this.health;
     
+    }
+
+    public boolean isAlive() {
+        System.out.println(this.health > 0);
+        return this.health > 0;
+
     }
 
     public String getId() {

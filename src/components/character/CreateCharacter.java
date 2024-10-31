@@ -202,7 +202,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // ! :::::::::::::::::::: Zombie ::::::::::::::::::::
-    public CreateCharacter(GameContent gameContent, String id) {
+    public CreateCharacter(GameContent gameContent, String id, int useThisProfile) {
         this.initialId = id;
         this.gameContent = gameContent;
 
@@ -214,7 +214,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         setOpaque(false);
         setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
-        this.useZombieProfile = (int) (Math.random() * 10) + 1;
+        this.useZombieProfile = useThisProfile;
 
         // JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
         // "", Color.WHITE, null, Font.PLAIN);

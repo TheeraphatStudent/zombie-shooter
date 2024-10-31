@@ -35,7 +35,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
 
     private volatile CopyOnWriteArrayList<ClientObj> clientObjs;
     private volatile CopyOnWriteArrayList<Player> players;
-    private volatile CopyOnWriteArrayList<CreateCharacter> zombieCharacters;
+    private volatile CopyOnWriteArrayList<CreateCharacter> characters;
     private Map<String, CreateCharacter> zombieMap = new ConcurrentHashMap<>();
     private volatile CopyOnWriteArrayList<Info> updatedZombies;
     private volatile CopyOnWriteArrayList<Bullet> updatedBullets;
@@ -92,7 +92,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     private void initializeEvent() {
         this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
         this.players = new CopyOnWriteArrayList<>();
-        this.zombieCharacters = new CopyOnWriteArrayList<>();
+        this.characters = new CopyOnWriteArrayList<>();
         this.updatedZombies = new CopyOnWriteArrayList<>();
 
         this.communication = this.clientConnect.getCommunication();
@@ -115,8 +115,8 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         updateExecutor = Executors.newSingleThreadScheduledExecutor();
         sendUpdateExecutor = Executors.newSingleThreadScheduledExecutor();
 
-        updateExecutor.scheduleAtFixedRate(this::update, 0, 100, TimeUnit.MILLISECONDS);
-        sendUpdateExecutor.scheduleAtFixedRate(this::sendUpdateToServer, 0, 125, TimeUnit.MILLISECONDS);
+        updateExecutor.scheduleAtFixedRate(this::update, 1, 16, TimeUnit.MILLISECONDS);
+        sendUpdateExecutor.scheduleAtFixedRate(this::sendUpdateToServer, 1, 100, TimeUnit.MILLISECONDS);
 
         // ? ON TEST
         // updateExecutor.scheduleAtFixedRate(this::update, 0, 1, TimeUnit.SECONDS);
@@ -131,17 +131,17 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             System.out.println(contents.entrySet());
 
             initializeMoment();
-            onUpdateBulletsFromServer();
-            onUpdateZombieFromServer();
+            // onUpdateBulletsFromServer();
+            // onUpdateZombieFromServer();
 
             CompletableFuture.allOf(
-                    CompletableFuture.runAsync(this::onUpdateClientObjFromServer, threadPool)
-            // CompletableFuture.runAsync(this::onUpdateBulletsFromServer, threadPool),
-            // CompletableFuture.runAsync(this::onUpdateZombieFromServer, threadPool)
+                    CompletableFuture.runAsync(this::onUpdateClientObjFromServer, threadPool),
+                    CompletableFuture.runAsync(this::onUpdateBulletsFromServer, threadPool),
+                    CompletableFuture.runAsync(this::onUpdateZombieFromServer, threadPool)
 
             ).thenRun(() -> {
                 SwingUtilities.invokeLater(this::revalidateContent);
-                this.updatedBullets.clear();
+                // this.updatedBullets.clear();
             });
 
             // onUpdateClientObjFromServer();
@@ -168,7 +168,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         int smoothX = (int) (currentX + deltaX * smoothingFactor);
         int smoothY = (int) (currentY + deltaY * smoothingFactor);
 
-        System.out.printf("SmoothX: %d, SmoothY: %d\n", smoothX, smoothY);
+        // System.out.printf("SmoothX: %d, SmoothY: %d\n", smoothX, smoothY);
 
         character.setLocation(smoothX, smoothY);
         character.setCharacterMoveLeft(isMovedLeft);
@@ -190,7 +190,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             Player player = clientObj.getPlayer();
 
             CreateCharacter existingCharacter = null;
-            for (CreateCharacter character : zombieCharacters) {
+            for (CreateCharacter character : characters) {
                 if (character.getInitClientObj().getId().equals(clientObj.getId())) {
                     existingCharacter = character;
                     break;
@@ -200,7 +200,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             if (existingCharacter == null) {
                 CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, clientObj);
                 players.add(player);
-                zombieCharacters.add(character);
+                characters.add(character);
                 character.setBounds(player.getDirectionX(), player.getDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
                 content.add(character);
 
@@ -216,7 +216,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
                 System.out.printf("Player position x: %d, y: %d\n", player.getDirectionX(), player.getDirectionY());
             }
 
-            revalidateContent();
+            // revalidateContent();
         }
     }
 
@@ -270,11 +270,12 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
 
         if (this.updatedBullets != null) {
             for (Bullet shootBullet : this.updatedBullets) {
-                super.addBullet(shootBullet);
+                SwingUtilities.invokeLater(() -> super.addBullet(shootBullet));
+                ;
 
             }
 
-            // this.updatedBullets.clear();
+            this.updatedBullets.clear();
         }
 
         // this.communication.setContent("BULLETS_INFO", this.updatedBullets);
@@ -291,7 +292,9 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             // this.updatedZombies.addAll(receivedZombies);
 
             for (Info zombieInfo : receivedZombies) {
-                updateZombieOnFrame(zombieInfo);
+                SwingUtilities.invokeLater(() -> updateZombieOnFrame(zombieInfo));
+                ;
+
             }
 
             zombieMap.entrySet()
@@ -302,20 +305,37 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     }
 
     private void updateZombieOnFrame(Info zombieInfo) {
-        CreateCharacter zombieCharacter = zombieMap.computeIfAbsent(zombieInfo.getId(), id -> {
-            CreateCharacter newZombie = new CreateCharacter(this, id);
-            newZombie.setBounds(zombieInfo.getX(), zombieInfo.getY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
-            content.add(newZombie);
-            return newZombie;
-        });
+        if (!zombieInfo.isAlive()) {
+            CreateCharacter zombieCharacter = zombieMap.remove(zombieInfo.getId());
+            if (zombieCharacter != null) {
+                super.content.remove(zombieCharacter);
 
-        zombieCharacter.setLocation(zombieInfo.getX(), zombieInfo.getY());
-        zombieCharacter.setCharacterHp(zombieInfo.getHealth());
-        zombieCharacter.repaint();
+                super.zombiesCharacters.remove(zombieCharacter);
+                // zombieCharacter.setVisible(false);
+                zombieCharacter.removeAll();
 
-        super.content.add(zombieCharacter);
-        super.content.revalidate();
-        super.content.repaint();
+                this.updatedZombies.removeIf(zombie -> zombie.getId().equals(zombieInfo.getId()));
+                this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
+
+                // super.ZOMBIE_REMAIN--;
+                // super.state.setZombieRemain(super.ZOMBIE_REMAIN);
+                // super.levelState.setZombieOnState(super.ZOMBIE_REMAIN);
+            }
+        } else {
+            CreateCharacter zombieCharacter = zombieMap.computeIfAbsent(zombieInfo.getId(), id -> {
+                CreateCharacter newZombie = new CreateCharacter(this, id, zombieInfo.getProfile());
+                newZombie.setBounds(zombieInfo.getX(), zombieInfo.getY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+
+                super.content.add(newZombie);
+                super.zombiesCharacters.add(newZombie);
+                return newZombie;
+            });
+
+            zombieCharacter.setLocation(zombieInfo.getX(), zombieInfo.getY());
+            zombieCharacter.setCharacterHp(zombieInfo.getHealth());
+            zombieCharacter.repaint();
+        }
+
     }
 
     @Override
@@ -362,26 +382,23 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
 
     @Override
     public void onZombieUpdate(Info updateZombie) {
-        CompletableFuture.runAsync(() -> {
-            boolean zombieExists = false;
-            for (int i = 0; i < this.updatedZombies.size(); i++) {
-                Info existingZombie = this.updatedZombies.get(i);
-                if (existingZombie.getId().equals(updateZombie.getId())) {
-                    this.updatedZombies.set(i, updateZombie);
-                    zombieExists = true;
-                    break;
-                }
+        boolean zombieExists = false;
+        for (int i = 0; i < this.updatedZombies.size(); i++) {
+            Info existingZombie = this.updatedZombies.get(i);
+            if (existingZombie.getId().equals(updateZombie.getId())) {
+                this.updatedZombies.set(i, updateZombie);
+                zombieExists = true;
+                break;
             }
+        }
 
-            if (!zombieExists) {
-                this.updatedZombies.add(updateZombie);
-            }
+        if (!zombieExists) {
+            this.updatedZombies.add(updateZombie);
+        }
 
-            this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
+        this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
 
-            SwingUtilities.invokeLater(() -> updateZombieOnFrame(updateZombie));
-
-        }, threadPool).thenRun(this::sendUpdateToServer);
+        // SwingUtilities.invokeLater(() -> updateZombieOnFrame(updateZombie));
     }
 
 }
