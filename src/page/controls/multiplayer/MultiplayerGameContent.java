@@ -37,7 +37,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     private volatile CopyOnWriteArrayList<Player> players;
     private volatile CopyOnWriteArrayList<CreateCharacter> zombieCharacters;
     private Map<String, CreateCharacter> zombieMap = new ConcurrentHashMap<>();
-    // private volatile CopyOnWriteArrayList<Info> updatedZombies;
+    private volatile CopyOnWriteArrayList<Info> updatedZombies;
     private volatile CopyOnWriteArrayList<Bullet> updatedBullets;
 
     // private ScheduledExecutorService executorService;
@@ -93,12 +93,13 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
         this.players = new CopyOnWriteArrayList<>();
         this.zombieCharacters = new CopyOnWriteArrayList<>();
+        this.updatedZombies = new CopyOnWriteArrayList<>();
 
         this.communication = this.clientConnect.getCommunication();
         this.contents = this.communication.getContent();
         this.communication.setContent("PLAYERS_INFO", this.clientObjs);
         this.communication.setContent("BULLETS_INFO", this.updatedBullets);
-        this.communication.setContent("ZOMBIES_INFO", new CopyOnWriteArrayList<Info>());
+        this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
 
         this.clientConnect.clientSideSendObject(this.communication);
         addMovementListener(this);
@@ -286,6 +287,9 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         System.out.println(receivedZombies);
 
         if (receivedZombies != null) {
+            // this.updatedZombies.clear();
+            // this.updatedZombies.addAll(receivedZombies);
+
             for (Info zombieInfo : receivedZombies) {
                 updateZombieOnFrame(zombieInfo);
             }
@@ -308,6 +312,10 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         zombieCharacter.setLocation(zombieInfo.getX(), zombieInfo.getY());
         zombieCharacter.setCharacterHp(zombieInfo.getHealth());
         zombieCharacter.repaint();
+
+        super.content.add(zombieCharacter);
+        super.content.revalidate();
+        super.content.repaint();
     }
 
     @Override
@@ -353,13 +361,27 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     }
 
     @Override
-    public void onZombieUpdate(CopyOnWriteArrayList<Info> zombies) {
-        // this.zombieInfos.clear();
-        // this.zombieInfos.addAll(zombies);
+    public void onZombieUpdate(Info updateZombie) {
+        CompletableFuture.runAsync(() -> {
+            boolean zombieExists = false;
+            for (int i = 0; i < this.updatedZombies.size(); i++) {
+                Info existingZombie = this.updatedZombies.get(i);
+                if (existingZombie.getId().equals(updateZombie.getId())) {
+                    this.updatedZombies.set(i, updateZombie);
+                    zombieExists = true;
+                    break;
+                }
+            }
 
-        this.communication.setContent("ZOMBIES_INFO", zombies);
-        // System.exit(-1);
+            if (!zombieExists) {
+                this.updatedZombies.add(updateZombie);
+            }
 
+            this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
+
+            SwingUtilities.invokeLater(() -> updateZombieOnFrame(updateZombie));
+
+        }, threadPool).thenRun(this::sendUpdateToServer);
     }
 
 }

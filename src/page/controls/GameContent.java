@@ -640,6 +640,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
             ZombieThreadControl zombieThread = new ZombieThreadControl(
                     zombieCharacter,
                     zombieBehavior,
+                    zombieInfo,
                     player,
                     character,
                     this);
@@ -672,6 +673,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 ZombieThreadControl zombieThread = new ZombieThreadControl(
                         zombieCharacter,
                         zombieBehavior,
+                        zombieInfo,
                         targetPlayer,
                         targetCharacter,
                         this);
@@ -679,7 +681,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                 zombieMoveThreads.add(zombieThread);
 
-                onZombieUpdate(new CopyOnWriteArrayList<>(this.zombieInfos));
+                onZombieUpdate(zombieInfo);
 
             }
 
@@ -832,7 +834,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
-    public void onZombieUpdate(CopyOnWriteArrayList<Info> actionZombies) {
+    public void onZombieUpdate(Info actionZombies) {
         System.out.println("On Zombie Update Work!");
 
         for (GameContentListener listener : playerListener) {

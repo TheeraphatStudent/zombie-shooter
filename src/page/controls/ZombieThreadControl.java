@@ -25,6 +25,7 @@ public class ZombieThreadControl extends Thread {
     // On Multiplayer Mode
     private List<Player> players;
     private List<CreateCharacter> characters;
+    private Info zombieInfo;
 
     private volatile boolean running = true;
     private volatile Timer biteTimer;
@@ -36,11 +37,13 @@ public class ZombieThreadControl extends Thread {
     public ZombieThreadControl(
             CreateCharacter zombie,
             Behavior behavior,
+            Info info,
             Player player,
             CreateCharacter character,
             GameContent content) {
         this.zombie = zombie;
         this.behavior = behavior;
+        this.zombieInfo = info;
 
         this.player = player;
         this.character = character;
@@ -76,6 +79,9 @@ public class ZombieThreadControl extends Thread {
 
                 // อัพเดทตำแหน่งการเดินของ Zombie
                 behavior.updateZombiePosition();
+                zombieInfo.setLocation(behavior.getMovedX(), behavior.getMovedY());
+
+                content.onZombieUpdate(zombieInfo);
 
                 biteTimer.start();
 

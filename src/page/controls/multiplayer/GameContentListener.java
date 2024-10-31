@@ -13,6 +13,6 @@ public interface GameContentListener extends Serializable {
     void onPlayerAction(Player player);
     void onPlayerTakeDamage(List<ClientObj> clientObj);
     void onShootBullet(CopyOnWriteArrayList<Bullet> bullets);
-    void onZombieUpdate(CopyOnWriteArrayList<Info> zombies);
+    void onZombieUpdate(Info updatedZombie);
 
 }

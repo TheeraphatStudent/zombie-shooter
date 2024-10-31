@@ -26,8 +26,8 @@ public class Behavior implements ManageCharacterElement {
     private double dx = 0f;
     private double dy = 0f;
 
-    private int movedX = 0;
-    private int movedY = 0;
+    private volatile int movedX = 0;
+    private volatile int movedY = 0;
 
     private String type = "normal";
 
