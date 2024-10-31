@@ -43,6 +43,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             Server serverConnect,
             List<ClientObj> clientObjs) {
         super(gameCenter, clientObjSide);
+        super.activeMultiplayerMode(clientObjs);
 
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
 
@@ -63,6 +64,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             Client clientConnect,
             List<ClientObj> clientObjs) {
         super(gameCenter, clientObjSide);
+        super.activeMultiplayerMode(clientObjs);
 
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
 
@@ -76,6 +78,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     }
 
     private void initializeEvent() {
+
         this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
         this.players = new CopyOnWriteArrayList<>();
         this.characters = new CopyOnWriteArrayList<>();
@@ -210,13 +213,13 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         if (this.updatedBullets != null) {
             for (Bullet shootBullet : this.updatedBullets) {
                 super.addBullet(shootBullet);
-                this.updatedBullets.remove(shootBullet);
+                // this.updatedBullets.remove(shootBullet);
 
             }
-            // this.updatedBullets.clear();
+            this.updatedBullets.clear();
         }
 
-        // this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
 
     }
 
