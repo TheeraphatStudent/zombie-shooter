@@ -1,18 +1,18 @@
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Welcome to the Java project! 🎉
 
-## Folder Structure
+You've just cloned a well-organized Java application that appears to be a multiplayer zombie game. Here's a quick rundown to help you get started:
 
-The workspace contains two folders by default, where:
+1. The project is set up for Visual Studio Code, making it easy to dive right in.
+2. The main code is in the src folder. This is where you'll spend most of your time.
+3. Key areas of the project include:
+   - client: Handles client-server communication
+   - components: Contains UI elements
+   - models: Defines game objects like players and zombies
+   - page: Manages different screens in the game
+   - utils: Offers helpful utility functions
+4. Resources like images and sounds are in the resource folder.
+5. Dependencies are managed in the lib folder and through the JAVA PROJECTS view in VS Code.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+To start contributing, open the project in VS Code and explore the src folder. The App.java file is likely a good starting point to understand the application's flow.

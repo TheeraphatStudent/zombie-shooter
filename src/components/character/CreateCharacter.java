@@ -247,16 +247,12 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     private void drawWeapon(Graphics2D g2d, AffineTransform originTransform) {
 
-        // g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        // RenderingHints.VALUE_ANTIALIAS_ON);
-
         if (!isSurvive)
             return;
 
         String getGun = "resource/images/character/weapon/Gun.png";
         Image weapon = new LoadImage().getImage(getGun);
 
-        // ตำแหน่งในการหมุนปืน
         int weaponSpinX = character.getX() + 40;
         int weaponSpinY = character.getY() + 70;
 
@@ -272,7 +268,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
                 -scaledHeight / 2,
                 WEAPON_WIDTH,
                 WEAPON_HEIGHT,
-                this);
+                null);
 
         g2d.setTransform(originTransform);
     }
@@ -289,7 +285,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         double deltaY = componentPos.y - weaponSpinY;
 
         this.weaponAngle = Math.atan2(deltaY, deltaX);
-        this.weapon.repaint();
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     public void onShootBullet(Point mousePos) {
@@ -302,7 +298,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         int weaponSpinY = (getY() + CHARACTER_CENTER_Y) + 70;
 
         // เพิ่มจำนวนกระสุนที่ยิงออกไป
-        gameContent.addBullet(new Bullet(weaponSpinX, weaponSpinY, weaponAngle));
+        gameContent.addBullet(new Bullet(client.getPlayer(), weaponSpinX, weaponSpinY, weaponAngle));
     }
 
     // ::::::::::::::::: Control :::::::::::::::::

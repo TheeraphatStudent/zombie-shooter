@@ -216,11 +216,22 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         layers.add(drawMouse, JLayeredPane.DRAG_LAYER);
         setContentPane(layers);
 
-        new WindowResize().addWindowResize(
-                this,
-                new Component[] { backgroundPanel, drawMouse },
-                new Component[] { layers });
-        new WindowClosingFrameEvent().navigateTo(this, gameCenter, true);
+        WindowResize resize = new WindowResize();
+        WindowClosingFrameEvent closing = new WindowClosingFrameEvent();
+
+        closing.navigateTo(WaitingRoom.this, gameCenter, true);
+        resize.addWindowResize(
+                    WaitingRoom.this,
+                    new Component[] { backgroundPanel, drawMouse, content, coverContent },
+                    new Component[] { layers }); 
+
+        // new Thread(new Runnable() {
+        //     @Override
+        //     public void run() {
+                    
+        //     }
+        // }).start();
+
     }
 
     private JButton createDisconnectButton() {
@@ -315,7 +326,7 @@ public class WaitingRoom extends JFrame implements ManageCharacterElement {
         // CreateCharacter playerCharacter = new CreateCharacter(false,
         // requireClientObj);
         CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, requireClientObj);
-        character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        character.setBounds(player.getDirectionX(), player.getDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
         content.add(character);
         content.revalidate();

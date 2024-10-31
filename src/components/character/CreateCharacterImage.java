@@ -1,6 +1,7 @@
 package components.character;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
@@ -28,8 +29,7 @@ public class CreateCharacterImage extends JPanel implements ManageCharacterEleme
     public void setCharacterMoveLeft(boolean isMoveLeft) {
         this.isMoveLeft = isMoveLeft;
 
-        repaint();
-        revalidate();
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     @Override

@@ -1,11 +1,11 @@
 package page.controls.multiplayer;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 
@@ -22,218 +22,239 @@ import page.home.GameCenter;
 public class MultiplayerGameContent extends GameContent implements PlayerBehaviorListener {
 
     private boolean isHost;
+
     private Client clientConnect;
     private Server serverConnect;
-
-    // ! Communication !
     private Communication communication;
-
     private Map<String, List> contents;
+
     private List<ClientObj> clientObjs;
     private List<Player> players;
     private List<CreateCharacter> characters;
+    private CopyOnWriteArrayList<Bullet> updatedBullets;
 
-    private Thread listenerThread;
+    private ScheduledExecutorService executorService;
 
+    // ! ----- Host ----- !
     public MultiplayerGameContent(
             GameCenter gameCenter,
             ClientObj clientObjSide,
             Client clientConnect,
             Server serverConnect,
             List<ClientObj> clientObjs) {
-        // ส่ง Client เรียกใช้งาน Super เพื่อสร้างหน้า GUI ของตัวเอง
         super(gameCenter, clientObjSide);
+        super.activeMultiplayerMode(clientObjs);
+
+        this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
 
         this.clientConnect = clientConnect;
         this.serverConnect = serverConnect;
-
         this.isHost = true;
 
-        this.clientObjs = clientObjs;
-        this.players = new ArrayList<>();
-        this.characters = new ArrayList<>();
-        this.communication = this.clientConnect.getCommunication();
-        this.communication.setContent("PLAYERS_INFO", clientObjs);
-
-        this.contents = this.communication.getContent();
-
-        // this.communication.setContent("CHARACTERS_INFO", players);
-
         System.out.println("-=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-\n");
-        System.out.println(contents.entrySet());
-        System.out.println(clientObjs);
 
         initializeEvent();
-
+        startUpdateLoop();
     }
 
+    // ! ----- Client ----- !
     public MultiplayerGameContent(
             GameCenter gameCenter,
             ClientObj clientObjSide,
             Client clientConnect,
             List<ClientObj> clientObjs) {
-        // เรียกใช้งาน Super เพื่อสร้างหน้า GUI ของตัวเอง
         super(gameCenter, clientObjSide);
+        super.activeMultiplayerMode(clientObjs);
+
+        this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
 
         this.clientConnect = clientConnect;
         this.isHost = false;
 
-        this.clientObjs = clientObjs;
-        this.players = new ArrayList<>();
-        this.characters = new ArrayList<>();
-        this.communication = this.clientConnect.getCommunication();
-        this.communication.setContent("PLAYERS_INFO", clientObjs);
-
-        this.contents = this.communication.getContent();
-
-        // this.communication.setContent("CHARACTERS_INFO", players);
         System.out.println("-=-=-=-=-=| On Game Start - Client |=-=-=-=-=-\n");
-        System.out.println(contents.entrySet());
-        System.out.println(clientObjs);
 
         initializeEvent();
+        startUpdateLoop();
     }
 
     private void initializeEvent() {
+
+        this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
+        this.players = new CopyOnWriteArrayList<>();
+        this.characters = new CopyOnWriteArrayList<>();
+
+        this.communication = this.clientConnect.getCommunication();
+        this.contents = this.communication.getContent();
+        this.communication.setContent("PLAYERS_INFO", this.clientObjs);
+        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+
+        this.clientConnect.clientSideSendObject(this.communication);
         addMovementListener(this);
 
+        System.out.println(contents.entrySet());
+        System.out.println(this.clientObjs);
+    }
+
+    private void startUpdateLoop() {
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(this::update, 4, 16, TimeUnit.MILLISECONDS);
+    }
+
+    private void update() {
+        if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
+            System.out.println("Updating game state...");
+
+            this.communication = clientConnect.getCommunication();
+            this.contents = this.communication.getContent();
+            System.out.println(contents);
+
+            onUpdateClientObjFromServer();
+            onUpdateBulletsFromServer();
+
+            initializeMoment();
+            sendUpdateToServer();
+            SwingUtilities.invokeLater(this::revalidateContent);
+        }
+    }
+
+    private void sendUpdateToServer() {
+        try {
+            clientConnect.clientSideSendObject(this.communication);
+        } catch (Exception e) {
+            System.err.println("Error sending update to server: " + e.getMessage());
+        }
+    }
+
+    private void updateCharacterPosition(CreateCharacter character, int targetX, int targetY) {
+        int currentX = character.getX();
+        int currentY = character.getY();
+
+        int deltaX = targetX - currentX;
+        int deltaY = targetY - currentY;
+
+        double smoothingFactor = 0.08;
+        int smoothX = (int) (currentX + deltaX * smoothingFactor);
+        int smoothY = (int) (currentY + deltaY * smoothingFactor);
+
+        System.out.printf("SmoothX: %d, SmoothY: %d\n", smoothX, smoothY);
+
+        character.setLocation(smoothX, smoothY);
     }
 
     private void initializeMoment() {
+        if (this.clientObjs == null || this.clientObjs.isEmpty()) {
+            return;
+        }
+
         for (ClientObj clientObj : this.clientObjs) {
+            if (this.parentClient.getId().equals(clientObj.getId())) {
+                continue;
+            }
+
+            System.out.println("Processing Client: " + clientObj.getClientName());
             Player player = clientObj.getPlayer();
 
-            boolean alreadyExists = characters.stream()
-                    .anyMatch(character -> character.getInitClientObj().getId()
-                            .equals(super.getClientObjParent().getId()));
+            CreateCharacter existingCharacter = characters.stream()
+                    .filter(character -> character.getInitClientObj().getId().equals(clientObj.getId()))
+                    .findFirst()
+                    .orElse(null);
 
-            if (!alreadyExists && !clientObj.getId().equals(super.getClientObjParent().getId())) {
+            if (existingCharacter == null) {
                 CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, clientObj);
                 players.add(player);
                 characters.add(character);
-                character.setBounds(player.geDirectionX(), player.geDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
-
+                character.setBounds(player.getDirectionX(), player.getDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
                 content.add(character);
+
+                System.out.println("Created new character for client: " + clientObj.getClientName());
+            } else {
+                System.out.printf("Updating character position for client: %s, x: %d, y: %d\n",
+                        clientObj.getClientName(), player.getDirectionX(), player.getDirectionY());
+                updateCharacterPosition(existingCharacter, player.getDirectionX(), player.getDirectionY());
+
+                System.out.println("Updated another character position: " + clientObj.getClientName());
+                System.out.printf("Player position x: %d, y: %d\n", player.getDirectionX(), player.getDirectionY());
             }
+
+            revalidateContent();
         }
-
-    }
-
-    private void eventListener() {
-        listenerThread = new Thread(() -> {
-            System.out.println("Multiplayer Game Content > On Event Listening...\n");
-            while (true) {
-                try {
-                    if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
-                        System.out.println("Contents: " + contents.entrySet());
-
-                        replaceClientObjsFromServer();
-
-                        SwingUtilities.invokeLater(() -> {
-                            initializeMoment();
-                            revalidateContent();
-                        });
-
-                        clientConnect.clientSideSendObject(this.communication);
-
-                    }
-                    Thread.sleep(16);
-                } catch (InterruptedException e) {
-                    System.err.println("Event listener interrupted: " + e.getMessage());
-                    e.printStackTrace();
-                    break;
-                } catch (Exception e) {
-                    System.err.println("Error in event listener: " + e.getMessage());
-                    e.printStackTrace();
-                    break;
-                }
-            }
-        });
-
-        listenerThread.setDaemon(true);
-        listenerThread.start();
     }
 
     @Override
     public void disposeContent() {
-        listenerThread.interrupt();
-
+        if (executorService != null) {
+            executorService.shutdown();
+        }
+        clientConnect.disconnect();
+        if (serverConnect != null) {
+            serverConnect.closeServer();
+        }
         super.disposeContent();
     }
 
-    private void updateClientObjList(ClientObj newClientObj) {
-        ClientObj clientToRemove = null;
-        for (ClientObj existingClient : this.clientObjs) {
-            if (existingClient.getId().equals(newClientObj.getId())) {
-                System.out.println("Removed: " + existingClient.getClientName() + "\n");
-                clientToRemove = existingClient;
-                break;
+    private void onUpdateClientObjFromServer() {
+        // System.out.println("OnUpdateClientObjFromServer...");
+
+        // ! Update Players
+        List<ClientObj> updatedClientObjs = (List<ClientObj>) this.contents.get("PLAYERS_INFO");
+
+        this.clientObjs.clear();
+        this.clientObjs.addAll(updatedClientObjs);
+
+        // System.out.println("=============== Update Client Obj ===============\n");
+        // System.out.println(updatedClientObjs);
+
+    }
+
+    private void onUpdateBulletsFromServer() {
+        this.updatedBullets = (CopyOnWriteArrayList<Bullet>) contents.get("BULLETS_INFO");
+        System.out.println("Update bullets...");
+    
+        if (this.updatedBullets != null) {
+            for (Bullet shootBullet : this.updatedBullets) {
+                super.addBullet(shootBullet);
+                // this.updatedBullets.remove(shootBullet);
+
             }
+            this.updatedBullets.clear();
         }
 
-        if (clientToRemove != null) {
-            this.clientObjs.remove(clientToRemove);
-        }
-
-        this.clientObjs.add(newClientObj);
-    }
-
-    private void replaceClientObjsFromServer() {
-        List<ClientObj> updatedClientObjs = contents.get("PLAYERS_INFO");
-        for (ClientObj updatedClient : updatedClientObjs) {
-            updateClientObjList(updatedClient);
-        }
-    }
-
-    @Override
-    public void run() {
-
-        // System.out.println("!>!<!>!<! On Thread Run !>!<!>!<!");
-        eventListener();
-        super.run();
+        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
 
     }
+
+    
 
     @Override
     public void onPlayerAction(Player player) {
-        boolean isUpdated = false;
+        System.out.printf("????? Player: x=%d | y=%d\n\n", player.getDirectionX(), player.getDirectionY());
 
-        for (ClientObj clientObj : this.clientObjs) {
+        boolean updated = false;
+        for (int i = 0; i < this.clientObjs.size(); i++) {
+            ClientObj clientObj = this.clientObjs.get(i);
             if (this.parentClient.getId().equals(clientObj.getId())) {
-                System.out.printf("Player On: x=%d | y=%d\n", player.geDirectionX(), player.geDirectionY());
                 clientObj.setPlayer(player);
-                updateClientObjList(clientObj);
-                isUpdated = true;
-                break;
+                updated = true;
+                System.out.println("On Player Action > Updated player for client: " + clientObj.getClientName());
+
+                this.clientObjs.set(i, clientObj);
             }
         }
 
-        if (isUpdated) {
-            try {
-                this.communication.setContent("PLAYERS_INFO", clientObjs);
-            } catch (Exception e) {
-                System.err.println("Error sending player update to server: " + e.getMessage());
-                e.printStackTrace();
-            }
-
-            SwingUtilities.invokeLater(() -> {
-                initializeMoment();
-                revalidateContent();
-            });
+        if (!updated) {
+            System.out.println("Warning: Could not find matching client for player update");
         }
+
+        // update();
+        SwingUtilities.invokeLater(this::revalidateContent);
     }
 
     @Override
     public void onShootBullet(CopyOnWriteArrayList<Bullet> bullets) {
-        // System.out.println("!!!Shoot!!!");
-        // System.out.println(bullets);
+        this.communication.setContent("BULLETS_INFO", bullets);
+
+        // update();
+        SwingUtilities.invokeLater(this::revalidateContent);
 
     }
-
-    // TODO - Host
-    // 1. สร้าง Thread เพื่อรับข้อมูลจาก Server
-    // 2. สร้าง Thread เพื่อส่งข้อมูลทุกอย่างที่เกิดขึ้นจาก Client ไปยัง Server
-    // 3. อัพเดท Frame และ Client Obj
-
-    // TODO - Client
 }

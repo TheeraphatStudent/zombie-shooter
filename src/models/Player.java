@@ -94,6 +94,7 @@ public class Player implements Serializable {
             // character.setCharacterHp(this.health);
             System.out.println("Current Health: " + this.health);
 
+            // ! อัพเดท Damage
             this.damage += (5 * state.getLevelState()) + rank+1;
             System.out.println("Current Damage: " + this.damage);
 
@@ -196,12 +197,12 @@ public class Player implements Serializable {
 
     }
 
-    public int geDirectionX() {
+    public int getDirectionX() {
         return this.xDir;
 
     }
 
-    public int geDirectionY() {
+    public int getDirectionY() {
         return this.yDir;
 
     }
