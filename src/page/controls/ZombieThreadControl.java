@@ -8,7 +8,7 @@ import javax.swing.Timer;
 import components.character.CreateCharacter;
 import models.Player;
 import models.Zombie.Behavior;
-import models.Zombie.Position;
+import models.Zombie.Info;
 import utils.UseCharacter;
 
 public class ZombieThreadControl extends Thread {
@@ -172,11 +172,6 @@ public class ZombieThreadControl extends Thread {
 
     public CreateCharacter getZombie() {
         return this.zombie;
-    }
-
-    public void updateTargetCharacter(CreateCharacter newTarget) {
-        this.character = newTarget;
-        this.behavior = new Behavior(newTarget, this.zombie, this.content, null, this.behavior.getType());
     }
 
     public void stopMovement() {

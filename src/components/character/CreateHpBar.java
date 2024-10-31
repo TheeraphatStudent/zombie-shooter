@@ -29,6 +29,12 @@ public class CreateHpBar extends JPanel {
         repaint();
     }
 
+    public void setColorBar(Color colorBar) {
+        this.colorBar = colorBar;
+        repaint();
+
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

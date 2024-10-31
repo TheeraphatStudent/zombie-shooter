@@ -14,6 +14,7 @@ public class Player implements Serializable {
 
     private boolean isMoveLeft = false;
     private boolean isInfected = false;
+    private boolean isDead = false;
 
     private State state;
     private int characterNo = 1;
@@ -34,7 +35,7 @@ public class Player implements Serializable {
     private volatile int rank = 0;
 
     // On Survive
-    private Timer onSurvive;
+    private transient Timer onSurvive;
     private volatile int sec = 0;
     private volatile int min = 0;
     private volatile int hour = 0;
@@ -229,6 +230,11 @@ public class Player implements Serializable {
 
     public boolean getInfectedStatus() {
         return this.isInfected;
+
+    }
+
+    public boolean getIsAlive() {
+        return this.isDead;
 
     }
 

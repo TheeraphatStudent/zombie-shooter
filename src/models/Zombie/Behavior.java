@@ -16,7 +16,7 @@ public class Behavior implements ManageCharacterElement {
     private static final ExecutorService executor = Executors.newCachedThreadPool();
     private String id;
 
-    private Position position;
+    private Info info;
     private CreateCharacter character;
     private CreateCharacter zombie;
     private GameContent gameContent;
@@ -36,7 +36,8 @@ public class Behavior implements ManageCharacterElement {
             CreateCharacter zombie,
             GameContent gameContent,
             State state,
-            String type) {
+            String type,
+            Info info) {
         this.character = character;
         this.zombie = zombie;
         this.gameContent = gameContent;
@@ -44,7 +45,7 @@ public class Behavior implements ManageCharacterElement {
         this.state = state;
         this.type = type;
 
-        this.id = UUID.randomUUID().toString();
+        this.info = info;
 
         updateZombieBehavior();
 
@@ -102,22 +103,17 @@ public class Behavior implements ManageCharacterElement {
 
             // เปลี่ยน ตำแหน่งของ Zombie
             zombie.setLocation(this.movedX, this.movedY);
-            position.setLocation(this.movedX, this.movedY);
+            info.setLocation(this.movedX, this.movedY);
 
         });
     }
 
     // ========== Setter ==========
 
-    public void setPositionObject(Position position) {
-        this.position = position;
-
-    }
-
     // ========== Getter ==========
 
-    public Position getPositionObject() {
-        return this.position;
+    public Info getInfo() {
+        return this.info;
 
     }
 

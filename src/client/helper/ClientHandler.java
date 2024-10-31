@@ -91,6 +91,7 @@ public class ClientHandler implements Runnable, Serializable {
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error receiving object: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

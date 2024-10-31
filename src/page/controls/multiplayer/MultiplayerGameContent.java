@@ -17,7 +17,7 @@ import models.ClientObj;
 import models.Communication;
 import models.Player;
 import models.Zombie.Behavior;
-import models.Zombie.Position;
+import models.Zombie.Info;
 import page.controls.GameContent;
 import page.home.GameCenter;
 
@@ -32,8 +32,8 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
 
     private volatile List<ClientObj> clientObjs;
     private volatile List<Player> players;
-    private volatile List<CreateCharacter> characters;
-    private volatile List<Behavior> updatedZombies;
+    private volatile List<CreateCharacter> zombieCharacters;
+    private volatile List<Info> updatedZombies;
     private volatile List<Bullet> updatedBullets;
 
     private ScheduledExecutorService executorService;
@@ -85,7 +85,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     private void initializeEvent() {
         this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
         this.players = new CopyOnWriteArrayList<>();
-        this.characters = new CopyOnWriteArrayList<>();
+        this.zombieCharacters = new CopyOnWriteArrayList<>();
         this.updatedZombies = new CopyOnWriteArrayList<>();
 
         this.communication = this.clientConnect.getCommunication();
@@ -114,12 +114,17 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             this.contents = this.communication.getContent();
             System.out.println(contents);
 
-            onUpdateClientObjFromServer();
-            onUpdateBulletsFromServer();
+            new Thread(() -> {
+                onUpdateClientObjFromServer();
+                onUpdateBulletsFromServer();
+                onUpdateZombieFromServer();
+
+            }).start();
 
             initializeMoment();
             sendUpdateToServer();
             SwingUtilities.invokeLater(this::revalidateContent);
+
         }
     }
 
@@ -131,7 +136,8 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         }
     }
 
-    private void updateCharacterPosition(CreateCharacter character, int targetX, int targetY) {
+    private void updateCharacter(CreateCharacter character, int targetX, int targetY, boolean isMovedLeft,
+            boolean isInfected) {
         int currentX = character.getX();
         int currentY = character.getY();
 
@@ -145,6 +151,9 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         System.out.printf("SmoothX: %d, SmoothY: %d\n", smoothX, smoothY);
 
         character.setLocation(smoothX, smoothY);
+        character.setCharacterMoveLeft(isMovedLeft);
+        character.setCharacterInfected(isInfected);
+
     }
 
     private void initializeMoment() {
@@ -161,7 +170,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             Player player = clientObj.getPlayer();
 
             CreateCharacter existingCharacter = null;
-            for (CreateCharacter character : characters) {
+            for (CreateCharacter character : zombieCharacters) {
                 if (character.getInitClientObj().getId().equals(clientObj.getId())) {
                     existingCharacter = character;
                     break;
@@ -171,7 +180,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             if (existingCharacter == null) {
                 CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, clientObj);
                 players.add(player);
-                characters.add(character);
+                zombieCharacters.add(character);
                 character.setBounds(player.getDirectionX(), player.getDirectionY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
                 content.add(character);
 
@@ -179,7 +188,9 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             } else {
                 System.out.printf("Updating character position for client: %s, x: %d, y: %d\n",
                         clientObj.getClientName(), player.getDirectionX(), player.getDirectionY());
-                updateCharacterPosition(existingCharacter, player.getDirectionX(), player.getDirectionY());
+
+                updateCharacter(existingCharacter, player.getDirectionX(), player.getDirectionY(),
+                        player.getPlayerIsMovedLeft(), player.getInfectedStatus());
 
                 System.out.println("Updated another character position: " + clientObj.getClientName());
                 System.out.printf("Player position x: %d, y: %d\n", player.getDirectionX(), player.getDirectionY());
@@ -200,6 +211,8 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         }
         super.disposeContent();
     }
+
+    // */*/*/*/*/* Receive And Update Content From Server */ */ */ */ */
 
     private void onUpdateClientObjFromServer() {
         // System.out.println("OnUpdateClientObjFromServer...");
@@ -222,15 +235,50 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         if (this.updatedBullets != null) {
             for (Bullet shootBullet : this.updatedBullets) {
                 super.addBullet(shootBullet);
-                // this.updatedBullets.remove(shootBullet);
 
             }
+
             this.updatedBullets.clear();
         }
 
         this.communication.setContent("BULLETS_INFO", this.updatedBullets);
 
     }
+
+    private void onUpdateZombieFromServer() {
+        List<Info> receivedZombies = (List<Info>) contents.get("ZOMBIES_INFO");
+        System.out.println("Updating zombies...");
+
+        if (receivedZombies != null) {
+            this.updatedZombies.clear();
+            this.updatedZombies.addAll(receivedZombies);
+            updateZombiesOnFrame();
+        }
+    }
+
+    private void updateZombiesOnFrame() {
+        for (Info zombieInfo : this.updatedZombies) {
+            CreateCharacter zombieCharacter = findOrCreateZombie(zombieInfo);
+            zombieCharacter.setLocation(zombieInfo.getX(), zombieInfo.getY());
+
+        }
+        revalidateContent();
+    }
+
+    private CreateCharacter findOrCreateZombie(Info zombieInfo) {
+        for (CreateCharacter zombie : zombieCharacters) {
+            if (zombie.getInitialId().equals(zombieInfo.getId())) {
+                return zombie;
+            }
+        }
+
+        CreateCharacter newZombie = new CreateCharacter(this, zombieInfo.getId());
+        newZombie.setBounds(zombieInfo.getX(), zombieInfo.getY(), CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        zombieCharacters.add(newZombie);
+        content.add(newZombie);
+        return newZombie;
+    }
+
 
     @Override
     public void onPlayerAction(Player player) {
@@ -253,7 +301,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         }
 
         // update();
-        SwingUtilities.invokeLater(this::revalidateContent);
+        // SwingUtilities.invokeLater(this::revalidateContent);
     }
 
     @Override
@@ -261,15 +309,18 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         this.communication.setContent("BULLETS_INFO", bullets);
 
         // update();
-        SwingUtilities.invokeLater(this::revalidateContent);
+        // SwingUtilities.invokeLater(this::revalidateContent);
 
     }
 
     @Override
-    public void onZombieSpawned(CopyOnWriteArrayList<Position> zombies) {
-        this.communication.setContent("ZOMBIES_INFO", zombies);
+    public void onZombieUpdate(CopyOnWriteArrayList<Info> zombies) {
+        this.updatedZombies.clear();
+        this.updatedZombies.addAll(zombies);
 
-        SwingUtilities.invokeLater(this::revalidateContent);
-
+        this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
+        sendUpdateToServer();
     }
+
+
 }

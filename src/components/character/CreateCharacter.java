@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.UUID;
 
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -47,6 +48,7 @@ interface CreateCharacterProps {
 
 public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
+    private String initialId;
 
     private ClientObj client;
 
@@ -85,6 +87,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(int characterProfile, boolean isInfected, ClientObj clientObj) {
         System.out.println("Character Name: " + clientObj.getClientName() + "\n");
+        this.initialId = clientObj.getId();
 
         // super();
         this.characterProfile = characterProfile;
@@ -199,9 +202,8 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
     }
 
     // ! :::::::::::::::::::: Zombie ::::::::::::::::::::
-    public CreateCharacter(GameContent gameContent) {
-        // super();
-
+    public CreateCharacter(GameContent gameContent, String id) {
+        this.initialId = id;
         this.gameContent = gameContent;
 
         // Zombie State -> false, false
@@ -324,6 +326,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     public void setCharacterInfected(boolean isInfected) {
         this.isInfected = isInfected;
+        if (this.isInfected) {
+            this.hpBar.setColorBar(Color.ORANGE);
+
+        }
     }
 
     public void setCharacterHp(int hp) {
@@ -366,6 +372,11 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     public int getCharacterProfile() {
         return this.useZombieProfile;
+
+    }
+
+    public String getInitialId() {
+        return this.initialId;
 
     }
 
