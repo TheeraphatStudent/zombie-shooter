@@ -1,34 +1,37 @@
-package models;
+package models.Zombie;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
+import models.State;
 import page.controls.GameContent;
 import types.ZombieType;
 
-public class Zombie implements ManageCharacterElement {
+public class Behavior implements ManageCharacterElement {
     private static final ExecutorService executor = Executors.newCachedThreadPool();
+    private String id;
 
+    private Position position;
     private CreateCharacter character;
     private CreateCharacter zombie;
     private GameContent gameContent;
     private State state;
 
-    // คำนวณหาตำแหน่งของผู้เล่น
+    // ความเร็วที่ Zombie เดิน
     private double dx = 0f;
     private double dy = 0f;
 
-    // ความเร็วที่ Zombie เดิน
     private int movedX = 0;
     private int movedY = 0;
 
     private String type = "normal";
 
-    public Zombie(
+    public Behavior(
             CreateCharacter character,
             CreateCharacter zombie,
             GameContent gameContent,
@@ -40,6 +43,8 @@ public class Zombie implements ManageCharacterElement {
 
         this.state = state;
         this.type = type;
+
+        this.id = UUID.randomUUID().toString();
 
         updateZombieBehavior();
 
@@ -97,8 +102,28 @@ public class Zombie implements ManageCharacterElement {
 
             // เปลี่ยน ตำแหน่งของ Zombie
             zombie.setLocation(this.movedX, this.movedY);
+            position.setLocation(this.movedX, this.movedY);
 
         });
+    }
+
+    // ========== Setter ==========
+
+    public void setPositionObject(Position position) {
+        this.position = position;
+
+    }
+
+    // ========== Getter ==========
+
+    public Position getPositionObject() {
+        return this.position;
+
+    }
+
+    public String getId() {
+        return this.id;
+
     }
 
     public ZombieType getZombieType(String zombieBehavior) {

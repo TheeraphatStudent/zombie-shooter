@@ -5,9 +5,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import models.Bullet;
 import models.Player;
+import models.Zombie.Position;
 
-public interface PlayerBehaviorListener extends Serializable {
+public interface GameContentListener extends Serializable {
     void onPlayerAction(Player player);
     void onShootBullet(CopyOnWriteArrayList<Bullet> bullets);
+    void onZombieSpawned(CopyOnWriteArrayList<Position> zombies);
 
 }

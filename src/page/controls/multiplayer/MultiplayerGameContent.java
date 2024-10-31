@@ -16,22 +16,25 @@ import models.Bullet;
 import models.ClientObj;
 import models.Communication;
 import models.Player;
+import models.Zombie.Behavior;
+import models.Zombie.Position;
 import page.controls.GameContent;
 import page.home.GameCenter;
 
-public class MultiplayerGameContent extends GameContent implements PlayerBehaviorListener {
+public class MultiplayerGameContent extends GameContent implements GameContentListener {
 
     private boolean isHost;
 
     private Client clientConnect;
     private Server serverConnect;
-    private Communication communication;
-    private Map<String, List> contents;
+    private volatile Communication communication;
+    private volatile Map<String, List> contents;
 
-    private List<ClientObj> clientObjs;
-    private List<Player> players;
-    private List<CreateCharacter> characters;
-    private CopyOnWriteArrayList<Bullet> updatedBullets;
+    private volatile List<ClientObj> clientObjs;
+    private volatile List<Player> players;
+    private volatile List<CreateCharacter> characters;
+    private volatile List<Behavior> updatedZombies;
+    private volatile List<Bullet> updatedBullets;
 
     private ScheduledExecutorService executorService;
 
@@ -42,14 +45,15 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             Client clientConnect,
             Server serverConnect,
             List<ClientObj> clientObjs) {
+        this.isHost = true;
+
         super(gameCenter, clientObjSide);
-        super.activeMultiplayerMode(clientObjs);
+        super.activeMultiplayerMode(clientObjs, this.isHost);
 
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
 
         this.clientConnect = clientConnect;
         this.serverConnect = serverConnect;
-        this.isHost = true;
 
         System.out.println("-=-=-=-=-=| On Game Start - HOST |=-=-=-=-=-\n");
 
@@ -63,13 +67,14 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             ClientObj clientObjSide,
             Client clientConnect,
             List<ClientObj> clientObjs) {
+        this.isHost = false;
+
         super(gameCenter, clientObjSide);
-        super.activeMultiplayerMode(clientObjs);
+        super.activeMultiplayerMode(clientObjs, this.isHost);
 
         this.clientObjs = new CopyOnWriteArrayList<>(clientObjs);
 
         this.clientConnect = clientConnect;
-        this.isHost = false;
 
         System.out.println("-=-=-=-=-=| On Game Start - Client |=-=-=-=-=-\n");
 
@@ -78,15 +83,16 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     }
 
     private void initializeEvent() {
-
         this.updatedBullets = new CopyOnWriteArrayList<>(super.bullets);
         this.players = new CopyOnWriteArrayList<>();
         this.characters = new CopyOnWriteArrayList<>();
+        this.updatedZombies = new CopyOnWriteArrayList<>();
 
         this.communication = this.clientConnect.getCommunication();
         this.contents = this.communication.getContent();
         this.communication.setContent("PLAYERS_INFO", this.clientObjs);
         this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+        this.communication.setContent("ZOMBIES_INFO", this.updatedZombies);
 
         this.clientConnect.clientSideSendObject(this.communication);
         addMovementListener(this);
@@ -154,10 +160,13 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
             System.out.println("Processing Client: " + clientObj.getClientName());
             Player player = clientObj.getPlayer();
 
-            CreateCharacter existingCharacter = characters.stream()
-                    .filter(character -> character.getInitClientObj().getId().equals(clientObj.getId()))
-                    .findFirst()
-                    .orElse(null);
+            CreateCharacter existingCharacter = null;
+            for (CreateCharacter character : characters) {
+                if (character.getInitClientObj().getId().equals(clientObj.getId())) {
+                    existingCharacter = character;
+                    break;
+                }
+            }
 
             if (existingCharacter == null) {
                 CreateCharacter character = new CreateCharacter(player.getCharacterNo(), false, clientObj);
@@ -209,7 +218,7 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
     private void onUpdateBulletsFromServer() {
         this.updatedBullets = (CopyOnWriteArrayList<Bullet>) contents.get("BULLETS_INFO");
         System.out.println("Update bullets...");
-    
+
         if (this.updatedBullets != null) {
             for (Bullet shootBullet : this.updatedBullets) {
                 super.addBullet(shootBullet);
@@ -222,8 +231,6 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         this.communication.setContent("BULLETS_INFO", this.updatedBullets);
 
     }
-
-    
 
     @Override
     public void onPlayerAction(Player player) {
@@ -254,6 +261,14 @@ public class MultiplayerGameContent extends GameContent implements PlayerBehavio
         this.communication.setContent("BULLETS_INFO", bullets);
 
         // update();
+        SwingUtilities.invokeLater(this::revalidateContent);
+
+    }
+
+    @Override
+    public void onZombieSpawned(CopyOnWriteArrayList<Position> zombies) {
+        this.communication.setContent("ZOMBIES_INFO", zombies);
+
         SwingUtilities.invokeLater(this::revalidateContent);
 
     }

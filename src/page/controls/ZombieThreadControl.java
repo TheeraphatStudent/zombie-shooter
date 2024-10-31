@@ -7,13 +7,14 @@ import javax.swing.Timer;
 
 import components.character.CreateCharacter;
 import models.Player;
-import models.Zombie;
+import models.Zombie.Behavior;
+import models.Zombie.Position;
 import utils.UseCharacter;
 
-public class ZombieMovementThread extends Thread {
+public class ZombieThreadControl extends Thread {
     private GameContent content;
 
-    private Zombie behavior;
+    private Behavior behavior;
     private CreateCharacter zombie;
 
     private Player player;
@@ -30,10 +31,15 @@ public class ZombieMovementThread extends Thread {
     private boolean isMultiplayer;
 
     // Single Player
-    public ZombieMovementThread(CreateCharacter zombie, Zombie behavior, Player player, CreateCharacter character,
+    public ZombieThreadControl(
+            CreateCharacter zombie,
+            Behavior behavior,
+            Player player,
+            CreateCharacter character,
             GameContent content) {
         this.zombie = zombie;
         this.behavior = behavior;
+
         this.player = player;
         this.character = character;
         this.content = content;
@@ -43,14 +49,15 @@ public class ZombieMovementThread extends Thread {
     }
 
     // Multiplayer
-    public ZombieMovementThread(
+    public ZombieThreadControl(
             CreateCharacter zombie,
-            Zombie behavior,
+            Behavior behavior,
             List<Player> players,
             List<CreateCharacter> characters,
             GameContent content) {
         this.zombie = zombie;
         this.behavior = behavior;
+
         this.players = players;
         this.characters = characters;
         this.content = content;
@@ -98,6 +105,7 @@ public class ZombieMovementThread extends Thread {
 
     private boolean isAnyPlayerInRange() {
         Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
+
         for (CreateCharacter character : characters) {
             Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(character);
             if (zombieHitbox.intersects(playerHitbox)) {
@@ -107,37 +115,40 @@ public class ZombieMovementThread extends Thread {
         return false;
     }
 
-
     private boolean isPlayerInRange(CreateCharacter zombie, CreateCharacter character) {
         Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
         Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(character);
+
         return zombieHitbox.intersects(playerHitbox);
     }
 
     private void biteInArea() {
-        if (isMultiplayer) {
+        if (this.isMultiplayer) {
             biteInAreaMultiplayer();
+
         } else {
             biteInAreaSinglePlayer();
+
         }
     }
 
     private void biteInAreaSinglePlayer() {
-        System.out.println("On Zombie Damage Single Mode");
-        
+        System.out.println("On Zombie Damage: Single Mode");
+
         if (isPlayerInRange(this.zombie, this.character)) {
             player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
             character.setCharacterHp(player.getPlayerHealth());
-            
+
             if (player.getPlayerHealth() <= 0) {
                 System.out.println("Player is dead!");
                 this.content.disposeContent();
+
             }
         }
     }
-    
+
     private void biteInAreaMultiplayer() {
-        System.out.println("On Zombie Damage Multiplayer Mode");
+        System.out.println("On Zombie Damage: Multiplayer Mode");
 
         Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
         for (int i = 0; i < characters.size(); i++) {
@@ -155,7 +166,7 @@ public class ZombieMovementThread extends Thread {
                 }
             }
         }
-        
+
         // Send update player to another clients
     }
 
@@ -165,7 +176,7 @@ public class ZombieMovementThread extends Thread {
 
     public void updateTargetCharacter(CreateCharacter newTarget) {
         this.character = newTarget;
-        this.behavior = new Zombie(newTarget, this.zombie, this.content, null, this.behavior.getType());
+        this.behavior = new Behavior(newTarget, this.zombie, this.content, null, this.behavior.getType());
     }
 
     public void stopMovement() {
