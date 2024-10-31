@@ -1,11 +1,13 @@
 package page.controls;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Timer;
 
 import components.character.CreateCharacter;
+import models.ClientObj;
 import models.Player;
 import models.Zombie.Behavior;
 import models.Zombie.Info;
@@ -45,7 +47,7 @@ public class ZombieThreadControl extends Thread {
         this.content = content;
         this.isMultiplayer = false;
 
-        biteTimer = new Timer(1000, e -> biteInArea());
+        biteTimer = new Timer(0, e -> biteInArea());
     }
 
     // Multiplayer
@@ -63,7 +65,7 @@ public class ZombieThreadControl extends Thread {
         this.content = content;
         this.isMultiplayer = true;
 
-        biteTimer = new Timer(1000, e -> biteInArea());
+        biteTimer = new Timer(0, e -> biteInArea());
     }
 
     @Override
@@ -75,13 +77,17 @@ public class ZombieThreadControl extends Thread {
                 // อัพเดทตำแหน่งการเดินของ Zombie
                 behavior.updateZombiePosition();
 
+                biteTimer.start();
+
                 if (!isBiting && checkIsPlayerInRange()) {
                     isBiting = true;
-                    biteTimer.start();
+                    biteTimer.setDelay(1000);
 
                 } else if (isBiting && !checkIsPlayerInRange()) {
                     isBiting = false;
+
                     biteTimer.stop();
+                    biteTimer.setDelay(0);
 
                 }
 
@@ -133,9 +139,8 @@ public class ZombieThreadControl extends Thread {
     }
 
     private void biteInAreaSinglePlayer() {
-        System.out.println("On Zombie Damage: Single Mode");
-
         if (isPlayerInRange(this.zombie, this.character)) {
+            System.out.println("On Zombie Damage: Single Mode");
             player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
             character.setCharacterHp(player.getPlayerHealth());
 
@@ -148,15 +153,18 @@ public class ZombieThreadControl extends Thread {
     }
 
     private void biteInAreaMultiplayer() {
-        System.out.println("On Zombie Damage: Multiplayer Mode");
 
         Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
+        List<ClientObj> updateClientObjects = new ArrayList<>();
+
         for (int i = 0; i < characters.size(); i++) {
             CreateCharacter character = characters.get(i);
             Player player = players.get(i);
+
             Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(character);
 
             if (zombieHitbox.intersects(playerHitbox)) {
+                System.out.println("On Zombie Damage: Multiplayer Mode");
                 player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
                 character.setCharacterHp(player.getPlayerHealth());
 
@@ -165,9 +173,11 @@ public class ZombieThreadControl extends Thread {
 
                 }
             }
+
+            updateClientObjects.get(i).setPlayer(player);
         }
 
-        // Send update player to another clients
+        this.content.onPlayerTakeDamages(updateClientObjects);
     }
 
     public CreateCharacter getZombie() {

@@ -40,7 +40,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     // private volatile CopyOnWriteArrayList<Info> updatedZombies;
     private volatile CopyOnWriteArrayList<Bullet> updatedBullets;
 
-    private ScheduledExecutorService executorService;
+    // private ScheduledExecutorService executorService;
     private ScheduledExecutorService updateExecutor;
     private ScheduledExecutorService sendUpdateExecutor;
     private ExecutorService threadPool;
@@ -100,7 +100,6 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         this.communication.setContent("BULLETS_INFO", this.updatedBullets);
         this.communication.setContent("ZOMBIES_INFO", new CopyOnWriteArrayList<Info>());
 
-
         this.clientConnect.clientSideSendObject(this.communication);
         addMovementListener(this);
 
@@ -109,33 +108,42 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     }
 
     private void startUpdateLoop() {
-        executorService = Executors.newSingleThreadScheduledExecutor();
         threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        // executorService = Executors.newSingleThreadScheduledExecutor();
         updateExecutor = Executors.newSingleThreadScheduledExecutor();
         sendUpdateExecutor = Executors.newSingleThreadScheduledExecutor();
 
         updateExecutor.scheduleAtFixedRate(this::update, 0, 100, TimeUnit.MILLISECONDS);
         sendUpdateExecutor.scheduleAtFixedRate(this::sendUpdateToServer, 0, 125, TimeUnit.MILLISECONDS);
+
+        // ? ON TEST
+        // updateExecutor.scheduleAtFixedRate(this::update, 0, 1, TimeUnit.SECONDS);
+        // sendUpdateExecutor.scheduleAtFixedRate(this::sendUpdateToServer, 0, 1100,
+        // TimeUnit.MILLISECONDS);
     }
 
     private void update() {
         if (clientConnect != null && clientConnect.isConnected() && this.communication != null) {
             this.communication = clientConnect.getCommunication();
             this.contents = this.communication.getContent();
+            System.out.println(contents.entrySet());
 
             initializeMoment();
+            onUpdateBulletsFromServer();
+            onUpdateZombieFromServer();
 
             CompletableFuture.allOf(
-                    // CompletableFuture.runAsync(this::onUpdateClientObjFromServer, threadPool),
-                    CompletableFuture.runAsync(this::onUpdateBulletsFromServer, threadPool),
-                    CompletableFuture.runAsync(this::onUpdateZombieFromServer, threadPool)
+                    CompletableFuture.runAsync(this::onUpdateClientObjFromServer, threadPool)
+            // CompletableFuture.runAsync(this::onUpdateBulletsFromServer, threadPool),
+            // CompletableFuture.runAsync(this::onUpdateZombieFromServer, threadPool)
 
             ).thenRun(() -> {
                 SwingUtilities.invokeLater(this::revalidateContent);
                 this.updatedBullets.clear();
             });
 
-            onUpdateClientObjFromServer();
+            // onUpdateClientObjFromServer();
         }
     }
 
@@ -213,9 +221,9 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
 
     @Override
     public void disposeContent() {
-        if (executorService != null) {
-            executorService.shutdown();
-        }
+        // if (executorService != null) {
+        // executorService.shutdown();
+        // }
 
         if (updateExecutor != null) {
             updateExecutor.shutdown();
@@ -257,6 +265,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
     private void onUpdateBulletsFromServer() {
         this.updatedBullets = (CopyOnWriteArrayList<Bullet>) contents.get("BULLETS_INFO");
         System.out.println("Update bullets...");
+        System.out.println(this.updatedBullets);
 
         if (this.updatedBullets != null) {
             for (Bullet shootBullet : this.updatedBullets) {
@@ -267,19 +276,24 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             // this.updatedBullets.clear();
         }
 
-        this.communication.setContent("BULLETS_INFO", this.updatedBullets);
+        // this.communication.setContent("BULLETS_INFO", this.updatedBullets);
 
     }
 
     private void onUpdateZombieFromServer() {
         List<Info> receivedZombies = (CopyOnWriteArrayList<Info>) contents.get("ZOMBIES_INFO");
         System.out.println("Updating zombies...");
+        System.out.println(receivedZombies);
 
         if (receivedZombies != null) {
-            // this.updatedZombies.addAll(receivedZombies);
             for (Info zombieInfo : receivedZombies) {
                 updateZombieOnFrame(zombieInfo);
             }
+
+            zombieMap.entrySet()
+                    .removeIf(entry -> receivedZombies.stream().noneMatch(info -> info.getId().equals(entry.getKey())));
+
+            revalidateContent();
         }
     }
 
@@ -291,17 +305,9 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
             return newZombie;
         });
 
-        int currentX = zombieCharacter.getX();
-        int currentY = zombieCharacter.getY();
-
-        int targetX = zombieInfo.getX();
-        int targetY = zombieInfo.getY();
-
-        double interpolationFactor = 0.1;
-        int newX = (int) (currentX + (targetX - currentX) * interpolationFactor);
-        int newY = (int) (currentY + (targetY - currentY) * interpolationFactor);
-
-        zombieCharacter.setLocation(newX, newY);
+        zombieCharacter.setLocation(zombieInfo.getX(), zombieInfo.getY());
+        zombieCharacter.setCharacterHp(zombieInfo.getHealth());
+        zombieCharacter.repaint();
     }
 
     @Override
@@ -328,6 +334,15 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
         // SwingUtilities.invokeLater(this::revalidateContent);
     }
 
+    public void onPlayerTakeDamage(List<ClientObj> refClientObj) {
+        for (int i = 0; i < this.clientObjs.size(); i++) {
+            ClientObj updateObj = refClientObj.get(i);
+            this.clientObjs.set(i, updateObj);
+
+        }
+
+    };
+
     @Override
     public void onShootBullet(CopyOnWriteArrayList<Bullet> bullets) {
         this.communication.setContent("BULLETS_INFO", bullets);
@@ -339,11 +354,12 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
 
     @Override
     public void onZombieUpdate(CopyOnWriteArrayList<Info> zombies) {
-        // this.updatedZombies.clear();
-        // this.updatedZombies.addAll(zombies);
+        // this.zombieInfos.clear();
+        // this.zombieInfos.addAll(zombies);
 
         this.communication.setContent("ZOMBIES_INFO", zombies);
-        // sendUpdateToServer();
+        // System.exit(-1);
+
     }
 
 }

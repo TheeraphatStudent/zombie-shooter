@@ -12,6 +12,7 @@ public class Info implements Serializable {
     private int x;
     private int y;
     private int profile;
+    private int health;
     private ZombieType type;
 
     public Info() {
@@ -21,14 +22,23 @@ public class Info implements Serializable {
 
     // >>>>>>>>>>>>>>>> Setter
 
+    public void setId(String id) {
+        this.initialId = id;
+
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
     public void setProfile(int profile) {
         this.profile = profile;
     }
-    
+
     public void setLocation(int x, int y) {
         this.x = x;
         this.y = y;
-    }   
+    }
 
     public void setZombieType(ZombieType type) {
         this.type = type;
@@ -36,6 +46,11 @@ public class Info implements Serializable {
     }
 
     // <<<<<<<<<<<<<<<< Getter
+
+    public int getHealth() {
+        return this.health;
+    
+    }
 
     public String getId() {
         return this.initialId;
@@ -58,7 +73,7 @@ public class Info implements Serializable {
     }
 
     public ZombieType getZombieType() {
-        return type; 
-    
+        return type;
+
     }
 }

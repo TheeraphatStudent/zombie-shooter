@@ -86,17 +86,21 @@ public class Player implements Serializable {
         this.zombieHunt += number;
         this.storeZombieHunt += number;
 
+        this.health += (int) (damage * 0.4);
+
         if (storeZombieHunt >= ((5 * (rank + 1)) * 2)) {
             System.out.println("Is Rank Up!");
             this.rank++;
             // character.setCharacterRank(rank);
             
-            this.health = this.health + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
+            this.maxHealth = this.maxHealth + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
+            this.health = this.maxHealth;
+
             // character.setCharacterHp(this.health);
-            System.out.println("Current Health: " + this.health);
+            // System.out.println("Current Health: " + this.health);
 
             // ! อัพเดท Damage
-            this.damage += (5 * state.getLevelState()) + rank+1;
+            this.damage += 5;
             System.out.println("Current Damage: " + this.damage);
 
             storeZombieHunt = 0;
