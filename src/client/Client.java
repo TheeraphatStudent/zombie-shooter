@@ -66,14 +66,15 @@ public class Client implements Serializable, ManageCharacterElement {
 
             System.out.printf("Spawn: x=%d | y=%d\n", spawnPositionX, spawnPositionY);
 
-            // character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+            // character.setBounds(spawnPositionX, spawnPositionY, CHARACTER_WIDTH,
+            // CHARACTER_HEIGHT);
 
             Player player = new Player(new UseCharacter().getRandomCharacterNo(), null);
             player.setPlayerLocation(spawnPositionX, spawnPositionY);
 
             this.clientObj.setPlayer(player);
 
-            if (!isRegister) { 
+            if (!isRegister) {
                 this.register = new RegisterClient(this.clientObj);
                 clientSideSendObject(register);
                 isRegister = true;
@@ -156,6 +157,7 @@ public class Client implements Serializable, ManageCharacterElement {
 
                     if (object instanceof Communication) {
                         this.communication = (Communication) object;
+                        System.out.println(this.communication.getContent().entrySet());
 
                     } else if (object instanceof String) {
                         this.message = (String) object;

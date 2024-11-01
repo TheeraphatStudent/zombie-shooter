@@ -21,6 +21,8 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Timer;
@@ -44,9 +46,10 @@ import components.Cover;
 import models.Bullet;
 import models.ClientObj;
 import models.Player;
-import models.Zombie;
 import models.State;
-import page.controls.multiplayer.PlayerBehaviorListener;
+import models.Zombie.Behavior;
+import models.Zombie.Info;
+import page.controls.multiplayer.GameContentListener;
 import page.home.GameCenter;
 
 import utils.LoadImage;
@@ -61,7 +64,7 @@ interface GameContentProps {
 
     void addBullet(Bullet bullet);
 
-    void updateGameState();
+    // void updateGameState();
 
     void disposeContent();
 
@@ -71,7 +74,7 @@ interface GameContentProps {
 
 public class GameContent extends JFrame implements KeyListener, GameContentProps, ManageCharacterElement, Runnable {
     // Player Listener
-    private List<PlayerBehaviorListener> playerListener = new ArrayList<>();
+    private List<GameContentListener> playerListener = new ArrayList<>();
 
     // ? Multiplayer
     private boolean isHost = false;
@@ -103,11 +106,12 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     protected Player player;
 
     // ! Zombie
-    private ArrayList<CreateCharacter> zombiesCharacters;
-    private List<Zombie> zombies;
-    private ArrayList<ZombieMovementThread> zombieMoveThreads;
+    protected ArrayList<CreateCharacter> zombiesCharacters;
+    private ArrayList<ZombieThreadControl> zombieMoveThreads;
+    public CopyOnWriteArrayList<Info> zombieInfos;
+    private CopyOnWriteArrayList<Behavior> zombieBehaviors;
     private Timer spawner;
-    private volatile int ZOMBIE_REMAIN;
+    protected volatile int ZOMBIE_REMAIN;
 
     // Movement
     private boolean isUpPressed, isDownPressed, isLeftPressed, isRightPressed;
@@ -115,10 +119,6 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // Bullet
     protected CopyOnWriteArrayList<Bullet> bullets;
-
-    // Thread
-    private Thread bulletThread;
-    private Thread characterThread;
 
     public GameContent(GameCenter gameCenter, ClientObj client) {
         this.parentClient = client;
@@ -128,19 +128,21 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         this.gameCenter = gameCenter;
         this.state = new State();
 
-        this.clientObjs = new ArrayList<>();
-        this.players = new ArrayList<>();
-        this.characters = new ArrayList<>();
+        this.clientObjs = new CopyOnWriteArrayList<>();
+        this.players = new CopyOnWriteArrayList<>();
+        this.characters = new CopyOnWriteArrayList<>();
 
         this.zombiesCharacters = new ArrayList<>();
-        this.zombies = new ArrayList<>();
         this.zombieMoveThreads = new ArrayList<>();
+        this.zombieInfos = new CopyOnWriteArrayList<>();
+        this.zombieBehaviors = new CopyOnWriteArrayList<>();
+
         this.bullets = new CopyOnWriteArrayList<>();
 
         createFrame();
 
         updateGameState();
-        updatePlayerStat();
+        // updatePlayerStat(this.player);
 
         // ปิดการปรับขนาดจอ
         // setUndecorated(true);
@@ -159,16 +161,28 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     // ==================== Game State ====================
 
-    public void updateGameState() {
+    protected void updateGameState() {
+        System.out.println("Update Game State");
+
+        zombiesCharacters.forEach(zombie -> zombie.removeAll());
+        zombiesCharacters.clear();
+
+        zombieMoveThreads.forEach(ZombieThreadControl::stopMovement);
+        zombieMoveThreads.clear();
+
+        this.zombieInfos.clear();
+        this.zombieBehaviors.clear();
+
         state.setStateLevel(1);
 
         ZOMBIE_REMAIN = state.getMaxZombie();
 
         updateLevelScoreboard();
+        revalidateContent();
 
     }
 
-    private void updateLevelScoreboard() {
+    protected void updateLevelScoreboard() {
         levelState.setLevelState(state.getLevelState());
         levelState.setZombieOnState(state.getMaxZombie());
         levelState.setZombieRemain(ZOMBIE_REMAIN);
@@ -177,13 +191,13 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
-    private void updatePlayerStat() {
+    private void updatePlayerStat(Player shootPlayer) {
         // Killed Stat
-        scoreboard.setKilled(player.getZombieHunt());
-        scoreboard.setNeededKilled(player.getStoreZombieHunt());
-        scoreboard.setMaxZombie(player.getRankUpKillZombieNeeded());
+        scoreboard.setKilled(shootPlayer.getZombieHunt());
+        scoreboard.setNeededKilled(shootPlayer.getStoreZombieHunt());
+        scoreboard.setMaxZombie(shootPlayer.getRankUpKillZombieNeeded());
 
-        scoreboard.setRank(player.getRank());
+        scoreboard.setRank(shootPlayer.getRank());
 
     }
 
@@ -260,8 +274,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         // content.add(anotherPlayer);
 
         // ! Add Zombie
-        initializeZombieSpawner();
-        // SwingUtilities.invokeLater(this::initializeZombieSpawner);
+        // initializeZombieSpawner();
+        SwingUtilities.invokeLater(this::initializeZombieSpawner);
 
         // ==================== Layer ====================
 
@@ -320,9 +334,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     }
 
     // Multiplayer Mode Content
-    protected void activeMultiplayerMode(List<ClientObj> clientObjs) {
+    protected void activeMultiplayerMode(List<ClientObj> clientObjs, boolean isHost) {
         this.clientObjs.addAll(clientObjs);
-        System.out.println(clientObjs);
+        this.isHost = isHost;
+
+        // System.out.println(clientObjs);
 
         for (ClientObj getObj : this.clientObjs) {
             Player player = getObj.getPlayer();
@@ -348,60 +364,76 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
+    protected void updateMultiplayerEvent(Map<String, List> contents) {
+        // Get ClientObj From Server
+
+    }
+
     // ----*----*----*---- Bullet Management ----*----*----*----
 
     protected void updateBullets() {
-        for (Bullet bullet : bullets) {
-            bullet.move();
+        new Thread(() -> {
+            for (Bullet bullet : bullets) {
+                bullet.move();
 
-            boolean bulletRemoved = false;
+                boolean bulletRemoved = false;
 
-            Iterator<CreateCharacter> zombieContain = zombiesCharacters.iterator();
-            while (zombieContain.hasNext() && !bulletRemoved) {
-                CreateCharacter zombie = zombieContain.next();
-                Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
+                Iterator<CreateCharacter> zombieContain = this.zombiesCharacters.iterator();
+                Iterator<Info> zombiesInfo = this.zombieInfos.iterator();
 
-                if (bullet.getBounds().intersects(zombieHitbox)) {
+                while (zombieContain.hasNext() && zombiesInfo.hasNext() && !bulletRemoved) {
+                    CreateCharacter zombieCharacter = zombieContain.next();
+                    Info zombieInfo = zombiesInfo.next();
 
-                    Player shottedPlayer = bullet.getPlayer();
+                    Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombieCharacter);
 
-                    // Remove bullet
-                    bullets.remove(bullet);
+                    if (bullet.getBounds().intersects(zombieHitbox)) {
+                        Player shottedPlayer = bullet.getPlayer();
 
-                    zombie.setCharacterHp(zombie.getCharacterHp() - shottedPlayer.getPlayerBulletDamage());
+                        bullets.remove(bullet);
 
-                    if (zombie.getCharacterHp() <= 0) {
-                        for (ZombieMovementThread thread : zombieMoveThreads) {
-                            if (thread.getZombie() == zombie) {
-                                thread.stopMovement();
-                                break;
+                        zombieInfo.setHealth(zombieInfo.getHealth() - shottedPlayer.getPlayerBulletDamage());
+                        zombieCharacter.setCharacterHp(zombieInfo.getHealth());
+
+                        if (zombieInfo.getHealth() <= 0) {
+                            for (ZombieThreadControl thread : zombieMoveThreads) {
+                                if (thread.getZombie() == zombieCharacter) {
+                                    thread.stopMovement();
+                                    break;
+
+                                }
                             }
+
+                            shottedPlayer.addZombieWasKilled(1);
+                            this.character.setCharacterHp(shottedPlayer.getPlayerHealth());
+                            this.character.repaint();
+
+                            scoreboard.setKilled(shottedPlayer.getZombieHunt());
+
+                            zombieContain.remove();
+                            content.remove(zombieCharacter);
+
+                            this.ZOMBIE_REMAIN = ZOMBIE_REMAIN - 1;
+
+                            updateLevelScoreboard();
+                            updatePlayerStat(shottedPlayer);
+
+                            onPlayerActions(shottedPlayer);
+
+                            revalidateContent();
                         }
 
-                        shottedPlayer.addZombieWasKilled(1);
-                        scoreboard.setKilled(shottedPlayer.getZombieHunt());
+                        onZombieUpdate(zombieInfo);
 
-                        zombieContain.remove();
-                        content.remove(zombie);
-
-                        this.ZOMBIE_REMAIN = ZOMBIE_REMAIN - 1;
-                        if (ZOMBIE_REMAIN <= 0) {
-                            updateGameState();
-                        }
-
-                        updateLevelScoreboard();
-                        updatePlayerStat();
-                        revalidateContent();
+                        bulletRemoved = true;
                     }
+                }
 
-                    bulletRemoved = true;
+                if (!bulletRemoved && bullet.isOutOfBounds(getWidth(), getHeight())) {
+                    bullets.remove(bullet);
                 }
             }
-
-            if (!bulletRemoved && bullet.isOutOfBounds(getWidth(), getHeight())) {
-                bullets.remove(bullet);
-            }
-        }
+        }).start();
     }
 
     public void drawBullets(Graphics2D g2d) {
@@ -418,6 +450,11 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
+    public CopyOnWriteArrayList<Bullet> getBullets() {
+        return this.bullets;
+
+    }
+
     // ----*----*----*---- Dispose Content ----*----*----*----
 
     public void disposeContent() {
@@ -428,7 +465,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
         character.removeAll();
 
         spawner.stop();
-        zombieMoveThreads.forEach(ZombieMovementThread::stopMovement);
+        zombieMoveThreads.forEach(ZombieThreadControl::stopMovement);
         player.onGameFinish();
 
     }
@@ -540,7 +577,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     protected void initializeZombieSpawner() {
         spawner = new Timer(1500, e -> {
-            if (zombiesCharacters.size() >= 4) {
+            if (zombiesCharacters.size() >= MAX_ZOMBIES_FRAME) {
                 return;
 
             }
@@ -551,6 +588,7 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
                 addZombie(randomType);
             }
+
         });
 
         spawner.start();
@@ -560,10 +598,26 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
     private void addZombie(String type) {
         // System.out.println("Level State: " + state.getLevelState());
 
-        CreateCharacter zombie = new CreateCharacter(this);
-        Zombie zombieBehavior = new Zombie(character, zombie, this, state, type);
+        Player targetPlayer = this.player;
 
-        zombie.setMaxCharacterHp((int) zombieBehavior.getZombieHealth());
+        // if (this.players != null && this.players.size() > 0) {
+        // targetPlayer = this.players.get((int) (Math.random() * this.players.size()));
+
+        // } else {
+        // targetPlayer = this.player;
+
+        // }
+
+        Info zombieInfo = new Info();
+
+        CreateCharacter zombieCharacter = new CreateCharacter(this, zombieInfo.getId(), (int) (Math.random() * 10) + 1);
+        zombieInfo.setProfile(zombieCharacter.getCharacterProfile());
+
+        Behavior zombieBehavior = new Behavior(targetPlayer, character, zombieCharacter, this, state, type, zombieInfo);
+        zombieInfo.setZombieType(zombieBehavior.getZombieType(type));
+        zombieInfo.setHealth((int) zombieBehavior.getZombieHealth());
+
+        zombieCharacter.setMaxCharacterHp((int) zombieBehavior.getZombieHealth());
 
         int spawnSide = (int) (Math.random() * 4);
         int x = 0, y = 0;
@@ -590,49 +644,60 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
                 break;
         }
 
-        zombie.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
-        zombie.setCharacterHp((int) zombieBehavior.getZombieHealth());
+        zombieCharacter.setBounds(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        zombieCharacter.setCharacterHp((int) zombieBehavior.getZombieHealth());
 
-        content.add(zombie);
-        zombiesCharacters.add(zombie);
+        zombieInfo.setLocation(x, y);
+        this.zombieInfos.add(zombieInfo);
+        this.zombieBehaviors.add(zombieBehavior);
+        this.zombiesCharacters.add(zombieCharacter);
 
-        ZombieMovementThread zombieThread = new ZombieMovementThread(zombie, zombieBehavior, player, character, this);
-        zombieThread.start();
-
-        zombieMoveThreads.add(zombieThread);
-
-        // if (!this.onMultiplayerMode) {
-        // ZombieMovementThread zombieThread = new ZombieMovementThread(zombie,
-        // zombieBehavior, player, character, this);
+        // ZombieThreadControl zombieThread = new ZombieThreadControl(
+        //         zombieCharacter,
+        //         zombieBehavior,
+        //         zombieInfo,
+        //         player,
+        //         character,
+        //         this);
         // zombieThread.start();
 
-        // zombieMoveThreads.add(zombieThread);
+        // this.zombieMoveThreads.add(zombieThread);
 
-        // } else {
-        // for (int i = 0; i < players.size(); i++) {
-        // ClientObj useClientObj = this.clientObjs.get(i);
-        // Player usePlayer = this.players.get(i);
+        if (!this.onMultiplayerMode) {
+            ZombieThreadControl zombieThread = new ZombieThreadControl(
+                    zombieCharacter,
+                    zombieBehavior,
+                    zombieInfo,
+                    player,
+                    character,
+                    this);
+            zombieThread.start();
 
-        // System.out.printf("Player: x=%d | y=%d", player.getDirectionX(),
-        // player.getDirectionY());
+            this.zombieMoveThreads.add(zombieThread);
+            this.content.add(zombieCharacter);
 
-        // CreateCharacter character = new CreateCharacter(usePlayer.getCharacterNo(),
-        // usePlayer.getInfectedStatus(), useClientObj);
-        // this.characters.add(character);
+        } else {
+            if (this.isHost) {
+                ZombieThreadControl zombieThread = new ZombieThreadControl(
+                        zombieCharacter,
+                        zombieBehavior,
+                        this.players,
+                        targetPlayer,
+                        this);
+                zombieThread.start();
 
-        // }
+                zombieMoveThreads.add(zombieThread);
 
-        // ZombieMovementThread zombieThread = new ZombieMovementThread(zombie,
-        // zombieBehavior, players, characters, this);
-        // zombieThread.start();
+                onZombieUpdate(zombieInfo);
 
-        // zombieMoveThreads.add(zombieThread);
+            }
 
-        // }
+        }
+
     }
 
-    public List<Zombie> getZombies() {
-        return this.zombies;
+    public List<Info> getZombiesInfo() {
+        return this.zombieInfos;
 
     }
 
@@ -700,7 +765,8 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     private void updateMousePosition() {
         mousePosition = player.getWeaponPoint();
-        character.updateWeaponAngle(player.getWeaponPoint());
+        character.updateWeaponAngle(mousePosition);
+        player.setWeaponPoint(mousePosition);
 
     }
 
@@ -714,40 +780,19 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
-    public CopyOnWriteArrayList<Bullet> getBullets() {
-        return this.bullets;
-
-    }
-
     @Override
     public void run() {
         System.out.println("*/*/*/*/ ! On Game Thread Start ! /*/*/*/*");
 
         while (this.player.getPlayerHealth() > 0) {
 
-            // ใช้ Thread A เพื่อควบคุมกระสุน
-            bulletThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    updateBullets();
+            updateBullets();
+            updateCharacterPosition();
 
-                }
+            if (this.ZOMBIE_REMAIN <= 0) {
+                updateGameState();
 
-            });
-
-            bulletThread.start();
-
-            // ใช้ Thread B เพื่อควบคุมการเดินของผู้เล่น
-            characterThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    updateCharacterPosition();
-
-                }
-
-            });
-
-            characterThread.start();
+            }
 
             revalidateContent();
 
@@ -766,27 +811,44 @@ public class GameContent extends JFrame implements KeyListener, GameContentProps
 
     }
 
-    // 0-0-0-0- Player Event Listener -0-0-0-0
-    public void addMovementListener(PlayerBehaviorListener listener) {
+    // 0-0-0-0-0-0-0-0- Game Event Listener -0-0-0-0-0-0-0-0
+
+    public void addMovementListener(GameContentListener listener) {
         playerListener.add(listener);
     }
 
-    public void removeMovementListener(PlayerBehaviorListener listener) {
+    public void removeMovementListener(GameContentListener listener) {
         playerListener.remove(listener);
     }
 
-    protected void onPlayerActions(Player actionPlayer) {
-        for (PlayerBehaviorListener listener : playerListener) {
+    public void onPlayerActions(Player actionPlayer) {
+        for (GameContentListener listener : playerListener) {
             listener.onPlayerAction(actionPlayer);
 
         }
     }
 
-    protected void onPlayerShootBullets(CopyOnWriteArrayList<Bullet> actionBullets) {
-        for (PlayerBehaviorListener listener : playerListener) {
+    public void onPlayerTakeDamages(List<ClientObj> refClientObj) {
+        for (GameContentListener listener : playerListener) {
+            listener.onPlayerTakeDamage(refClientObj);
+
+        }
+    }
+
+    public void onPlayerShootBullets(CopyOnWriteArrayList<Bullet> actionBullets) {
+        for (GameContentListener listener : playerListener) {
             listener.onShootBullet(actionBullets);
 
         }
 
+    }
+
+    public void onZombieUpdate(Info actionZombies) {
+        // System.out.println("On Zombie Update Work!");
+
+        for (GameContentListener listener : playerListener) {
+            listener.onZombieUpdate(actionZombies);
+
+        }
     }
 }

@@ -1,6 +1,10 @@
 package types;
 
-public class ZombieType {
+import java.io.Serializable;
+
+public class ZombieType implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     int speed;
     int damage;
     int health;

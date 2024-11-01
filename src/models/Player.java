@@ -2,6 +2,7 @@ package models;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.SwingUtilities;
@@ -14,6 +15,7 @@ public class Player implements Serializable {
 
     private boolean isMoveLeft = false;
     private boolean isInfected = false;
+    private boolean isDead = false;
 
     private State state;
     private int characterNo = 1;
@@ -34,7 +36,7 @@ public class Player implements Serializable {
     private volatile int rank = 0;
 
     // On Survive
-    private Timer onSurvive;
+    private transient Timer onSurvive;
     private volatile int sec = 0;
     private volatile int min = 0;
     private volatile int hour = 0;
@@ -85,17 +87,21 @@ public class Player implements Serializable {
         this.zombieHunt += number;
         this.storeZombieHunt += number;
 
+        this.health += (int) (damage * 0.4);
+
         if (storeZombieHunt >= ((5 * (rank + 1)) * 2)) {
             System.out.println("Is Rank Up!");
             this.rank++;
             // character.setCharacterRank(rank);
             
-            this.health = this.health + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
+            this.maxHealth = this.maxHealth + (int) ((int) (10 * (rank + 1)) * (state.getLevelState() * 0.2));
+            this.health = this.maxHealth;
+
             // character.setCharacterHp(this.health);
-            System.out.println("Current Health: " + this.health);
+            // System.out.println("Current Health: " + this.health);
 
             // ! อัพเดท Damage
-            this.damage += (5 * state.getLevelState()) + rank+1;
+            this.damage += 5;
             System.out.println("Current Damage: " + this.damage);
 
             storeZombieHunt = 0;
@@ -229,6 +235,11 @@ public class Player implements Serializable {
 
     public boolean getInfectedStatus() {
         return this.isInfected;
+
+    }
+
+    public boolean getIsAlive() {
+        return this.isDead;
 
     }
 

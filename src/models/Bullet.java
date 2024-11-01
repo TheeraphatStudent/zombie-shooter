@@ -19,12 +19,11 @@ interface BulletProps {
 
     void isOutOfBounds(int width, int height);
 
-    void setIsAlive(Boolean isActive);
+    void setIsBulletActive(Boolean isActive);
 
 }
 
 public class Bullet extends JPanel implements ManageBulletElement{
-    private static final long serialVersionUID = 1L;
     private String bulletId;
 
     private Player player;
@@ -89,7 +88,7 @@ public class Bullet extends JPanel implements ManageBulletElement{
     }
 
     // เมื่อผู้เล่นติดเชื้อ หรือ ตาย จะยิงไม่ได้
-    public void setIsAlive(Boolean isActive) {
+    public void setIsBulletActive(Boolean isActive) {
         this.isActive = isActive;
 
     }

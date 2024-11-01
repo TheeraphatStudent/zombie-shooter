@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.UUID;
 
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -47,6 +48,7 @@ interface CreateCharacterProps {
 
 public class CreateCharacter extends JPanel implements CreateCharacterProps, ManageCharacterElement {
     private static final long serialVersionUID = 1L;
+    private String initialId;
 
     private ClientObj client;
 
@@ -79,9 +81,13 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     private int characterProfile = 1;
 
+    // Zombie
+    private int useZombieProfile = 0;
+
     // [[[[[[[[[[[[[[[[[[[[ Player ]]]]]]]]]]]]]]]]]]]]
     public CreateCharacter(int characterProfile, boolean isInfected, ClientObj clientObj) {
         System.out.println("Character Name: " + clientObj.getClientName() + "\n");
+        this.initialId = clientObj.getId();
 
         // super();
         this.characterProfile = characterProfile;
@@ -195,10 +201,9 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     }
 
-    // :::::::::::::::::::: Zombie ::::::::::::::::::::
-    public CreateCharacter(GameContent gameContent) {
-        // super();
-
+    // ! :::::::::::::::::::: Zombie ::::::::::::::::::::
+    public CreateCharacter(GameContent gameContent, String id, int useThisProfile) {
+        this.initialId = id;
         this.gameContent = gameContent;
 
         // Zombie State -> false, false
@@ -209,7 +214,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
         setOpaque(false);
         setPreferredSize(new Dimension(CHARACTER_WIDTH, CHARACTER_HEIGHT));
 
-        int useCharacter = (int) (Math.random() * 10) + 1;
+        this.useZombieProfile = useThisProfile;
 
         // JTextPane zombieName = new UseText(14, CHARACTER_WIDTH, 40).createSimpleText(
         // "", Color.WHITE, null, Font.PLAIN);
@@ -217,7 +222,7 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
         // add(zombieName);
 
-        character = new CreateCharacterImage(useCharacter, false, this.isMoveLeft);
+        character = new CreateCharacterImage(this.useZombieProfile, false, this.isMoveLeft);
 
         // ! Character set content size
         character.setBounds(CHARACTER_CENTER_XY);
@@ -321,6 +326,10 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     public void setCharacterInfected(boolean isInfected) {
         this.isInfected = isInfected;
+        if (this.isInfected) {
+            this.hpBar.setColorBar(Color.ORANGE);
+
+        }
     }
 
     public void setCharacterHp(int hp) {
@@ -358,6 +367,16 @@ public class CreateCharacter extends JPanel implements CreateCharacterProps, Man
 
     public int getCharacterHp() {
         return this.hp;
+
+    }
+
+    public int getCharacterProfile() {
+        return this.useZombieProfile;
+
+    }
+
+    public String getInitialId() {
+        return this.initialId;
 
     }
 

@@ -197,6 +197,7 @@ public class Register extends JFrame implements KeyListener {
             new WindowClosingFrameEvent().navigateTo(this, gameCenter, false);
         } else {
             new UseAlert().warringAlert("Please enter display name!");
+
         }
     }
 }
