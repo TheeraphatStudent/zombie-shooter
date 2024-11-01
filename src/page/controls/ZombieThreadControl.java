@@ -7,13 +7,14 @@ import java.util.List;
 import javax.swing.Timer;
 
 import components.character.CreateCharacter;
+import components.character.ManageCharacterElement;
 import models.ClientObj;
 import models.Player;
 import models.Zombie.Behavior;
 import models.Zombie.Info;
 import utils.UseCharacter;
 
-public class ZombieThreadControl extends Thread {
+public class ZombieThreadControl extends Thread implements ManageCharacterElement {
     private GameContent content;
 
     private Behavior behavior;
@@ -24,6 +25,7 @@ public class ZombieThreadControl extends Thread {
 
     // On Multiplayer Mode
     private List<Player> players;
+    private Player target;
     private List<CreateCharacter> characters;
     private Info zombieInfo;
 
@@ -58,13 +60,13 @@ public class ZombieThreadControl extends Thread {
             CreateCharacter zombie,
             Behavior behavior,
             List<Player> players,
-            List<CreateCharacter> characters,
+            Player target,
             GameContent content) {
         this.zombie = zombie;
         this.behavior = behavior;
 
+        this.player = target;
         this.players = players;
-        this.characters = characters;
         this.content = content;
         this.isMultiplayer = true;
 
@@ -83,9 +85,9 @@ public class ZombieThreadControl extends Thread {
 
                 content.onZombieUpdate(zombieInfo);
 
-                biteTimer.start();
-
+                
                 if (!isBiting && checkIsPlayerInRange()) {
+                    biteTimer.start();
                     biteTimer.setDelay(1000);
                     isBiting = true;
 
@@ -115,6 +117,7 @@ public class ZombieThreadControl extends Thread {
         }
     }
 
+    // คำนวณผู้เล่นทั้งหมดที่อยู่ในระยะ
     private boolean isAnyPlayerInRange() {
         Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
 
@@ -146,7 +149,7 @@ public class ZombieThreadControl extends Thread {
 
     private void biteInAreaSinglePlayer() {
         if (isPlayerInRange(this.zombie, this.character)) {
-            System.out.println("On Zombie Damage: Single Mode");
+            // System.out.println("On Zombie Damage: Single Mode");
             player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
             character.setCharacterHp(player.getPlayerHealth());
 
@@ -159,31 +162,25 @@ public class ZombieThreadControl extends Thread {
     }
 
     private void biteInAreaMultiplayer() {
-
         Rectangle zombieHitbox = new UseCharacter().getCharacterHitbox(zombie);
-        List<ClientObj> updateClientObjects = new ArrayList<>();
 
         for (int i = 0; i < characters.size(); i++) {
-            CreateCharacter character = characters.get(i);
             Player player = players.get(i);
-
-            Rectangle playerHitbox = new UseCharacter().getCharacterHitbox(character);
-
-            if (zombieHitbox.intersects(playerHitbox)) {
-                System.out.println("On Zombie Damage: Multiplayer Mode");
-                player.setPlayerHealth(player.getPlayerHealth() - (int) behavior.getZombieDamage());
-                character.setCharacterHp(player.getPlayerHealth());
-
-                if (player.getPlayerHealth() <= 0) {
+            Rectangle hitbox = new Rectangle(player.getDirectionX(), player.getDirectionY(), CHARACTER_HIT_X, CHARACTER_HIT_Y);
+    
+            if (zombieHitbox.intersects(hitbox)) {
+                // System.out.println("On Zombie Damage: Multiplayer Mode");
+                int newHealth = player.getPlayerHealth() - (int) behavior.getZombieDamage();
+                player.setPlayerHealth(newHealth);
+                character.setCharacterHp(newHealth);
+    
+                if (newHealth <= 0) {
                     player.setInfectedPlayer(true);
-
                 }
+    
+                this.content.onPlayerActions(player);
             }
-
-            updateClientObjects.get(i).setPlayer(player);
         }
-
-        this.content.onPlayerTakeDamages(updateClientObjects);
     }
 
     public CreateCharacter getZombie() {

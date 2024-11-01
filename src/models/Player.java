@@ -2,6 +2,7 @@ package models;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.SwingUtilities;

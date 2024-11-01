@@ -24,7 +24,6 @@ interface BulletProps {
 }
 
 public class Bullet extends JPanel implements ManageBulletElement{
-    private static final long serialVersionUID = 1L;
     private String bulletId;
 
     private Player player;

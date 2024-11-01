@@ -8,8 +8,11 @@ import java.util.concurrent.Executors;
 
 import components.character.CreateCharacter;
 import components.character.ManageCharacterElement;
+import models.Player;
 import models.State;
+
 import page.controls.GameContent;
+
 import types.ZombieType;
 
 public class Behavior implements ManageCharacterElement {
@@ -17,6 +20,7 @@ public class Behavior implements ManageCharacterElement {
     private String id;
 
     private Info info;
+    private Player player;
     private CreateCharacter character;
     private CreateCharacter zombie;
     private GameContent gameContent;
@@ -32,6 +36,7 @@ public class Behavior implements ManageCharacterElement {
     private String type = "normal";
 
     public Behavior(
+            Player player,
             CreateCharacter character,
             CreateCharacter zombie,
             GameContent gameContent,
@@ -87,7 +92,8 @@ public class Behavior implements ManageCharacterElement {
             this.dx = playerX - zombieX;
             this.dy = playerY - zombieY;
 
-            // System.out.printf("Diagonal Player Position: dx=%f | dy=%f\n", this.dx, this.dy);
+            // System.out.printf("Diagonal Player Position: dx=%f | dy=%f\n", this.dx,
+            // this.dy);
 
             // หามุมที่ ผู้เล่นอยู่ เพื่อให้ zombie เดินไปหา ผู้เล่น
             double angle = Math.atan2(this.dy, this.dx);
@@ -104,6 +110,7 @@ public class Behavior implements ManageCharacterElement {
             // เปลี่ยน ตำแหน่งของ Zombie
             zombie.setLocation(this.movedX, this.movedY);
             info.setLocation(this.movedX, this.movedY);
+            this.gameContent.onZombieUpdate(info);
 
         });
     }

@@ -311,7 +311,7 @@ public class MultiplayerGameContent extends GameContent implements GameContentLi
                 super.content.remove(zombieCharacter);
 
                 super.zombiesCharacters.remove(zombieCharacter);
-                // zombieCharacter.setVisible(false);
+                zombieCharacter.setVisible(false);
                 zombieCharacter.removeAll();
 
                 this.updatedZombies.removeIf(zombie -> zombie.getId().equals(zombieInfo.getId()));
